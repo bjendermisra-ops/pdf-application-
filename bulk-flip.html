@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Bulk Flip Images Online — Mirror Multiple Photos Instantly</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s ease;
+        }
+        .upload-area.dragover {
+            border-color: #4f46e5;
+            background-color: #eef2ff;
+        }
+        .image-card {
+            transition: all 0.2s ease;
+            animation: fadeInUp 0.25s ease-out;
+        }
+        .image-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .gallery-container {
+            max-height: 600px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        .gallery-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .gallery-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .gallery-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+        }
+        .flip-animation {
+            transition: transform 0.2s ease;
+        }
+        .selection-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #4f46e5;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .flip-preview {
+            transition: transform 0.15s ease;
+        }
+        .active-flip-btn {
+            background-color: #4f46e5 !important;
+            color: white !important;
+            border-color: #4f46e5 !important;
+        }
+        .inactive-flip-btn {
+            background-color: #f3f4f6 !important;
+            color: #374151 !important;
+            border-color: #e5e7eb !important;
+        }
+        .inactive-flip-btn:hover {
+            background-color: #e5e7eb !important;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-slate-100 antialiased">
+
+    <!-- Breadcrumb -->
+    <div class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 md:py-4">
+            <div class="flex items-center gap-2 text-sm">
+                <a href="/" class="text-gray-600 hover:text-indigo-600 transition"><i class="fas fa-home"></i> Home</a>
+                <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                <span class="text-indigo-700 font-semibold">Bulk Flip Images</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
+        <!-- Header section -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center gap-2 bg-indigo-50 px-4 py-1.5 rounded-full text-indigo-700 text-sm font-medium mb-4">
+                <i class="fas fa-arrows-alt-h"></i> Batch mirroring
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-gray-800 to-indigo-700 bg-clip-text text-transparent mb-4">
+                Bulk Flip Images Online
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Mirror one photo or dozens at once — horizontally, vertically, or both. 
+                <span class="text-indigo-500 font-medium">Free, instant, and 100% private.</span> 
+                Your images never leave your device.
+                <i class="fas fa-shield-alt text-green-500 ml-1"></i>
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- LEFT PANEL: Upload & controls -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Dropzone -->
+                <div id="dropzone" class="upload-area rounded-2xl p-6 text-center bg-white transition-all cursor-pointer shadow-sm hover:shadow-md">
+                    <div class="flex flex-col items-center">
+                        <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-3">
+                            <i class="fas fa-images text-2xl text-indigo-500"></i>
+                        </div>
+                        <p id="uploadStatus" class="text-gray-800 font-semibold">Drop images here</p>
+                        <p class="text-gray-400 text-xs mt-1">JPEG, PNG, WEBP · No limit</p>
+                        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple class="hidden">
+                        <button id="selectImagesBtn" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-xl transition shadow-md flex items-center gap-2 text-sm">
+                            <i class="fas fa-folder-open"></i> Select images
+                        </button>
+                        <p class="text-xs text-gray-400 mt-3"><i class="fas fa-lock"></i> 100% local processing</p>
+                    </div>
+                </div>
+
+                <!-- Flip Controls -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-gray-800 flex items-center gap-2 mb-4">
+                        <i class="fas fa-arrows-alt-h text-indigo-500"></i> Flip settings
+                    </h3>
+                    
+                    <div class="grid grid-cols-3 gap-3 mb-5">
+                        <button id="flipHorizontalBtn" class="flip-type-btn bg-gray-100 text-gray-700 font-medium py-3 rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fas fa-arrows-alt-h"></i> H
+                        </button>
+                        <button id="flipVerticalBtn" class="flip-type-btn bg-gray-100 text-gray-700 font-medium py-3 rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fas fa-arrows-alt-v"></i> V
+                        </button>
+                        <button id="flipBothBtn" class="flip-type-btn bg-gray-100 text-gray-700 font-medium py-3 rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fas fa-sync-alt"></i> Both
+                        </button>
+                    </div>
+                    
+                    <div class="mb-5">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm text-gray-600">Preview effect:</label>
+                            <div id="previewIndicator" class="text-xs text-indigo-600 font-medium">No flip</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3 flex justify-center">
+                            <div id="flipPreviewIcon" class="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center text-4xl transition-all duration-200">
+                                <i class="fas fa-image text-gray-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Selection info -->
+                    <div class="bg-indigo-50 rounded-xl p-3 mb-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-indigo-800"><i class="fas fa-check-circle"></i> Selected:</span>
+                            <span id="selectedCount" class="font-bold text-indigo-900">0</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-sm text-indigo-800"><i class="fas fa-images"></i> Total images:</span>
+                            <span id="totalImagesCount" class="font-bold text-indigo-900">0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Action buttons -->
+                    <button id="applyFlipBtn" class="w-full btn-primary text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 mb-3">
+                        <i class="fas fa-magic"></i> Apply flip to selected
+                    </button>
+                    <button id="resetFlipBtn" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 mb-3">
+                        <i class="fas fa-undo-alt"></i> Reset selected to original
+                    </button>
+                    <button id="downloadAllBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fas fa-download"></i> Download all flipped images (ZIP)
+                    </button>
+                </div>
+                
+                <!-- Tips -->
+                <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                    <p class="text-xs font-semibold text-blue-800 flex items-center gap-1"><i class="fas fa-lightbulb"></i> Pro tip</p>
+                    <p class="text-xs text-blue-700 mt-1">Select individual images by clicking on them. Use "Apply flip to selected" to mirror chosen images. "Both" flips horizontally and vertically at the same time (180° rotation equivalent).</p>
+                </div>
+            </div>
+            
+            <!-- RIGHT PANEL: Gallery of images -->
+            <div class="lg:col-span-8">
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-th"></i> Image gallery
+                            <span id="galleryBadge" class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">0 images</span>
+                        </h3>
+                        <div class="flex gap-2">
+                            <button id="selectAllBtn" class="text-xs text-indigo-600 hover:text-indigo-700 font-medium">Select all</button>
+                            <span class="text-gray-300">|</span>
+                            <button id="deselectAllBtn" class="text-xs text-gray-500 hover:text-gray-700 font-medium">Deselect all</button>
+                        </div>
+                    </div>
+                    
+                    <div id="galleryContainer" class="gallery-container grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-1">
+                        <!-- Dynamic gallery items will appear here -->
+                        <div class="text-center text-gray-400 col-span-full py-12">
+                            <i class="fas fa-cloud-upload-alt text-4xl mb-2 block"></i>
+                            <p class="text-sm">No images uploaded yet</p>
+                            <p class="text-xs mt-1">Drop your images above or click "Select images"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center text-gray-400 text-xs mt-10 pb-4">
+            <i class="fas fa-arrows-alt-h"></i> All flips are applied locally — your original files remain untouched. Flipped images are processed in your browser.
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const selectImagesBtn = document.getElementById('selectImagesBtn');
+        const galleryContainer = document.getElementById('galleryContainer');
+        const totalImagesCountSpan = document.getElementById('totalImagesCount');
+        const selectedCountSpan = document.getElementById('selectedCount');
+        const galleryBadge = document.getElementById('galleryBadge');
+        const flipHorizontalBtn = document.getElementById('flipHorizontalBtn');
+        const flipVerticalBtn = document.getElementById('flipVerticalBtn');
+        const flipBothBtn = document.getElementById('flipBothBtn');
+        const applyFlipBtn = document.getElementById('applyFlipBtn');
+        const resetFlipBtn = document.getElementById('resetFlipBtn');
+        const downloadAllBtn = document.getElementById('downloadAllBtn');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const deselectAllBtn = document.getElementById('deselectAllBtn');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const previewIndicator = document.getElementById('previewIndicator');
+        const flipPreviewIcon = document.getElementById('flipPreviewIcon');
+
+        // Data structures
+        let images = []; // array of image objects
+        let nextId = 0;
+        let currentFlipType = 'horizontal'; // 'horizontal', 'vertical', 'both'
+        
+        // Update preview icon based on flip type
+        function updateFlipPreview() {
+            const icon = flipPreviewIcon.querySelector('i');
+            if (!icon) return;
+            
+            if (currentFlipType === 'horizontal') {
+                icon.style.transform = 'scaleX(-1)';
+                icon.style.display = 'inline-block';
+                previewIndicator.innerText = 'Horizontal flip ↹';
+            } else if (currentFlipType === 'vertical') {
+                icon.style.transform = 'scaleY(-1)';
+                icon.style.display = 'inline-block';
+                previewIndicator.innerText = 'Vertical flip ↕';
+            } else if (currentFlipType === 'both') {
+                icon.style.transform = 'scale(-1, -1)';
+                icon.style.display = 'inline-block';
+                previewIndicator.innerText = 'Both flips ⟲';
+            }
+        }
+        
+        // Reset preview
+        function resetPreview() {
+            const icon = flipPreviewIcon.querySelector('i');
+            if (icon) {
+                icon.style.transform = 'scale(1, 1)';
+                previewIndicator.innerText = 'No flip';
+            }
+        }
+        
+        // Flip type selection
+        flipHorizontalBtn.addEventListener('click', () => {
+            currentFlipType = 'horizontal';
+            updateFlipButtons();
+            updateFlipPreview();
+        });
+        flipVerticalBtn.addEventListener('click', () => {
+            currentFlipType = 'vertical';
+            updateFlipButtons();
+            updateFlipPreview();
+        });
+        flipBothBtn.addEventListener('click', () => {
+            currentFlipType = 'both';
+            updateFlipButtons();
+            updateFlipPreview();
+        });
+        
+        function updateFlipButtons() {
+            [flipHorizontalBtn, flipVerticalBtn, flipBothBtn].forEach(btn => {
+                btn.classList.remove('active-flip-btn', 'bg-indigo-600', 'text-white');
+                btn.classList.add('inactive-flip-btn');
+            });
+            
+            if (currentFlipType === 'horizontal') {
+                flipHorizontalBtn.classList.remove('inactive-flip-btn');
+                flipHorizontalBtn.classList.add('active-flip-btn', 'bg-indigo-600', 'text-white');
+            } else if (currentFlipType === 'vertical') {
+                flipVerticalBtn.classList.remove('inactive-flip-btn');
+                flipVerticalBtn.classList.add('active-flip-btn', 'bg-indigo-600', 'text-white');
+            } else if (currentFlipType === 'both') {
+                flipBothBtn.classList.remove('inactive-flip-btn');
+                flipBothBtn.classList.add('active-flip-btn', 'bg-indigo-600', 'text-white');
+            }
+        }
+        
+        // Apply flip to an image and get flipped blob
+        function applyFlipToImage(imgItem, flipType) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = imgItem.originalWidth;
+                canvas.height = imgItem.originalHeight;
+                const ctx = canvas.getContext('2d');
+                
+                ctx.save();
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                
+                if (flipType === 'horizontal') {
+                    ctx.scale(-1, 1);
+                } else if (flipType === 'vertical') {
+                    ctx.scale(1, -1);
+                } else if (flipType === 'both') {
+                    ctx.scale(-1, -1);
+                }
+                
+                ctx.drawImage(imgItem.originalImgElement, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+                ctx.restore();
+                
+                canvas.toBlob((blob) => {
+                    resolve(blob);
+                }, imgItem.originalMimeType || 'image/jpeg', 0.92);
+            });
+        }
+        
+        // Update image display with flipped version
+        async function updateImageFlip(imgItem, flipType) {
+            const blob = await applyFlipToImage(imgItem, flipType);
+            const url = URL.createObjectURL(blob);
+            
+            if (imgItem.currentDisplayUrl) {
+                URL.revokeObjectURL(imgItem.currentDisplayUrl);
+            }
+            
+            imgItem.currentFlipType = flipType;
+            imgItem.currentDisplayUrl = url;
+            imgItem.currentFlippedBlob = blob;
+            
+            const displayImg = imgItem.element.querySelector('.gallery-image');
+            if (displayImg) {
+                displayImg.src = url;
+            }
+            
+            // Update badge
+            const flipBadge = imgItem.element.querySelector('.flip-badge');
+            if (flipBadge) {
+                let flipText = '';
+                if (flipType === 'horizontal') flipText = '↹ H';
+                else if (flipType === 'vertical') flipText = '↕ V';
+                else if (flipType === 'both') flipText = '⟲ Both';
+                else flipText = 'Original';
+                flipBadge.innerText = flipText;
+            }
+        }
+        
+        // Apply flip to selected images
+        async function applyFlipToSelected() {
+            const selected = images.filter(img => img.checkbox && img.checkbox.checked);
+            if (selected.length === 0) {
+                alert('Please select at least one image to flip.');
+                return;
+            }
+            
+            for (const img of selected) {
+                await updateImageFlip(img, currentFlipType);
+            }
+            
+            updateCounts();
+        }
+        
+        // Reset selected images to original
+        async function resetSelectedToOriginal() {
+            const selected = images.filter(img => img.checkbox && img.checkbox.checked);
+            if (selected.length === 0) {
+                alert('Please select images to reset.');
+                return;
+            }
+            
+            for (const img of selected) {
+                const url = img.originalUrl;
+                if (img.currentDisplayUrl) {
+                    URL.revokeObjectURL(img.currentDisplayUrl);
+                }
+                img.currentFlipType = 'none';
+                img.currentDisplayUrl = url;
+                img.currentFlippedBlob = img.originalBlob;
+                
+                const displayImg = img.element.querySelector('.gallery-image');
+                if (displayImg) {
+                    displayImg.src = url;
+                }
+                
+                const flipBadge = img.element.querySelector('.flip-badge');
+                if (flipBadge) {
+                    flipBadge.innerText = 'Original';
+                }
+            }
+            
+            updateCounts();
+        }
+        
+        // Update counts
+        function updateCounts() {
+            const total = images.length;
+            const selected = images.filter(img => img.checkbox && img.checkbox.checked).length;
+            totalImagesCountSpan.innerText = total;
+            selectedCountSpan.innerText = selected;
+            galleryBadge.innerText = `${total} image${total !== 1 ? 's' : ''}`;
+            if (total === 0) {
+                uploadStatus.innerHTML = 'Drop images here';
+            } else {
+                uploadStatus.innerHTML = `${total} image${total !== 1 ? 's' : ''} loaded <i class="fas fa-check-circle text-green-500"></i>`;
+            }
+        }
+        
+        // Add new images to gallery
+        function addImages(files) {
+            const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+            if (validFiles.length === 0) {
+                alert('Please select valid image files (JPEG, PNG, WEBP).');
+                return;
+            }
+            
+            validFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const imageId = nextId++;
+                        const imageCard = document.createElement('div');
+                        imageCard.className = 'image-card relative bg-gray-50 rounded-xl p-2 border border-gray-200';
+                        imageCard.setAttribute('data-id', imageId);
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.className = 'absolute top-2 left-2 w-4 h-4 z-10 cursor-pointer rounded border-gray-300 text-indigo-600 focus:ring-indigo-500';
+                        checkbox.checked = true;
+                        
+                        const imgContainer = document.createElement('div');
+                        imgContainer.className = 'relative w-full pt-[100%] overflow-hidden rounded-lg bg-gray-100';
+                        
+                        const displayImg = document.createElement('img');
+                        displayImg.className = 'gallery-image absolute top-0 left-0 w-full h-full object-contain p-2';
+                        displayImg.src = e.target.result;
+                        
+                        imgContainer.appendChild(displayImg);
+                        
+                        const label = document.createElement('div');
+                        label.className = 'text-xs text-gray-600 truncate mt-2 text-center px-1';
+                        label.innerText = file.name.length > 25 ? file.name.slice(0, 22) + '...' : file.name;
+                        
+                        const flipBadge = document.createElement('div');
+                        flipBadge.className = 'flip-badge text-[10px] text-center mt-0.5 font-medium px-1 py-0.5 rounded-full bg-gray-200 text-gray-600 inline-block mx-auto';
+                        flipBadge.style.width = 'fit-content';
+                        flipBadge.innerText = 'Original';
+                        
+                        const badgeContainer = document.createElement('div');
+                        badgeContainer.className = 'flex justify-center mt-1';
+                        badgeContainer.appendChild(flipBadge);
+                        
+                        imageCard.appendChild(checkbox);
+                        imageCard.appendChild(imgContainer);
+                        imageCard.appendChild(label);
+                        imageCard.appendChild(badgeContainer);
+                        
+                        // Create blob from original
+                        const originalBlob = file;
+                        const originalUrl = e.target.result;
+                        
+                        const imgItem = {
+                            id: imageId,
+                            file: file,
+                            originalUrl: originalUrl,
+                            originalBlob: originalBlob,
+                            originalImgElement: img,
+                            originalWidth: img.width,
+                            originalHeight: img.height,
+                            originalMimeType: file.type,
+                            currentFlipType: 'none',
+                            currentDisplayUrl: originalUrl,
+                            currentFlippedBlob: originalBlob,
+                            element: imageCard,
+                            checkbox: checkbox,
+                            displayImg: displayImg
+                        };
+                        
+                        images.push(imgItem);
+                        
+                        // Add to gallery
+                        if (galleryContainer.querySelector('.col-span-full')) {
+                            galleryContainer.innerHTML = '';
+                        }
+                        galleryContainer.appendChild(imageCard);
+                        
+                        // Checkbox change
+                        checkbox.addEventListener('change', (e) => {
+                            e.stopPropagation();
+                            updateCounts();
+                        });
+                        
+                        // Click on card toggles checkbox
+                        imageCard.addEventListener('click', (e) => {
+                            if (e.target !== checkbox && !checkbox.contains(e.target)) {
+                                checkbox.checked = !checkbox.checked;
+                                updateCounts();
+                            }
+                        });
+                        
+                        updateCounts();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // Select all images
+        function selectAll() {
+            images.forEach(img => {
+                if (img.checkbox) img.checkbox.checked = true;
+            });
+            updateCounts();
+        }
+        
+        // Deselect all images
+        function deselectAll() {
+            images.forEach(img => {
+                if (img.checkbox) img.checkbox.checked = false;
+            });
+            updateCounts();
+        }
+        
+        selectAllBtn.addEventListener('click', selectAll);
+        deselectAllBtn.addEventListener('click', deselectAll);
+        applyFlipBtn.addEventListener('click', applyFlipToSelected);
+        resetFlipBtn.addEventListener('click', resetSelectedToOriginal);
+        
+        // Download all as ZIP
+        async function downloadAllAsZip() {
+            const flippedImages = images.filter(img => img.currentFlippedBlob && img.currentFlipType !== 'none');
+            const imagesToDownload = flippedImages.length > 0 ? flippedImages : images;
+            
+            if (imagesToDownload.length === 0) {
+                alert('No images to download. Please upload some images first.');
+                return;
+            }
+            
+            const originalBtnText = downloadAllBtn.innerHTML;
+            downloadAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating ZIP...';
+            downloadAllBtn.disabled = true;
+            
+            try {
+                if (typeof JSZip === 'undefined') {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+                    await new Promise((resolve, reject) => {
+                        script.onload = resolve;
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                }
+                
+                const JSZip = window.JSZip;
+                const zip = new JSZip();
+                
+                for (let img of imagesToDownload) {
+                    const blob = img.currentFlippedBlob || img.originalBlob;
+                    if (blob) {
+                        const originalName = img.file.name;
+                        const nameParts = originalName.split('.');
+                        const ext = nameParts.pop();
+                        const baseName = nameParts.join('.');
+                        let suffix = '';
+                        if (img.currentFlipType === 'horizontal') suffix = '_flipped_h';
+                        else if (img.currentFlipType === 'vertical') suffix = '_flipped_v';
+                        else if (img.currentFlipType === 'both') suffix = '_flipped_both';
+                        else suffix = '_original';
+                        const newName = `${baseName}${suffix}.${ext}`;
+                        zip.file(newName, blob);
+                    }
+                }
+                
+                const content = await zip.generateAsync({ type: 'blob' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = `flipped_images_${Date.now()}.zip`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+            } catch (err) {
+                console.error('ZIP error:', err);
+                alert('Failed to create ZIP. Please try again.');
+            } finally {
+                downloadAllBtn.innerHTML = originalBtnText;
+                downloadAllBtn.disabled = false;
+            }
+        }
+        
+        downloadAllBtn.addEventListener('click', downloadAllAsZip);
+        
+        // File selection handler
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files && files.length > 0) {
+                addImages(files);
+            }
+            fileInput.value = '';
+        }
+        
+        // Event listeners
+        fileInput.addEventListener('change', handleFileSelect);
+        selectImagesBtn.addEventListener('click', () => fileInput.click());
+        
+        // Drag & drop
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files && files.length > 0) {
+                addImages(files);
+            }
+        });
+        dropzone.addEventListener('click', (e) => {
+            if (e.target === selectImagesBtn || selectImagesBtn.contains(e.target)) return;
+            fileInput.click();
+        });
+        
+        // Initialize
+        updateFlipButtons();
+        updateFlipPreview();
+        resetPreview();
+        updateCounts();
+        
+        // Reset preview on mouse leave (optional)
+        const previewBox = document.getElementById('flipPreviewIcon');
+        previewBox.addEventListener('mouseleave', () => {
+            if (!flipHorizontalBtn.classList.contains('active-flip-btn') &&
+                !flipVerticalBtn.classList.contains('active-flip-btn') &&
+                !flipBothBtn.classList.contains('active-flip-btn')) {
+                resetPreview();
+            }
+        });
+    </script>
+</body>
+</html>

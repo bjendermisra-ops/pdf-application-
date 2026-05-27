@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Passport & Visa Photo Maker — Create Compliant Official Photos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s ease;
+        }
+        .upload-area.dragover {
+            border-color: #4f46e5;
+            background-color: #eef2ff;
+        }
+        .fade-in {
+            animation: fadeSlideUp 0.3s ease-out;
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .size-badge {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+        .rule-bullet {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .rule-bullet li::before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+            display: inline-block;
+            width: 1.2rem;
+        }
+        .btn-active-doc {
+            background-color: #4f46e5 !important;
+            color: white !important;
+        }
+        .btn-inactive-doc {
+            background-color: #f3f4f6 !important;
+            color: #374151 !important;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .crop-container {
+            background: #f1f5f9;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .cropper-view-box,
+        .cropper-face {
+            border-radius: 0;
+        }
+    </style>
+    <!-- Cropper.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-slate-100 antialiased">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="bg-white rounded-2xl p-8 text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <p id="loadingText" class="text-gray-700 font-medium">Processing photo...</p>
+            <p class="text-xs text-gray-400 mt-2">Please wait</p>
+        </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 md:py-4">
+            <div class="flex items-center gap-2 text-sm">
+                <a href="/" class="text-gray-600 hover:text-indigo-600 transition"><i class="fas fa-home"></i> Home</a>
+                <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                <span class="text-indigo-700 font-semibold">Passport & Visa Photo Maker</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
+        <!-- Header section -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center gap-2 bg-indigo-50 px-4 py-1.5 rounded-full text-indigo-700 text-sm font-medium mb-4">
+                <i class="fas fa-passport"></i> Official compliant
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-gray-800 to-indigo-700 bg-clip-text text-transparent mb-4">
+                Passport & Visa Photo Maker
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Create compliant, print-ready passport and visa photos instantly — 
+                <span class="text-indigo-500 font-medium">auto-crop, white background, official sizes.</span>
+                <i class="fas fa-shield-alt text-green-500 ml-1"></i>
+            </p>
+        </div>
+
+        <!-- Size Indicator (from URL) -->
+        <div id="sizeIndicator" class="hidden max-w-2xl mx-auto mb-8">
+            <div class="size-badge rounded-2xl p-4 text-center text-white shadow-lg">
+                <i class="fas fa-passport text-xl mr-2"></i>
+                <span id="sizeName" class="font-semibold">2x2 inch</span>
+                <span id="sizeDimensions" class="text-sm opacity-90 ml-2"></span>
+                <p class="text-xs opacity-80 mt-1">Official size preset applied automatically</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- LEFT PANEL: Upload & Crop Area -->
+            <div class="lg:col-span-7 space-y-6">
+                <!-- Dropzone -->
+                <div id="dropzone" class="upload-area rounded-2xl p-8 text-center bg-white transition-all cursor-pointer shadow-sm hover:shadow-md">
+                    <div class="flex flex-col items-center">
+                        <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-camera-retro text-3xl text-indigo-500"></i>
+                        </div>
+                        <p id="uploadStatus" class="text-gray-800 font-semibold text-lg">Upload your photo</p>
+                        <p class="text-gray-400 text-sm mt-1">JPEG, PNG · Max 15MB · Face must be clearly visible</p>
+                        <div class="flex flex-wrap gap-2 justify-center my-4">
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fas fa-id-card"></i> Passport (2x2 inch)</span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fas fa-globe"></i> Visa (2x2 inch)</span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fas fa-user"></i> ID photo</span>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/jpeg,image/png" class="hidden">
+                        <button id="selectImageBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-xl transition shadow-md flex items-center gap-2">
+                            <i class="fas fa-upload"></i> Select photo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cropper Container -->
+                <div id="cropperCard" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hidden fade-in">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-crop-alt text-indigo-500"></i> Crop Area
+                        </h3>
+                        <button id="resetCropBtn" class="text-gray-500 hover:text-indigo-600 text-sm transition"><i class="fas fa-undo-alt"></i> Reset crop</button>
+                    </div>
+                    <div class="crop-container" id="cropContainer">
+                        <img id="cropImage" src="#" alt="Crop preview" style="max-width: 100%; display: none;">
+                    </div>
+                </div>
+
+                <!-- Result Preview -->
+                <div id="resultCard" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hidden fade-in">
+                    <h3 class="font-bold text-gray-800 flex items-center gap-2 mb-3">
+                        <i class="fas fa-check-circle text-green-500"></i> Compliant Photo
+                    </h3>
+                    <div class="flex flex-col items-center">
+                        <img id="resultImage" src="#" alt="Passport photo" class="max-w-full max-h-[250px] object-contain rounded-lg shadow-md">
+                        <div id="resultMeta" class="mt-3 text-xs text-gray-500 text-center"></div>
+                        <div class="flex gap-3 mt-4">
+                            <button id="downloadJpgBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-5 rounded-xl transition shadow flex items-center gap-2">
+                                <i class="fas fa-download"></i> Download JPG
+                            </button>
+                            <button id="downloadPngBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-5 rounded-xl transition shadow flex items-center gap-2">
+                                <i class="fas fa-file-image"></i> Download PNG
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Controls -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm sticky top-24">
+                    <div class="flex items-center gap-2 border-b border-gray-100 pb-4 mb-5">
+                        <i class="fas fa-sliders-h text-indigo-500 text-xl"></i>
+                        <h2 class="text-xl font-bold text-gray-800">Photo specifications</h2>
+                    </div>
+
+                    <!-- Size Presets -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium text-sm mb-2">Official size presets</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button data-size="2x2" class="size-preset px-3 py-2 rounded-xl text-sm font-medium transition btn-inactive-doc">2x2 inch (US Passport)</button>
+                            <button data-size="35x45" class="size-preset px-3 py-2 rounded-xl text-sm font-medium transition btn-inactive-doc">35x45 mm (EU/UK)</button>
+                            <button data-size="35x35" class="size-preset px-3 py-2 rounded-xl text-sm font-medium transition btn-inactive-doc">35x35 mm (India)</button>
+                            <button data-size="51x51" class="size-preset px-3 py-2 rounded-xl text-sm font-medium transition btn-inactive-doc">51x51 mm (2x2 inch)</button>
+                        </div>
+                    </div>
+
+                    <!-- Dimensions Info -->
+                    <div class="mb-6 p-4 bg-gray-50 rounded-xl">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-xs text-gray-500">Output size</p>
+                                <p class="text-xl font-bold text-gray-800" id="targetSizeDisplay">600 × 600 px</p>
+                                <p class="text-xs text-gray-400" id="targetSizeText">2 × 2 inch (300 DPI)</p>
+                            </div>
+                            <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-ruler-combined text-indigo-600"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Background Color -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium text-sm mb-2">Background color</label>
+                        <div class="flex gap-3 items-center">
+                            <button id="bgWhite" class="bg-option w-10 h-10 rounded-full border-2 border-indigo-500 shadow" style="background: #ffffff;"></button>
+                            <button id="bgOffWhite" class="bg-option w-10 h-10 rounded-full border-2 border-gray-300" style="background: #f8fafc;"></button>
+                            <div class="flex items-center gap-2 ml-2">
+                                <label class="text-sm text-gray-600">Custom:</label>
+                                <input type="color" id="customBgColor" value="#FFFFFF" class="w-10 h-10 rounded border cursor-pointer">
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2">Official standard requires plain white/off-white background</p>
+                    </div>
+
+                    <!-- Face Scale Adjustment -->
+                    <div class="mb-6 pb-4 border-b border-gray-100">
+                        <div class="flex justify-between items-center">
+                            <label class="text-gray-700 font-medium text-sm">Face scale adjustment</label>
+                            <span id="zoomPercent" class="text-indigo-600 text-xs font-semibold">100%</span>
+                        </div>
+                        <input type="range" id="zoomSlider" min="0.7" max="1.5" step="0.01" value="1.0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2">
+                        <p class="text-[11px] text-gray-400 mt-2"><i class="fas fa-info-circle"></i> Adjust so head fills 50-70% of photo height</p>
+                    </div>
+
+                    <!-- Rotation Controls -->
+                    <div class="mb-7 flex justify-between items-center">
+                        <span class="text-gray-700 text-sm font-medium">Rotate / Straighten</span>
+                        <div class="flex gap-2">
+                            <button id="rotateLeftBtn" class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-xl text-sm transition"><i class="fas fa-undo-alt"></i> Left</button>
+                            <button id="rotateRightBtn" class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-xl text-sm transition"><i class="fas fa-redo-alt"></i> Right</button>
+                            <button id="resetRotateBtn" class="text-red-500 text-sm px-2 hover:bg-red-50 rounded-lg transition"><i class="fas fa-sync-alt"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button id="generateBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-base">
+                        <i class="fas fa-magic"></i> Generate compliant photo
+                    </button>
+
+                    <!-- Guidelines -->
+                    <div class="mt-6 p-4 bg-amber-50 rounded-xl border border-amber-100">
+                        <p class="text-xs font-bold text-amber-800 flex items-center gap-1"><i class="fas fa-clipboard-list"></i> Official requirements</p>
+                        <ul class="rule-bullet text-xs text-gray-600 mt-2 space-y-1">
+                            <li>Plain white or off-white background</li>
+                            <li>Neutral expression, mouth closed, eyes open</li>
+                            <li>No glasses with glare, no headwear (except religious)</li>
+                            <li>Full face front view, centered</li>
+                            <li>Head height between 50% - 70% of photo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center text-gray-400 text-xs mt-10 pb-4">
+            <i class="fas fa-laptop-code"></i> 100% client-side — your photo never leaves your device. Print at 300 DPI for physical use.
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const selectImageBtn = document.getElementById('selectImageBtn');
+        const cropperCard = document.getElementById('cropperCard');
+        const resultCard = document.getElementById('resultCard');
+        const cropImage = document.getElementById('cropImage');
+        const resultImage = document.getElementById('resultImage');
+        const resultMeta = document.getElementById('resultMeta');
+        const resetCropBtn = document.getElementById('resetCropBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadJpg = document.getElementById('downloadJpgBtn');
+        const downloadPng = document.getElementById('downloadPngBtn');
+        const zoomSlider = document.getElementById('zoomSlider');
+        const zoomPercent = document.getElementById('zoomPercent');
+        const rotateLeft = document.getElementById('rotateLeftBtn');
+        const rotateRight = document.getElementById('rotateRightBtn');
+        const resetRotate = document.getElementById('resetRotateBtn');
+        const bgWhite = document.getElementById('bgWhite');
+        const bgOffWhite = document.getElementById('bgOffWhite');
+        const customBgColor = document.getElementById('customBgColor');
+        const targetSizeDisplay = document.getElementById('targetSizeDisplay');
+        const targetSizeText = document.getElementById('targetSizeText');
+        const sizeIndicator = document.getElementById('sizeIndicator');
+        const sizeName = document.getElementById('sizeName');
+        const sizeDimensions = document.getElementById('sizeDimensions');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingText = document.getElementById('loadingText');
+
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        let urlSize = urlParams.get('size');
+        let urlCountry = urlParams.get('country');
+
+        // Size presets mapping
+        const sizePresets = {
+            '2x2': { name: '2x2 inch', width: 600, height: 600, unit: 'px', desc: 'US Passport / Visa (2×2 inch @ 300 DPI)' },
+            '35x45': { name: '35x45 mm', width: 413, height: 531, unit: 'px', desc: 'EU / UK Passport (35×45 mm)' },
+            '35x35': { name: '35x35 mm', width: 413, height: 413, unit: 'px', desc: 'India Passport (35×35 mm)' },
+            '51x51': { name: '51x51 mm', width: 600, height: 600, unit: 'px', desc: '2×2 inch (51×51 mm)' }
+        };
+
+        // Country-specific presets
+        const countryPresets = {
+            us: { name: 'US Passport', size: '2x2' },
+            uk: { name: 'UK Passport', size: '35x45' },
+            india: { name: 'India Passport', size: '35x35' },
+            schengen: { name: 'Schengen Visa', size: '35x45' }
+        };
+
+        // State
+        let cropper = null;
+        let currentImageFile = null;
+        let currentImageUrl = null;
+        let currentResultUrl = null; // Fix for broken preview URL
+        let currentBgColor = '#FFFFFF';
+        let currentZoom = 1.0;
+        let currentRotation = 0;
+        let currentSize = '2x2';
+        let currentWidth = 600;
+        let currentHeight = 600;
+        let currentResultBlob = null;
+
+        function showLoading(message) {
+            loadingText.innerText = message;
+            loadingOverlay.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+        }
+
+        // Apply size preset
+        function applySizePreset(sizeKey) {
+            const preset = sizePresets[sizeKey];
+            if (preset) {
+                currentSize = sizeKey;
+                currentWidth = preset.width;
+                currentHeight = preset.height;
+                targetSizeDisplay.innerText = `${preset.width} × ${preset.height} px`;
+                targetSizeText.innerText = preset.desc;
+                
+                // Update active button styling
+                document.querySelectorAll('.size-preset').forEach(btn => {
+                    btn.classList.remove('btn-active-doc');
+                    btn.classList.add('btn-inactive-doc');
+                });
+                const activeBtn = document.querySelector(`.size-preset[data-size="${sizeKey}"]`);
+                if (activeBtn) {
+                    activeBtn.classList.remove('btn-inactive-doc');
+                    activeBtn.classList.add('btn-active-doc');
+                }
+                
+                // Show indicator
+                sizeName.innerText = preset.name;
+                sizeDimensions.innerText = preset.desc;
+                sizeIndicator.classList.remove('hidden');
+                
+                if (cropper) {
+                    updateCropperAspectRatio();
+                }
+                if (currentImageFile) {
+                    generateCompliantPhoto();
+                }
+            }
+        }
+
+        // Update cropper aspect ratio
+        function updateCropperAspectRatio() {
+            if (cropper) {
+                const aspectRatio = currentWidth / currentHeight;
+                cropper.setAspectRatio(aspectRatio);
+            }
+        }
+
+        // Initialize cropper
+        function initCropper(imageUrl) {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            
+            cropImage.src = imageUrl;
+            cropImage.style.display = 'block';
+            
+            const aspectRatio = currentWidth / currentHeight;
+            cropper = new Cropper(cropImage, {
+                aspectRatio: aspectRatio,
+                viewMode: 1,
+                dragMode: 'move',
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                zoomable: true,
+                zoomOnWheel: true,
+                autoCropArea: 0.8,
+                background: true,
+                backgroundColor: '#f1f5f9'
+            });
+            
+            cropperCard.classList.remove('hidden');
+        }
+
+        // Generate compliant photo
+        async function generateCompliantPhoto() {
+            if (!cropper) return;
+            
+            showLoading('Generating compliant photo...');
+            
+            // Get cropped canvas
+            const croppedCanvas = cropper.getCroppedCanvas({
+                width: currentWidth,
+                height: currentHeight
+            });
+            
+            if (!croppedCanvas) {
+                hideLoading();
+                alert('Unable to crop. Please adjust the crop area.');
+                return;
+            }
+            
+            // Create final canvas with background
+            const canvas = document.createElement('canvas');
+            canvas.width = currentWidth;
+            canvas.height = currentHeight;
+            const ctx = canvas.getContext('2d');
+            
+            // Fill background
+            ctx.fillStyle = currentBgColor;
+            ctx.fillRect(0, 0, currentWidth, currentHeight);
+            
+            // Apply zoom and rotation to the cropped image
+            const centerX = currentWidth / 2;
+            const centerY = currentHeight / 2;
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate((currentRotation * Math.PI) / 180);
+            
+            const scaledWidth = croppedCanvas.width * currentZoom;
+            const scaledHeight = croppedCanvas.height * currentZoom;
+            ctx.drawImage(croppedCanvas, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight);
+            ctx.restore();
+            
+            // Generate blob
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    currentResultBlob = blob;
+                    
+                    // Fix Broken Image: Revoke old URL before creating new one
+                    if (currentResultUrl) {
+                        URL.revokeObjectURL(currentResultUrl);
+                    }
+
+                    currentResultUrl = URL.createObjectURL(blob);
+                    resultImage.src = currentResultUrl;
+                    const sizeKB = (blob.size / 1024).toFixed(1);
+                    resultMeta.innerHTML = `${sizeKB} KB • ${currentWidth}×${currentHeight} px • Compliant`;
+                    resultCard.classList.remove('hidden');
+                }
+                hideLoading();
+            }, 'image/jpeg', 0.95);
+        }
+
+        // Load image
+        function loadImage(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file.');
+                return;
+            }
+            if (file.size > 15 * 1024 * 1024) {
+                alert('File too large. Maximum size is 15MB.');
+                return;
+            }
+            
+            currentImageFile = file;
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                currentImageUrl = e.target.result;
+                initCropper(currentImageUrl);
+                uploadStatus.innerHTML = '✓ Photo loaded <i class="fas fa-check-circle text-green-500"></i>';
+                
+                // Reset transforms
+                currentZoom = 1.0;
+                currentRotation = 0;
+                zoomSlider.value = 1.0;
+                zoomPercent.innerText = '100%';
+                
+                setTimeout(() => {
+                    generateCompliantPhoto();
+                }, 100);
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        // Download functions
+        function downloadBlob(blob, filename) {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            // Allow time for download before cleaning up
+            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+        }
+
+        downloadJpg.addEventListener('click', () => {
+            if (currentResultBlob) {
+                downloadBlob(currentResultBlob, `passport_photo_${Date.now()}.jpg`);
+            } else {
+                alert('Please generate a photo first.');
+            }
+        });
+
+        downloadPng.addEventListener('click', () => {
+            if (!currentImageFile) {
+                alert('Please upload a photo first.');
+                return;
+            }
+            
+            showLoading('Generating PNG...');
+            
+            if (!cropper) {
+                hideLoading();
+                alert('Please wait for image to load.');
+                return;
+            }
+            
+            const croppedCanvas = cropper.getCroppedCanvas({
+                width: currentWidth,
+                height: currentHeight
+            });
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = currentWidth;
+            canvas.height = currentHeight;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = currentBgColor;
+            ctx.fillRect(0, 0, currentWidth, currentHeight);
+            
+            const centerX = currentWidth / 2;
+            const centerY = currentHeight / 2;
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate((currentRotation * Math.PI) / 180);
+            const scaledWidth = croppedCanvas.width * currentZoom;
+            const scaledHeight = croppedCanvas.height * currentZoom;
+            ctx.drawImage(croppedCanvas, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight);
+            ctx.restore();
+            
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    downloadBlob(blob, `passport_photo_${Date.now()}.png`);
+                }
+                hideLoading();
+            }, 'image/png');
+        });
+
+        // Event listeners for controls
+        zoomSlider.addEventListener('input', (e) => {
+            currentZoom = parseFloat(e.target.value);
+            zoomPercent.innerText = Math.round(currentZoom * 100) + '%';
+            generateCompliantPhoto();
+        });
+        
+        rotateLeft.addEventListener('click', () => {
+            currentRotation -= 5;
+            generateCompliantPhoto();
+        });
+        
+        rotateRight.addEventListener('click', () => {
+            currentRotation += 5;
+            generateCompliantPhoto();
+        });
+        
+        resetRotate.addEventListener('click', () => {
+            currentRotation = 0;
+            generateCompliantPhoto();
+        });
+        
+        resetCropBtn.addEventListener('click', () => {
+            if (cropper) {
+                cropper.reset();
+                setTimeout(() => cropper.crop(), 50);
+                generateCompliantPhoto();
+            }
+        });
+        
+        generateBtn.addEventListener('click', () => {
+            if (cropper) {
+                generateCompliantPhoto();
+            } else {
+                alert('Please upload a photo first.');
+                fileInput.click();
+            }
+        });
+
+        // Background color
+        function setBgColor(color) {
+            currentBgColor = color;
+            [bgWhite, bgOffWhite].forEach(btn => {
+                btn.classList.remove('border-indigo-500', 'border-2');
+                btn.classList.add('border-gray-300');
+            });
+            generateCompliantPhoto();
+        }
+        
+        bgWhite.addEventListener('click', () => {
+            setBgColor('#FFFFFF');
+            bgWhite.classList.add('border-indigo-500', 'border-2');
+            customBgColor.value = '#FFFFFF';
+        });
+        
+        bgOffWhite.addEventListener('click', () => {
+            setBgColor('#F8FAFC');
+            bgOffWhite.classList.add('border-indigo-500', 'border-2');
+            customBgColor.value = '#F8FAFC';
+        });
+        
+        customBgColor.addEventListener('input', (e) => {
+            setBgColor(e.target.value);
+            [bgWhite, bgOffWhite].forEach(btn => {
+                btn.classList.remove('border-indigo-500', 'border-2');
+                btn.classList.add('border-gray-300');
+            });
+        });
+        
+        bgWhite.classList.add('border-indigo-500', 'border-2');
+
+        // Size preset buttons
+        document.querySelectorAll('.size-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                applySizePreset(btn.dataset.size);
+            });
+        });
+
+        // File input handling
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                loadImage(e.target.files[0]);
+            }
+            fileInput.value = '';
+        });
+        
+        selectImageBtn.addEventListener('click', () => fileInput.click());
+        
+        // Drag and drop
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+        
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                loadImage(e.dataTransfer.files[0]);
+            }
+        });
+        
+        dropzone.addEventListener('click', (e) => {
+            if (e.target !== selectImageBtn && !selectImageBtn.contains(e.target)) {
+                fileInput.click();
+            }
+        });
+        
+        // Initialize with URL parameters
+        let initialSize = '2x2';
+        
+        if (urlCountry && countryPresets[urlCountry]) {
+            initialSize = countryPresets[urlCountry].size;
+        } else if (urlSize && sizePresets[urlSize]) {
+            initialSize = urlSize;
+        }
+        
+        applySizePreset(initialSize);
+        setBgColor('#FFFFFF');
+    </script>
+</body>
+</html>

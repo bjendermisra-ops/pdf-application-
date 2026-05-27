@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PNG to WEBP Converter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    .dropzone {
+      border: 2px dashed #cbd5e0;
+      transition: all 0.3s ease;
+    }
+
+    .dropzone.active {
+      border-color: #4299e1;
+      background-color: #ebf8ff;
+    }
+
+    .conversion-loader {
+      display: none;
+    }
+
+    .conversion-loader.active {
+      display: block;
+    }
+  </style>
+</head>
+
+
+<?php include 'includes/navbar.html'; ?>
+<nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+<div class="max-w-3xl mx-auto mt-12 mb-12">
+  <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-500 p-6 text-white">
+      <h1 class="text-2xl md:text-3xl font-bold">Convert PNG to WEBP</h1>
+      <p class="mt-1 opacity-90">
+        Convert PNG images to WEBP format online
+      </p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="p-6">
+      <!-- Upload Section -->
+      <div id="upload-section">
+        <div id="dropzone" class="dropzone rounded-lg p-8 text-center cursor-pointer mb-4">
+          <input type="file" id="file-input" accept="image/png" class="hidden" />
+          <div class="flex flex-col items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <p class="text-gray-600 mb-2 font-medium">
+              Drag & drop PNG files here
+            </p>
+            <p class="text-sm text-gray-500 mb-4">or</p>
+            <button id="browse-btn"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              Select PNG File
+            </button>
+          </div>
+        </div>
+
+        <div id="file-info" class="hidden">
+          <div class="flex items-center justify-between bg-gray-50 p-3 rounded-md mb-4">
+            <div class="flex items-center truncate">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2 flex-shrink-0" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span id="filename" class="font-medium text-gray-700 truncate"></span>
+            </div>
+            <button id="remove-file" class="text-red-500 hover:text-red-700 ml-2 flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Conversion Options -->
+          <div class="bg-gray-50 p-4 rounded-md mb-4">
+            <h3 class="font-medium text-gray-700 mb-3">
+              Conversion Options
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-gray-600 mb-1">Quality</label>
+                <input type="range" id="quality" min="0" max="100" value="80" class="w-full" />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>Low</span>
+                  <span id="quality-value">80%</span>
+                  <span>High</span>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm text-gray-600 mb-1">Output Size</label>
+                <select id="output-size"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="original">Original Size</option>
+                  <option value="1024">Max 1024px</option>
+                  <option value="800">Max 800px</option>
+                  <option value="640">Max 640px</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button id="convert-btn"
+            class="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+            Convert to WEBP
+          </button>
+        </div>
+      </div>
+
+      <!-- Conversion Loader -->
+      <div id="conversion-loader" class="conversion-loader text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mb-4">
+        </div>
+        <p class="text-gray-700 font-medium">Converting to WEBP...</p>
+      </div>
+
+      <!-- Result Section -->
+      <div id="result-section" class="hidden">
+        <div class="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <p class="text-green-700 font-medium">Conversion successful!</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Original Image -->
+          <div class="border border-gray-200 rounded-md overflow-hidden">
+            <div class="bg-gray-100 p-3 border-b border-gray-200">
+              <h3 class="font-medium text-gray-700">Original PNG</h3>
+              <p id="original-size" class="text-sm text-gray-500">-</p>
+            </div>
+            <div class="p-4 flex justify-center bg-gray-50">
+              <img id="original-image" src="#" alt="Original PNG" class="max-w-full max-h-64 object-contain" />
+            </div>
+          </div>
+
+          <!-- Converted Image -->
+          <div class="border border-gray-200 rounded-md overflow-hidden">
+            <div class="bg-gray-100 p-3 border-b border-gray-200">
+              <h3 class="font-medium text-gray-700">Converted WEBP</h3>
+              <p id="converted-size" class="text-sm text-gray-500">-</p>
+            </div>
+            <div class="p-4 flex justify-center bg-gray-50">
+              <img id="converted-image" src="#" alt="Converted WEBP" class="max-w-full max-h-64 object-contain" />
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-md p-4 flex flex-col sm:flex-row justify-between items-center">
+          <div class="mb-3 sm:mb-0">
+            <p class="text-sm text-gray-600">WEBP file ready to download</p>
+            <p id="converted-file-info" class="font-medium text-gray-800"></p>
+          </div>
+          <button id="download-btn"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 whitespace-nowrap">
+            Download WEBP
+          </button>
+        </div>
+
+        <button id="new-conversion"
+          class="mt-6 w-full py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
+          Convert Another Image
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<?php include 'includes/footer.html'; ?>
+<script>
+  // DOM Elements
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("file-input");
+  const browseBtn = document.getElementById("browse-btn");
+  const fileInfo = document.getElementById("file-info");
+  const filename = document.getElementById("filename");
+  const removeFileBtn = document.getElementById("remove-file");
+  const convertBtn = document.getElementById("convert-btn");
+  const qualitySlider = document.getElementById("quality");
+  const qualityValue = document.getElementById("quality-value");
+  const outputSize = document.getElementById("output-size");
+  const conversionLoader = document.getElementById("conversion-loader");
+  const resultSection = document.getElementById("result-section");
+  const originalImage = document.getElementById("original-image");
+  const convertedImage = document.getElementById("converted-image");
+  const originalSize = document.getElementById("original-size");
+  const convertedSize = document.getElementById("converted-size");
+  const convertedFileInfo = document.getElementById("converted-file-info");
+  const downloadBtn = document.getElementById("download-btn");
+  const newConversionBtn = document.getElementById("new-conversion");
+  const uploadSection = document.getElementById("upload-section");
+
+  // Variables
+  let currentFile = null;
+  let convertedBlob = null;
+
+  // Event Listeners
+  browseBtn.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", handleFileSelect);
+  removeFileBtn.addEventListener("click", resetFileInput);
+  qualitySlider.addEventListener("input", updateQualityValue);
+  convertBtn.addEventListener("click", convertToWebp);
+  downloadBtn.addEventListener("click", downloadWebp);
+  newConversionBtn.addEventListener("click", resetConverter);
+
+  // Drag and drop events
+  ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, preventDefaults, false);
+  });
+
+  ["dragenter", "dragover"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, highlight, false);
+  });
+
+  ["dragleave", "drop"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, unhighlight, false);
+  });
+
+  dropzone.addEventListener("drop", handleDrop, false);
+
+  // Functions
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  function highlight() {
+    dropzone.classList.add("active");
+  }
+
+  function unhighlight() {
+    dropzone.classList.remove("active");
+  }
+
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files.length) {
+      fileInput.files = files;
+      handleFileSelect({ target: fileInput });
+    }
+  }
+
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check if file is PNG
+    if (!file.type.match("image/png")) {
+      alert("Please select a PNG file");
+      return;
+    }
+
+    currentFile = file;
+
+    // Display file info
+    filename.textContent = file.name;
+    fileInfo.classList.remove("hidden");
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      originalImage.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function resetFileInput() {
+    fileInput.value = "";
+    fileInfo.classList.add("hidden");
+    currentFile = null;
+  }
+
+  function updateQualityValue() {
+    qualityValue.textContent = `${qualitySlider.value}%`;
+  }
+
+  function convertToWebp() {
+    if (!currentFile) return;
+
+    // Show loader
+    uploadSection.classList.add("hidden");
+    conversionLoader.classList.add("active");
+
+    // Simulate conversion delay (in a real app, this would be actual conversion)
+    setTimeout(() => {
+      // Create a canvas to "convert" the image
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        // Apply size constraints if selected
+        const maxSize = parseInt(outputSize.value);
+        if (maxSize && (width > maxSize || height > maxSize)) {
+          const ratio = Math.min(maxSize / width, maxSize / height);
+          width = Math.floor(width * ratio);
+          height = Math.floor(height * ratio);
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Get WEBP data (quality 0-1, so we divide by 100)
+        canvas.toBlob(
+          (blob) => {
+            convertedBlob = blob;
+
+            // Hide loader, show results
+            conversionLoader.classList.remove("active");
+            resultSection.classList.remove("hidden");
+
+            // Update result UI
+            originalSize.textContent = `${img.width} × ${img.height
+              } px • ${formatFileSize(currentFile.size)}`;
+            convertedSize.textContent = `${width} × ${height} px • ${formatFileSize(
+              blob.size
+            )}`;
+            convertedFileInfo.textContent = `${currentFile.name.replace(
+              ".png",
+              ""
+            )}.webp • ${formatFileSize(blob.size)}`;
+
+            // Show converted image
+            const url = URL.createObjectURL(blob);
+            convertedImage.src = url;
+          },
+          "image/webp",
+          qualitySlider.value / 100
+        );
+      };
+      img.src = URL.createObjectURL(currentFile);
+    }, 1000);
+  }
+
+  function downloadWebp() {
+    if (!convertedBlob) return;
+
+    const url = URL.createObjectURL(convertedBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = currentFile.name.replace(".png", "") + ".webp";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function resetConverter() {
+    resultSection.classList.add("hidden");
+    uploadSection.classList.remove("hidden");
+    fileInput.value = "";
+    fileInfo.classList.add("hidden");
+    currentFile = null;
+    convertedBlob = null;
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  }
+</script>
+</body>
+
+</html>

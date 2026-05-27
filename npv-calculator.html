@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NPV & IRR Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen py-12 px-4 font-[Inter]">
+
+     <!-- Back Button -->
+<div class="fixed top-6 left-6 z-50">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <a href="/"
+     class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white
+            rounded-full shadow-md w-fit
+            bg-gradient-to-r from-blue-600 to-blue-700
+            hover:from-blue-700 hover:to-indigo-800
+            hover:-translate-x-1 hover:shadow-lg
+            transition-all duration-300 ease-in-out">
+    <i class="fas fa-arrow-left text-sm"></i>
+    <span>Back to All Tools</span>
+  </a>
+</div>
+
+
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">NPV & IRR Calculator</h1>
+      <p class="text-gray-600">Evaluate investment profitability with real-time analysis</p>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Input Panel -->
+      <div class="lg:col-span-1 bg-white rounded-2xl shadow-xl p-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800">Project Inputs</h2>
+
+        <div class="space-y-5">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Initial Investment (₹)</label>
+            <input type="number" id="initialInvestment" value="1000000" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Discount Rate (%)</label>
+            <input type="range" id="discountRate" min="0" max="30" step="0.1" value="10" class="w-full h-2 bg-gray-200 rounded-lg cursor-pointer">
+            <div class="flex justify-between text-xs text-gray-600">
+              <span>0%</span>
+              <span id="rateValue" class="font-medium">10%</span>
+              <span>30%</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Project Name (Optional)</label>
+            <input type="text" id="projectName" placeholder="e.g., New Factory" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+          </div>
+        </div>
+
+        <hr class="my-6 border-gray-300">
+
+        <!-- Cash Flows -->
+        <div class="space-y-3">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-sm font-medium text-gray-700">Annual Cash Flows (₹)</h3>
+            <button id="addYear" class="text-xs text-indigo-600 hover:text-indigo-800">+ Add Year</button>
+          </div>
+          <div id="cashFlows"></div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="mt-6 space-y-2">
+          <button id="calculateBtn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition">
+            Calculate NPV & IRR
+          </button>
+          <button id="exportCsv" class="w-full bg-green-600 text-white font-medium py-2 rounded-lg hover:bg-green-700 transition">
+            Export to Excel (CSV)
+          </button>
+          <button id="printBtn" class="w-full bg-blue-600 text-white font-medium py-2 rounded-lg hover:bg-blue-700 transition">
+            Print Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Results Panel -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 bg-indigo-50 rounded-lg">
+            <p class="text-sm text-gray-600">Net Present Value</p>
+            <p id="npvResult" class="text-2xl font-bold text-indigo-600">₹0</p>
+            <p id="npvVerdict" class="text-xs mt-1">—</p>
+          </div>
+          <div class="p-4 bg-green-50 rounded-lg">
+            <p class="text-sm text-green-600">Internal Rate of Return</p>
+            <p id="irrResult" class="text-2xl font-bold text-green-600">0%</p>
+          </div>
+          <div class="p-4 bg-blue-50 rounded-lg">
+            <p class="text-sm text-blue-600">Payback Period</p>
+            <p id="paybackResult" class="text-2xl font-bold text-blue-600">—</p>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="bg-white rounded-2xl shadow-xl p-6">
+          <h3 class="text-lg font-semibold mb-4 text-gray-800">Cash Flow Analysis</h3>
+          <canvas id="npvChart"></canvas>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 overflow-x-auto">
+          <h3 class="text-lg font-semibold mb-4 text-gray-800">Detailed Cash Flows</h3>
+          <table class="w-full text-sm border-collapse">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="p-3 text-left">Year</th>
+                <th class="p-3 text-right">Cash Flow (₹)</th>
+                <th class="p-3 text-right">PV (₹)</th>
+                <th class="p-3 text-right">Cumulative (₹)</th>
+              </tr>
+            </thead>
+            <tbody id="cashFlowTable" class="text-gray-600"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <footer class="text-center mt-12 text-gray-500 text-sm">
+      NPV > 0 → Accept Project • IRR > Discount Rate → Profitable • Updated October 2025
+    </footer>
+  </div>
+
+  <script>
+    let cashFlows = [
+      { year: 1, amount: 300000 },
+      { year: 2, amount: 400000 },
+      { year: 3, amount: 500000 },
+      { year: 4, amount: 600000 }
+    ];
+    let npvChart;
+
+    const cashFlowsContainer = document.getElementById('cashFlows');
+    const addYearBtn = document.getElementById('addYear');
+    const calculateBtn = document.getElementById('calculateBtn');
+    const discountRateSlider = document.getElementById('discountRate');
+    const rateValue = document.getElementById('rateValue');
+    const npvResult = document.getElementById('npvResult');
+    const npvVerdict = document.getElementById('npvVerdict');
+    const irrResult = document.getElementById('irrResult');
+    const paybackResult = document.getElementById('paybackResult');
+    const cashFlowTable = document.getElementById('cashFlowTable');
+    const chartCtx = document.getElementById('npvChart');
+
+    function renderCashFlows() {
+      cashFlowsContainer.innerHTML = '';
+      cashFlows.forEach((cf, i) => {
+        const div = document.createElement('div');
+        div.className = 'flex gap-2 items-center';
+        div.innerHTML = `
+          <input type="number" value="${cf.amount}" data-index="${i}" class="cash-input w-full px-3 py-2 border rounded-lg" placeholder="Year ${cf.year}">
+          <button class="remove-year text-red-600 hover:text-red-800 text-xs" data-index="${i}">✕</button>
+        `;
+        cashFlowsContainer.appendChild(div);
+      });
+      saveToStorage();
+    }
+
+    addYearBtn.addEventListener('click', () => {
+      const nextYear = cashFlows.length ? cashFlows[cashFlows.length - 1].year + 1 : 1;
+      cashFlows.push({ year: nextYear, amount: 0 });
+      renderCashFlows();
+    });
+
+    cashFlowsContainer.addEventListener('click', (e) => {
+      if (e.target.classList.contains('remove-year')) {
+        const index = e.target.dataset.index;
+        cashFlows.splice(index, 1);
+        renderCashFlows();
+      }
+    });
+
+    cashFlowsContainer.addEventListener('input', (e) => {
+      if (e.target.classList.contains('cash-input')) {
+        const index = e.target.dataset.index;
+        cashFlows[index].amount = parseFloat(e.target.value) || 0;
+        saveToStorage();
+      }
+    });
+
+    discountRateSlider.addEventListener('input', () => {
+      rateValue.textContent = `${discountRateSlider.value}%`;
+    });
+
+    function saveToStorage() {
+      const project = {
+        name: document.getElementById('projectName').value,
+        initial: +document.getElementById('initialInvestment').value,
+        rate: +discountRateSlider.value,
+        cashFlows: cashFlows
+      };
+      localStorage.setItem('npvProject', JSON.stringify(project));
+    }
+
+    function loadFromStorage() {
+      const saved = localStorage.getItem('npvProject');
+      if (saved) {
+        const p = JSON.parse(saved);
+        document.getElementById('projectName').value = p.name || '';
+        document.getElementById('initialInvestment').value = p.initial;
+        discountRateSlider.value = p.rate;
+        rateValue.textContent = `${p.rate}%`;
+        cashFlows = p.cashFlows || cashFlows;
+      }
+      renderCashFlows();
+    }
+
+    loadFromStorage();
+
+    function calculateNPV() {
+      const initial = parseFloat(document.getElementById('initialInvestment').value) || 0;
+      const rate = parseFloat(discountRateSlider.value) / 100;
+      let npv = -initial;
+      let cumulative = -initial;
+      const pvList = [];
+      const cumList = [];
+      const labels = ['Year 0'];
+
+      cashFlowTable.innerHTML = `
+        <tr class="border-b">
+          <td class="p-3">0</td>
+          <td class="p-3 text-right">-₹${initial.toLocaleString()}</td>
+          <td class="p-3 text-right">-₹${initial.toLocaleString()}</td>
+          <td class="p-3 text-right font-medium">-₹${initial.toLocaleString()}</td>
+        </tr>`;
+
+      cashFlows.forEach((cf) => {
+        const pv = cf.amount / Math.pow(1 + rate, cf.year);
+        npv += pv;
+        cumulative += cf.amount;
+        pvList.push(pv);
+        cumList.push(cumulative);
+        labels.push(`Year ${cf.year}`);
+
+        cashFlowTable.innerHTML += `
+          <tr class="border-b">
+            <td class="p-3">${cf.year}</td>
+            <td class="p-3 text-right">₹${cf.amount.toLocaleString()}</td>
+            <td class="p-3 text-right">₹${pv.toFixed(0).toLocaleString()}</td>
+            <td class="p-3 text-right">${cumulative >= 0 ? '₹' : '-₹'}${Math.abs(cumulative).toLocaleString()}</td>
+          </tr>`;
+      });
+
+      npvResult.textContent = `${npv >= 0 ? '₹' : '-₹'}${Math.abs(npv).toFixed(0).toLocaleString()}`;
+      npvVerdict.textContent = npv > 0 ? 'Profitable' : npv < 0 ? 'Not Viable' : 'Break-even';
+      npvVerdict.className = `text-xs mt-1 ${npv > 0 ? 'text-green-600' : npv < 0 ? 'text-red-600' : 'text-gray-600'}`;
+
+      const irr = calculateIRR([-initial, ...cashFlows.map(cf => cf.amount)], 0.1);
+      irrResult.textContent = irr !== null ? `${(irr * 100).toFixed(2)}%` : 'N/A';
+
+      let payback = 0;
+      let remaining = initial;
+      for (let i = 0; i < cashFlows.length; i++) {
+        remaining -= cashFlows[i].amount;
+        if (remaining <= 0) {
+          payback = i + 1 - (remaining / cashFlows[i].amount);
+          break;
+        }
+      }
+      paybackResult.textContent = remaining > 0 ? '> Project Life' : `${payback.toFixed(1)} years`;
+
+      if (npvChart) npvChart.destroy();
+      npvChart = new Chart(chartCtx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            { label: 'Cash Flow', data: [-initial, ...cashFlows.map(cf => cf.amount)], backgroundColor: 'rgba(99, 102, 241, 0.6)' },
+            { label: 'Cumulative', data: [-initial, ...cumList], type: 'line', borderColor: 'rgb(34, 197, 94)', fill: true, tension: 0.3 }
+          ]
+        }
+      });
+
+      saveToStorage();
+    }
+
+    function calculateIRR(cashFlows, guess = 0.1) {
+      const maxIterations = 1000, precision = 0.00001;
+      let rate = guess;
+      for (let i = 0; i < maxIterations; i++) {
+        let npv = 0, derivative = 0;
+        cashFlows.forEach((cf, t) => {
+          npv += cf / Math.pow(1 + rate, t);
+          derivative -= t * cf / Math.pow(1 + rate, t + 1);
+        });
+        if (Math.abs(npv) < precision) return rate;
+        if (derivative === 0) return null;
+        rate -= npv / derivative;
+        if (rate < -1) return null;
+      }
+      return null;
+    }
+
+    calculateBtn.addEventListener('click', calculateNPV);
+
+    document.getElementById('exportCsv').addEventListener('click', () => {
+      let csv = 'Year,Cash Flow,Present Value,Cumulative\n';
+      const initial = document.getElementById('initialInvestment').value;
+      csv += `0,-${initial},-${initial},-${initial}\n`;
+      cashFlows.forEach(cf => {
+        const pv = cf.amount / Math.pow(1 + (discountRateSlider.value / 100), cf.year);
+        csv += `${cf.year},${cf.amount},${pv.toFixed(0)},\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'npv-report.csv'; a.click();
+    });
+
+    document.getElementById('printBtn').addEventListener('click', () => window.print());
+    ['initialInvestment', 'projectName'].forEach(id => document.getElementById(id).addEventListener('input', saveToStorage));
+    renderCashFlows();
+  </script>
+</body>
+</html>

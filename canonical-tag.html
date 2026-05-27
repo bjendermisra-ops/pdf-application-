@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Canonical Tag Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#1e40af',
+                        accent: '#10b981',
+                        warning: '#f59e0b',
+                        error: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .tab-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .code-output {
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            background-color: #1e293b;
+            color: #e2e8f0;
+        }
+        .url-status {
+            transition: all 0.3s ease;
+        }
+        .validation-check {
+            transition: all 0.3s ease;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .progress-bar {
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #10b981;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Advanced Canonical Tag Generator</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Generate canonical tags to prevent duplicate content issues and improve your SEO.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Input Section -->
+            <div class="space-y-8">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Canonical URL Configuration</h2>
+                        <div class="flex border-b border-gray-200 mb-4">
+                            <button class="tab-btn px-4 py-2 font-medium text-gray-600 hover:text-primary active" data-tab="basic">Basic</button>
+                            <button class="tab-btn px-4 py-2 font-medium text-gray-600 hover:text-primary" data-tab="advanced">Advanced</button>
+                            <button class="tab-btn px-4 py-2 font-medium text-gray-600 hover:text-primary" data-tab="analysis">URL Analysis</button>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <!-- Basic Tab -->
+                        <div id="basic-tab" class="tab-content active">
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Canonical URL
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">The preferred version of this page that search engines should index</span>
+                                    </span>
+                                </label>
+                                <input type="url" id="canonical-url" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="https://example.com/preferred-page" value="https://easysmartcalculator.com/">
+                                <div class="flex items-center mt-2">
+                                    <div id="url-status" class="url-status text-sm flex items-center">
+                                        <i class="fas fa-check-circle text-accent mr-1"></i>
+                                        <span class="text-accent">Valid URL format</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Current Page URL
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">The URL of the page where you'll add the canonical tag</span>
+                                    </span>
+                                </label>
+                                <input type="url" id="current-url" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="https://example.com/duplicate-page" value="https://easysmartcalculator.com/?utm_source=social">
+                                <div class="flex items-center mt-2">
+                                    <div id="current-url-status" class="url-status text-sm flex items-center">
+                                        <i class="fas fa-check-circle text-accent mr-1"></i>
+                                        <span class="text-accent">Valid URL format</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">URL Comparison</label>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm font-medium">URL Similarity</span>
+                                        <span id="similarity-percent" class="text-sm font-bold text-accent">85%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div id="similarity-bar" class="progress-fill" style="width: 85%"></div>
+                                    </div>
+                                    <div class="mt-3 text-sm text-gray-600">
+                                        <div id="url-differences" class="space-y-1">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-check text-accent mr-2"></i>
+                                                <span>Same domain</span>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <i class="fas fa-check text-accent mr-2"></i>
+                                                <span>Same path</span>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <i class="fas fa-times text-error mr-2"></i>
+                                                <span>Different query parameters</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Tab -->
+                        <div id="advanced-tab" class="tab-content">
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Implementation Method
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">How the canonical tag will be implemented on your site</span>
+                                    </span>
+                                </label>
+                                <select id="implementation-method" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="html">HTML Tag (Recommended)</option>
+                                    <option value="http-header">HTTP Header</option>
+                                    <option value="sitemap">Sitemap Indication</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Content Type
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">The type of content this canonical tag applies to</span>
+                                    </span>
+                                </label>
+                                <select id="content-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="webpage">Web Page</option>
+                                    <option value="article">Article/Blog Post</option>
+                                    <option value="product">Product Page</option>
+                                    <option value="category">Category Page</option>
+                                    <option value="homepage">Homepage</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    International Targeting
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">For sites with multiple language/region versions</span>
+                                    </span>
+                                </label>
+                                <select id="international-targeting" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="none">No International Targeting</option>
+                                    <option value="hreflang">Use hreflang Annotations</option>
+                                    <option value="ccTLD">Country-Specific Domain</option>
+                                    <option value="subdirectory">Language Subdirectory</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="self-referencing" class="rounded border-gray-300 text-primary focus:ring-primary" checked>
+                                    <span class="ml-2 text-sm text-gray-700">Self-referencing canonical</span>
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">Point to the same page (recommended for most cases)</span>
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="mobile-alternate" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm text-gray-700">Mobile alternate URL</span>
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">For separate mobile URLs (not recommended for responsive sites)</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Analysis Tab -->
+                        <div id="analysis-tab" class="tab-content">
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-800 mb-3">URL Structure Analysis</h3>
+                                <div class="bg-gray-50 p-4 rounded-lg space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium">Protocol:</span>
+                                        <span id="analysis-protocol" class="text-sm font-mono">https</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium">Domain:</span>
+                                        <span id="analysis-domain" class="text-sm font-mono">easysmartcalculator.com</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium">Path:</span>
+                                        <span id="analysis-path" class="text-sm font-mono">/</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium">Query Parameters:</span>
+                                        <span id="analysis-query" class="text-sm font-mono">None</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm font-medium">Fragment:</span>
+                                        <span id="analysis-fragment" class="text-sm font-mono">None</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-800 mb-3">Canonical Validation</h3>
+                                <div class="space-y-3">
+                                    <div class="validation-check flex items-center p-3 bg-green-50 border border-green-200 rounded-lg">
+                                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                        <div>
+                                            <div class="font-medium text-green-800">Absolute URL</div>
+                                            <div class="text-sm text-green-600">Your canonical URL uses absolute path (recommended)</div>
+                                        </div>
+                                    </div>
+                                    <div class="validation-check flex items-center p-3 bg-green-50 border border-green-200 rounded-lg">
+                                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                        <div>
+                                            <div class="font-medium text-green-800">HTTPS Protocol</div>
+                                            <div class="text-sm text-green-600">Secure protocol improves SEO and user trust</div>
+                                        </div>
+                                    </div>
+                                    <div class="validation-check flex items-center p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                        <i class="fas fa-exclamation-triangle text-yellow-500 mr-3"></i>
+                                        <div>
+                                            <div class="font-medium text-yellow-800">Query Parameters</div>
+                                            <div class="text-sm text-yellow-600">Consider if tracking parameters should be in canonical URL</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-800 mb-3">Common Canonical Scenarios</h3>
+                                <div class="space-y-2">
+                                    <button class="scenario-btn w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-url="https://easysmartcalculator.com/">
+                                        <div class="font-medium">Homepage</div>
+                                        <div class="text-sm text-gray-600">Clean homepage URL without parameters</div>
+                                    </button>
+                                    <button class="scenario-btn w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-url="https://easysmartcalculator.com/calculator/mortgage">
+                                        <div class="font-medium">Product/Service Page</div>
+                                        <div class="text-sm text-gray-600">Main product page without tracking parameters</div>
+                                    </button>
+                                    <button class="scenario-btn w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-url="https://easysmartcalculator.com/blog/seo-tips">
+                                        <div class="font-medium">Blog Post</div>
+                                        <div class="text-sm text-gray-600">Article URL without social media tracking</div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Best Practices -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800">Canonical Tag Best Practices</h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 rounded-full bg-accent flex items-center justify-center mt-0.5">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Use absolute URLs</p>
+                                    <p class="text-sm text-gray-600">Always use full URLs including https:// for canonical tags</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 rounded-full bg-accent flex items-center justify-center mt-0.5">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Point to crawlable pages</p>
+                                    <p class="text-sm text-gray-600">Ensure the canonical URL is accessible to search engines</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 rounded-full bg-accent flex items-center justify-center mt-0.5">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Consistent signals</p>
+                                    <p class="text-sm text-gray-600">Use the same canonical URL in sitemaps and internal links</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 rounded-full bg-warning flex items-center justify-center mt-0.5">
+                                    <i class="fas fa-exclamation text-white text-xs"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Avoid chains</p>
+                                    <p class="text-sm text-gray-600">Don't create canonical chains (A→B→C), point directly to the final URL</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="space-y-8">
+                <!-- Generated Code -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Generated Canonical Tag</h2>
+                        <p class="text-gray-600">Copy and paste this code into the &lt;head&gt; section of your webpage.</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="code-output p-4 rounded-lg overflow-x-auto">
+                            <pre id="canonical-output">&lt;link rel="canonical" href="https://easysmartcalculator.com/"&gt;</pre>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <button id="copy-btn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors flex items-center">
+                                <i class="fas fa-copy mr-2"></i> Copy to Clipboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Implementation Example -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Implementation Example</h2>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Here's how to implement the canonical tag in your HTML:</p>
+                        
+                        <div class="code-output p-4 rounded-lg mb-4">
+                            &lt;!DOCTYPE html&gt;<br>
+                            &lt;html lang="en"&gt;<br>
+                            &lt;head&gt;<br>
+                            &nbsp;&nbsp;&lt;meta charset="UTF-8"&gt;<br>
+                            &nbsp;&nbsp;&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;<br>
+                            &nbsp;&nbsp;&lt;title&gt;Your Page Title&lt;/title&gt;<br>
+                            &nbsp;&nbsp;<span class="text-accent" id="implementation-example">&lt;link rel="canonical" href="https://easysmartcalculator.com/"&gt;</span><br>
+                            &lt;/head&gt;<br>
+                            &lt;body&gt;<br>
+                            &nbsp;&nbsp;&lt;!-- Your website content --&gt;<br>
+                            &lt;/body&gt;<br>
+                            &lt;/html&gt;
+                        </div>
+                        
+                        <p class="text-gray-700">The canonical tag should be placed in the <code>&lt;head&gt;</code> section of your HTML document.</p>
+                    </div>
+                </div>
+
+                <!-- Additional Methods -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Alternative Implementation Methods</h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-medium text-gray-800 mb-2">HTTP Header</h3>
+                                <div class="code-output p-3 rounded-lg text-sm">
+                                    <pre>Link: &lt;https://easysmartcalculator.com/&gt;; rel="canonical"</pre>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1">For non-HTML content like PDFs</p>
+                            </div>
+                            <div>
+                                <h3 class="font-medium text-gray-800 mb-2">Sitemap Indication</h3>
+                                <div class="code-output p-3 rounded-lg text-sm">
+                                    <pre>&lt;url&gt;<br>  &lt;loc&gt;https://easysmartcalculator.com/&lt;/loc&gt;<br>  &lt;xhtml:link rel="canonical" href="https://easysmartcalculator.com/"&gt;<br>&lt;/url&gt;</pre>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1">Additional canonical indication in sitemap</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testing Tools -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Testing & Validation</h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-3">
+                            <a href="https://search.google.com/search-console" target="_blank" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-external-link-alt text-primary mr-3"></i>
+                                <div>
+                                    <div class="font-medium text-gray-800">Google Search Console</div>
+                                    <div class="text-sm text-gray-600">Monitor indexing and canonicalization</div>
+                                </div>
+                            </a>
+                            <a href="https://validator.w3.org/" target="_blank" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-external-link-alt text-primary mr-3"></i>
+                                <div>
+                                    <div class="font-medium text-gray-800">W3C Validator</div>
+                                    <div class="text-sm text-gray-600">Validate your HTML markup</div>
+                                </div>
+                            </a>
+                            <a href="https://technicalseo.com/tools/canonical/" target="_blank" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-external-link-alt text-primary mr-3"></i>
+                                <div>
+                                    <div class="font-medium text-gray-800">Canonical Checker</div>
+                                    <div class="text-sm text-gray-600">Test canonical tag implementation</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and tabs
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(tab => tab.classList.remove('active'));
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Show corresponding tab
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        // Form input listeners
+        const formInputs = document.querySelectorAll('input, select, textarea');
+        formInputs.forEach(input => {
+            input.addEventListener('input', updateOutput);
+            input.addEventListener('change', updateOutput);
+        });
+
+        // Scenario buttons
+        const scenarioButtons = document.querySelectorAll('.scenario-btn');
+        scenarioButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const url = button.getAttribute('data-url');
+                document.getElementById('canonical-url').value = url;
+                updateOutput();
+            });
+        });
+
+        // Copy to clipboard functionality
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const output = document.getElementById('canonical-output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                const copyBtn = document.getElementById('copy-btn');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Copied!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+
+        // Function to validate URL
+        function isValidURL(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Function to analyze URL
+        function analyzeURL(url) {
+            if (!isValidURL(url)) return null;
+            
+            const urlObj = new URL(url);
+            return {
+                protocol: urlObj.protocol.replace(':', ''),
+                domain: urlObj.hostname,
+                path: urlObj.pathname,
+                query: urlObj.search ? urlObj.searchParams.toString() : null,
+                fragment: urlObj.hash ? urlObj.hash : null
+            };
+        }
+
+        // Function to calculate URL similarity
+        function calculateSimilarity(url1, url2) {
+            if (!isValidURL(url1) || !isValidURL(url2)) return 0;
+            
+            const u1 = new URL(url1);
+            const u2 = new URL(url2);
+            
+            let score = 0;
+            let total = 0;
+            
+            // Domain (40% weight)
+            total += 40;
+            if (u1.hostname === u2.hostname) score += 40;
+            
+            // Path (40% weight)
+            total += 40;
+            if (u1.pathname === u2.pathname) score += 40;
+            
+            // Protocol (10% weight)
+            total += 10;
+            if (u1.protocol === u2.protocol) score += 10;
+            
+            // Query parameters (10% weight)
+            total += 10;
+            if (u1.search === u2.search) score += 10;
+            
+            return Math.round((score / total) * 100);
+        }
+
+        // Function to update output based on form inputs
+        function updateOutput() {
+            const canonicalUrl = document.getElementById('canonical-url').value;
+            const currentUrl = document.getElementById('current-url').value;
+            const selfReferencing = document.getElementById('self-referencing').checked;
+            
+            // Update URL validation status
+            const urlStatus = document.getElementById('url-status');
+            const currentUrlStatus = document.getElementById('current-url-status');
+            
+            if (isValidURL(canonicalUrl)) {
+                urlStatus.innerHTML = '<i class="fas fa-check-circle text-accent mr-1"></i><span class="text-accent">Valid URL format</span>';
+            } else if (canonicalUrl) {
+                urlStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-warning mr-1"></i><span class="text-warning">Invalid URL format</span>';
+            } else {
+                urlStatus.innerHTML = '<i class="fas fa-info-circle text-gray-400 mr-1"></i><span class="text-gray-500">Enter a URL</span>';
+            }
+            
+            if (isValidURL(currentUrl)) {
+                currentUrlStatus.innerHTML = '<i class="fas fa-check-circle text-accent mr-1"></i><span class="text-accent">Valid URL format</span>';
+            } else if (currentUrl) {
+                currentUrlStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-warning mr-1"></i><span class="text-warning">Invalid URL format</span>';
+            } else {
+                currentUrlStatus.innerHTML = '<i class="fas fa-info-circle text-gray-400 mr-1"></i><span class="text-gray-500">Enter a URL</span>';
+            }
+            
+            // Update URL analysis
+            const analysis = analyzeURL(canonicalUrl);
+            if (analysis) {
+                document.getElementById('analysis-protocol').textContent = analysis.protocol;
+                document.getElementById('analysis-domain').textContent = analysis.domain;
+                document.getElementById('analysis-path').textContent = analysis.path || '/';
+                document.getElementById('analysis-query').textContent = analysis.query || 'None';
+                document.getElementById('analysis-fragment').textContent = analysis.fragment || 'None';
+            }
+            
+            // Update similarity
+            const similarity = calculateSimilarity(canonicalUrl, currentUrl);
+            document.getElementById('similarity-percent').textContent = `${similarity}%`;
+            document.getElementById('similarity-bar').style.width = `${similarity}%`;
+            
+            // Update URL differences
+            const differences = document.getElementById('url-differences');
+            if (isValidURL(canonicalUrl) && isValidURL(currentUrl)) {
+                const u1 = new URL(canonicalUrl);
+                const u2 = new URL(currentUrl);
+                
+                differences.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-${u1.hostname === u2.hostname ? 'check text-accent' : 'times text-error'} mr-2"></i>
+                        <span>${u1.hostname === u2.hostname ? 'Same domain' : 'Different domain'}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-${u1.pathname === u2.pathname ? 'check text-accent' : 'times text-error'} mr-2"></i>
+                        <span>${u1.pathname === u2.pathname ? 'Same path' : 'Different path'}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-${u1.search === u2.search ? 'check text-accent' : 'times text-error'} mr-2"></i>
+                        <span>${u1.search === u2.search ? 'Same query parameters' : 'Different query parameters'}</span>
+                    </div>
+                `;
+            }
+            
+            // Generate canonical tag
+            let output = '';
+            if (canonicalUrl && isValidURL(canonicalUrl)) {
+                output = `<link rel="canonical" href="${canonicalUrl}">`;
+            }
+            
+            // Update outputs
+            document.getElementById('canonical-output').textContent = output;
+            document.getElementById('implementation-example').textContent = output;
+        }
+
+        // Initialize with default values
+        updateOutput();
+    </script>
+</body>
+</html>

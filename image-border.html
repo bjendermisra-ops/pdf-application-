@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Border Tool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+
+
+<?php include 'includes/navbar.html'; ?>
+<nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+<div class="max-w-4xl mx-auto bg-blue-50 rounded-xl shadow-md overflow-hidden p-6 mt-12 mb-12">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Image Border Tool</h1>
+
+  <div class="flex flex-col md:flex-row gap-8">
+    <!-- Image Preview Section -->
+    <div class="flex-1">
+      <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4">
+        <div id="imageContainer" class="relative overflow-hidden rounded-md">
+          <img id="previewImage" src="https://via.placeholder.com/500x300" alt="Preview" class="w-full h-auto" />
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Upload Image</label>
+        <input type="file" id="imageUpload" accept="image/*"
+          class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+      </div>
+    </div>
+
+    <!-- Controls Section -->
+    <div class="flex-1 space-y-6">
+      <!-- Border Width -->
+      <div>
+        <label for="borderWidth" class="block text-sm font-medium text-gray-700 mb-2">Border Width: <span
+            id="widthValue">5</span>px</label>
+        <input type="range" id="borderWidth" min="0" max="50" value="5"
+          class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+      </div>
+
+      <!-- Border Color -->
+      <div>
+        <label for="borderColor" class="block text-sm font-medium text-gray-700 mb-2">Border Color</label>
+        <input type="color" id="borderColor" value="#4f46e5" class="w-16 h-10 cursor-pointer" />
+      </div>
+
+      <!-- Border Style -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Border Style</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button data-style="solid"
+            class="border-style-btn border-2 border-solid px-3 py-2 rounded-md bg-gray-50 hover:bg-gray-100">
+            Solid
+          </button>
+          <button data-style="dashed"
+            class="border-style-btn border-2 border-dashed px-3 py-2 rounded-md bg-gray-50 hover:bg-gray-100">
+            Dashed
+          </button>
+          <button data-style="dotted"
+            class="border-style-btn border-2 border-dotted px-3 py-2 rounded-md bg-gray-50 hover:bg-gray-100">
+            Dotted
+          </button>
+          <button data-style="double"
+            class="border-style-btn border-2 border-double px-3 py-2 rounded-md bg-gray-50 hover:bg-gray-100">
+            Double
+          </button>
+          <button data-style="groove"
+            class="border-style-btn border-2 border-groove px-3 py-2 rounded-md bg-gray-50 hover:bg-gray-100">
+            Groove
+          </button>
+          <button data-style="ridge"
+            class="border-style-btn border-2 border-ridge px-3 py-2 rounded-md bg-gray-50 hover:bg-gray-100">
+            Ridge
+          </button>
+        </div>
+      </div>
+
+      <!-- Border Radius -->
+      <div>
+        <label for="borderRadius" class="block text-sm font-medium text-gray-700 mb-2">Corner Radius: <span
+            id="radiusValue">8</span>px</label>
+        <input type="range" id="borderRadius" min="0" max="100" value="8"
+          class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+      </div>
+
+      <!-- Download Button -->
+      <div class="pt-4">
+        <button id="downloadBtn"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition duration-150">
+          Download Image with Border
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<?php include 'includes/footer.html'; ?>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // DOM Elements
+    const imageUpload = document.getElementById("imageUpload");
+    const previewImage = document.getElementById("previewImage");
+    const imageContainer = document.getElementById("imageContainer");
+    const borderWidth = document.getElementById("borderWidth");
+    const widthValue = document.getElementById("widthValue");
+    const borderColor = document.getElementById("borderColor");
+    const borderRadius = document.getElementById("borderRadius");
+    const radiusValue = document.getElementById("radiusValue");
+    const borderStyleBtns = document.querySelectorAll(".border-style-btn");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    // Current settings
+    let currentSettings = {
+      width: 5,
+      color: "#4f46e5",
+      style: "solid",
+      radius: 8,
+    };
+
+    // Initialize
+    updateBorder();
+
+    // Event Listeners
+    imageUpload.addEventListener("change", handleImageUpload);
+    borderWidth.addEventListener("input", updateBorderWidth);
+    borderColor.addEventListener("input", updateBorderColor);
+    borderRadius.addEventListener("input", updateBorderRadius);
+    borderStyleBtns.forEach((btn) =>
+      btn.addEventListener("click", updateBorderStyle)
+    );
+    downloadBtn.addEventListener("click", downloadImage);
+
+    // Functions
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          previewImage.src = event.target.result;
+          // Reset container size to match new image
+          setTimeout(() => {
+            updateBorder();
+          }, 100);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function updateBorderWidth() {
+      currentSettings.width = borderWidth.value;
+      widthValue.textContent = currentSettings.width;
+      updateBorder();
+    }
+
+    function updateBorderColor() {
+      currentSettings.color = borderColor.value;
+      updateBorder();
+    }
+
+    function updateBorderRadius() {
+      currentSettings.radius = borderRadius.value;
+      radiusValue.textContent = currentSettings.radius;
+      updateBorder();
+    }
+
+    function updateBorderStyle(e) {
+      // Remove active class from all buttons
+      borderStyleBtns.forEach((btn) =>
+        btn.classList.remove("bg-indigo-100", "border-indigo-500")
+      );
+
+      // Add active class to clicked button
+      e.target.classList.add("bg-indigo-100", "border-indigo-500");
+
+      currentSettings.style = e.target.dataset.style;
+      updateBorder();
+    }
+
+    function updateBorder() {
+      // Apply border styles to the container
+      imageContainer.style.borderWidth = `${currentSettings.width}px`;
+      imageContainer.style.borderColor = currentSettings.color;
+      imageContainer.style.borderStyle = currentSettings.style;
+      imageContainer.style.borderRadius = `${currentSettings.radius}px`;
+
+      // Adjust padding to account for border width
+      imageContainer.style.padding = `${currentSettings.width}px`;
+    }
+
+    function downloadImage() {
+      // Create a canvas element
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      // Set canvas dimensions to include border
+      const img = previewImage;
+      const totalWidth = img.width + currentSettings.width * 2;
+      const totalHeight = img.height + currentSettings.width * 2;
+
+      canvas.width = totalWidth;
+      canvas.height = totalHeight;
+
+      // Draw border
+      ctx.fillStyle = currentSettings.color;
+      ctx.fillRect(0, 0, totalWidth, totalHeight);
+
+      // Draw image with border radius
+      if (currentSettings.radius > 0) {
+        ctx.beginPath();
+        ctx.moveTo(
+          currentSettings.width + currentSettings.radius,
+          currentSettings.width
+        );
+
+        // Top right corner
+        ctx.lineTo(
+          totalWidth - currentSettings.width - currentSettings.radius,
+          currentSettings.width
+        );
+        ctx.quadraticCurveTo(
+          totalWidth - currentSettings.width,
+          currentSettings.width,
+          totalWidth - currentSettings.width,
+          currentSettings.width + currentSettings.radius
+        );
+
+        // Bottom right corner
+        ctx.lineTo(
+          totalWidth - currentSettings.width,
+          totalHeight - currentSettings.width - currentSettings.radius
+        );
+        ctx.quadraticCurveTo(
+          totalWidth - currentSettings.width,
+          totalHeight - currentSettings.width,
+          totalWidth - currentSettings.width - currentSettings.radius,
+          totalHeight - currentSettings.width
+        );
+
+        // Bottom left corner
+        ctx.lineTo(
+          currentSettings.width + currentSettings.radius,
+          totalHeight - currentSettings.width
+        );
+        ctx.quadraticCurveTo(
+          currentSettings.width,
+          totalHeight - currentSettings.width,
+          currentSettings.width,
+          totalHeight - currentSettings.width - currentSettings.radius
+        );
+
+        // Top left corner
+        ctx.lineTo(
+          currentSettings.width,
+          currentSettings.width + currentSettings.radius
+        );
+        ctx.quadraticCurveTo(
+          currentSettings.width,
+          currentSettings.width,
+          currentSettings.width + currentSettings.radius,
+          currentSettings.width
+        );
+
+        ctx.closePath();
+        ctx.clip();
+      }
+
+      // Draw image
+      ctx.drawImage(
+        img,
+        currentSettings.width,
+        currentSettings.width,
+        img.width,
+        img.height
+      );
+
+      // Create download link
+      const link = document.createElement("a");
+      link.download = "image-with-border.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+  });
+</script>
+</body>
+
+</html>

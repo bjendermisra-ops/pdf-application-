@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Splitter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+
+  <body class="bg-gray-100 min-h-screen">
+    <?php include 'includes/navbar.html'; ?>
+    <nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="container mx-auto px-4 py-12">
+      <div
+        class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6"
+      >
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
+          Image Splitter
+        </h1>
+        <p class="text-center text-gray-600 mb-8">
+          Upload an image and split it into equal parts
+        </p>
+
+        <!-- Upload Section -->
+        <div class="mb-8">
+          <div
+            id="drop-area"
+            class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 transition"
+          >
+            <input type="file" id="fileInput" accept="image/*" class="hidden" />
+            <div class="flex flex-col items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-12 w-12 text-blue-500 mb-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
+              </svg>
+              <p class="text-lg font-medium text-gray-700">
+                Drag & drop image here
+              </p>
+              <p class="text-gray-500 mt-1">or click to browse files</p>
+              <p class="text-sm text-gray-400 mt-2">Supports JPG, PNG, WEBP</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div id="preview-section" class="hidden mb-8">
+          <h2 class="text-xl font-semibold text-gray-700 mb-3">
+            Original Image
+          </h2>
+          <div class="flex justify-center">
+            <img
+              id="original-image"
+              class="max-w-full max-h-96 rounded-lg border border-gray-200"
+              alt="Original image"
+            />
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+          <div>
+            <label
+              for="rows"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Number of Rows</label
+            >
+            <input
+              type="number"
+              id="rows"
+              min="1"
+              max="10"
+              value="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div>
+            <label
+              for="cols"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Number of Columns</label
+            >
+            <input
+              type="number"
+              id="cols"
+              min="1"
+              max="10"
+              value="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div class="sm:col-span-2">
+            <label
+              for="gap"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Gap Between Parts (px)</label
+            >
+            <input
+              type="number"
+              id="gap"
+              min="0"
+              max="50"
+              value="5"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+          <button
+            id="preview-btn"
+            class="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled
+          >
+            Preview Split
+          </button>
+          <button
+            id="download-all-btn"
+            class="px-6 py-3 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed hidden"
+          >
+            Download All Parts
+          </button>
+          <button
+            id="reset-btn"
+            class="px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 hidden"
+          >
+            Reset
+          </button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="hidden">
+          <h2 class="text-xl font-semibold text-gray-700 mb-3">
+            Split Results
+          </h2>
+          <div id="grid-preview" class="mb-6 bg-gray-100 p-4 rounded-lg"></div>
+
+          <div
+            id="individual-parts"
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6"
+          >
+            <!-- Individual parts will be inserted here -->
+          </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div
+          id="loading"
+          class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+        >
+          <div
+            class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center"
+          >
+            <div
+              class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"
+            ></div>
+            <p class="text-lg font-medium text-gray-800">Processing Image...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <?php include 'includes/footer.html'; ?>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Elements
+        const fileInput = document.getElementById("fileInput");
+        const dropArea = document.getElementById("drop-area");
+        const previewSection = document.getElementById("preview-section");
+        const originalImage = document.getElementById("original-image");
+        const previewBtn = document.getElementById("preview-btn");
+        const downloadAllBtn = document.getElementById("download-all-btn");
+        const resetBtn = document.getElementById("reset-btn");
+        const resultsSection = document.getElementById("results-section");
+        const gridPreview = document.getElementById("grid-preview");
+        const individualParts = document.getElementById("individual-parts");
+        const loading = document.getElementById("loading");
+
+        // Input controls
+        const rowsInput = document.getElementById("rows");
+        const colsInput = document.getElementById("cols");
+        const gapInput = document.getElementById("gap");
+
+        let originalImageFile = null;
+        let canvas = document.createElement("canvas");
+        let ctx = canvas.getContext("2d");
+        let imageParts = [];
+
+        // Set up drag and drop
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+          dropArea.addEventListener(eventName, preventDefaults, false);
+          document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        ["dragenter", "dragover"].forEach((eventName) => {
+          dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ["dragleave", "drop"].forEach((eventName) => {
+          dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+          dropArea.classList.add("border-blue-400", "bg-blue-50");
+        }
+
+        function unhighlight() {
+          dropArea.classList.remove("border-blue-400", "bg-blue-50");
+        }
+
+        dropArea.addEventListener("drop", handleDrop, false);
+        dropArea.addEventListener("click", () => fileInput.click());
+        fileInput.addEventListener("change", handleFileSelect);
+
+        // Handle file selection
+        function handleFileSelect(e) {
+          const files = e.target.files || e.dataTransfer.files;
+          if (files.length > 0) {
+            processImage(files[0]);
+          }
+        }
+
+        function handleDrop(e) {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          if (files.length > 0) {
+            processImage(files[0]);
+          }
+        }
+
+        // Process the selected image
+        function processImage(file) {
+          if (!file.type.match("image.*")) {
+            alert("Please select an image file.");
+            return;
+          }
+
+          originalImageFile = file;
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            originalImage.src = e.target.result;
+            originalImage.onload = function () {
+              previewSection.classList.remove("hidden");
+              previewBtn.disabled = false;
+              resultsSection.classList.add("hidden");
+              downloadAllBtn.classList.add("hidden");
+              resetBtn.classList.add("hidden");
+            };
+          };
+          reader.readAsDataURL(file);
+        }
+
+        // Preview button click handler
+        previewBtn.addEventListener("click", function () {
+          if (!originalImageFile) return;
+
+          loading.classList.remove("hidden");
+
+          // Use setTimeout to allow UI to update before heavy processing
+          setTimeout(() => {
+            splitImage();
+            loading.classList.add("hidden");
+          }, 100);
+        });
+
+        // Split the image into parts
+        function splitImage() {
+          const rows = parseInt(rowsInput.value);
+          const cols = parseInt(colsInput.value);
+          const gap = parseInt(gapInput.value);
+
+          // Clear previous results
+          gridPreview.innerHTML = "";
+          individualParts.innerHTML = "";
+          imageParts = [];
+
+          // Set up canvas
+          canvas.width = originalImage.naturalWidth;
+          canvas.height = originalImage.naturalHeight;
+          ctx.drawImage(originalImage, 0, 0);
+
+          // Calculate part dimensions
+          const partWidth = Math.floor(canvas.width / cols);
+          const partHeight = Math.floor(canvas.height / rows);
+
+          // Create grid preview
+          const previewCanvas = document.createElement("canvas");
+          const previewCtx = previewCanvas.getContext("2d");
+          previewCanvas.width = canvas.width;
+          previewCanvas.height = canvas.height;
+          previewCtx.drawImage(originalImage, 0, 0);
+
+          // Draw grid lines
+          previewCtx.strokeStyle = "#ff0000";
+          previewCtx.lineWidth = 2;
+
+          // Vertical lines
+          for (let c = 1; c < cols; c++) {
+            const x = c * partWidth;
+            previewCtx.beginPath();
+            previewCtx.moveTo(x, 0);
+            previewCtx.lineTo(x, canvas.height);
+            previewCtx.stroke();
+          }
+
+          // Horizontal lines
+          for (let r = 1; r < rows; r++) {
+            const y = r * partHeight;
+            previewCtx.beginPath();
+            previewCtx.moveTo(0, y);
+            previewCtx.lineTo(canvas.width, y);
+            previewCtx.stroke();
+          }
+
+          gridPreview.appendChild(previewCanvas);
+
+          // Create individual parts
+          for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+              const x = c * partWidth;
+              const y = r * partHeight;
+
+              // Create a canvas for each part
+              const partCanvas = document.createElement("canvas");
+              partCanvas.width = partWidth;
+              partCanvas.height = partHeight;
+              const partCtx = partCanvas.getContext("2d");
+
+              // Draw the part
+              partCtx.drawImage(
+                canvas,
+                x,
+                y,
+                partWidth,
+                partHeight, // Source rectangle
+                0,
+                0,
+                partWidth,
+                partHeight // Destination rectangle
+              );
+
+              // Create container for the part
+              const partContainer = document.createElement("div");
+              partContainer.className = "flex flex-col items-center";
+
+              // Add part number
+              const partNumber = document.createElement("div");
+              partNumber.className = "text-sm font-medium text-gray-700 mb-1";
+              partNumber.textContent = `Part ${r * cols + c + 1}`;
+
+              // Add image
+              const partImage = document.createElement("img");
+              partImage.src = partCanvas.toDataURL("image/jpeg");
+              partImage.className =
+                "w-full h-auto rounded border border-gray-200";
+
+              // Add download button
+              const downloadBtn = document.createElement("button");
+              downloadBtn.className =
+                "mt-2 px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600";
+              downloadBtn.textContent = "Download";
+              downloadBtn.onclick = function () {
+                downloadImage(partImage.src, `part-${r * cols + c + 1}.jpg`);
+              };
+
+              // Add to container
+              partContainer.appendChild(partNumber);
+              partContainer.appendChild(partImage);
+              partContainer.appendChild(downloadBtn);
+
+              // Add to results
+              individualParts.appendChild(partContainer);
+
+              // Save part data
+              imageParts.push({
+                canvas: partCanvas,
+                row: r,
+                col: c,
+              });
+            }
+          }
+
+          // Show results
+          resultsSection.classList.remove("hidden");
+          downloadAllBtn.classList.remove("hidden");
+          resetBtn.classList.remove("hidden");
+        }
+
+        // Download all parts as ZIP
+        downloadAllBtn.addEventListener("click", function () {
+          if (imageParts.length === 0) return;
+
+          loading.classList.remove("hidden");
+
+          // Create a new JSZip instance
+          const zip = new JSZip();
+          const imgFolder = zip.folder("image_parts");
+
+          // Add each image to the zip
+          imageParts.forEach((part, index) => {
+            const dataUrl = part.canvas.toDataURL("image/jpeg");
+            const base64Data = dataUrl.split(",")[1];
+            imgFolder.file(`part-${index + 1}.jpg`, base64Data, {
+              base64: true,
+            });
+          });
+
+          // Generate the zip file
+          zip.generateAsync({ type: "blob" }).then(function (content) {
+            saveAs(content, "image_parts.zip");
+            loading.classList.add("hidden");
+          });
+        });
+
+        // Reset button handler
+        resetBtn.addEventListener("click", function () {
+          previewSection.classList.add("hidden");
+          resultsSection.classList.add("hidden");
+          downloadAllBtn.classList.add("hidden");
+          resetBtn.classList.add("hidden");
+          previewBtn.disabled = true;
+          fileInput.value = "";
+          originalImageFile = null;
+        });
+
+        // Helper function to download an image
+        function downloadImage(dataUrl, filename) {
+          const link = document.createElement("a");
+          link.href = dataUrl;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      });
+    </script>
+  </body>
+</html>

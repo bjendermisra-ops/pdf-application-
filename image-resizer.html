@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Image Resizer — Resize Images Online Free | Pixel, Inch, CM, MM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s ease;
+        }
+        .upload-area.dragover {
+            border-color: #4f46e5;
+            background-color: #eef2ff;
+        }
+        .preview-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .fade-in {
+            animation: fadeSlideUp 0.3s ease-out;
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .quality-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            outline: none;
+        }
+        .quality-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(79,70,229,0.3);
+        }
+        .unit-btn-active {
+            background-color: #4f46e5 !important;
+            color: white !important;
+        }
+        .unit-btn-inactive {
+            background-color: #f3f4f6 !important;
+            color: #374151 !important;
+        }
+        .unit-btn-inactive:hover {
+            background-color: #e5e7eb !important;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-slate-100 antialiased">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="bg-white rounded-2xl p-8 text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <p id="loadingText" class="text-gray-700 font-medium">Processing image...</p>
+            <p class="text-xs text-gray-400 mt-2">Please wait</p>
+        </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 md:py-4">
+            <div class="flex items-center gap-2 text-sm">
+                <a href="/" class="text-gray-600 hover:text-indigo-600 transition"><i class="fas fa-home"></i> Home</a>
+                <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                <span class="text-indigo-700 font-semibold">Image Resizer</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
+        <!-- Header section -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center gap-2 bg-indigo-50 px-4 py-1.5 rounded-full text-indigo-700 text-sm font-medium mb-4">
+                <i class="fas fa-expand-alt"></i> Free & Private
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-gray-800 to-indigo-700 bg-clip-text text-transparent mb-4">
+                Image Resizer
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Resize photos with any unit (px, inch, cm, mm) — 
+                <span class="text-indigo-500 font-medium">free, instant, and 100% private.</span>
+                <i class="fas fa-shield-alt text-green-500 ml-1"></i>
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- LEFT PANEL: Upload & Preview -->
+            <div class="lg:col-span-7 space-y-6">
+                <!-- Dropzone -->
+                <div id="dropzone" class="upload-area rounded-2xl p-8 text-center bg-white transition-all cursor-pointer shadow-sm hover:shadow-md">
+                    <div class="flex flex-col items-center">
+                        <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-expand-alt text-3xl text-indigo-500"></i>
+                        </div>
+                        <p id="uploadStatus" class="text-gray-800 font-semibold text-lg">Upload your image</p>
+                        <p class="text-gray-400 text-sm mt-1">JPEG, PNG, WEBP · Max 20MB</p>
+                        <div class="flex flex-wrap gap-2 justify-center my-4">
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fas fa-camera"></i> JPEG</span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fas fa-file-image"></i> PNG</span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fab fa-chrome"></i> WEBP</span>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" class="hidden">
+                        <button id="selectImageBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-xl transition shadow-md flex items-center gap-2">
+                            <i class="fas fa-upload"></i> Select image
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Preview Section -->
+                <div id="previewCard" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hidden fade-in">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-image text-indigo-500"></i> Preview
+                        </h3>
+                        <button id="clearBtn" class="text-red-500 hover:text-red-700 text-sm font-medium transition bg-red-50 px-3 py-1.5 rounded-full">
+                            <i class="fas fa-trash-alt"></i> Clear
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="text-center">
+                            <p class="text-xs font-medium text-gray-500 mb-2">Original</p>
+                            <div class="bg-gray-50 rounded-xl p-3 flex justify-center items-center min-h-[200px]">
+                                <img id="originalImg" src="#" alt="Original" class="max-w-full max-h-[200px] object-contain rounded-lg">
+                            </div>
+                            <div id="originalMeta" class="mt-2 text-xs text-gray-500"></div>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-xs font-medium text-green-600 mb-2">Resized</p>
+                            <div class="bg-gray-50 rounded-xl p-3 flex justify-center items-center min-h-[200px]">
+                                <img id="resizedImg" src="#" alt="Resized" class="max-w-full max-h-[200px] object-contain rounded-lg">
+                            </div>
+                            <div id="resizedMeta" class="mt-2 text-xs text-green-600 font-medium"></div>
+                        </div>
+                    </div>
+                    <button id="downloadBtn" class="w-full mt-5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fas fa-download"></i> Download Resized Image
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Controls -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm sticky top-24">
+                    <div class="flex items-center gap-2 border-b border-gray-100 pb-4 mb-5">
+                        <i class="fas fa-sliders-h text-indigo-500 text-xl"></i>
+                        <h2 class="text-xl font-bold text-gray-800">Resize Settings</h2>
+                    </div>
+
+                    <!-- Unit Selection -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium text-sm mb-2">Unit</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button data-unit="px" class="unit-btn px-4 py-2 rounded-xl text-sm font-medium transition">PX</button>
+                            <button data-unit="inch" class="unit-btn px-4 py-2 rounded-xl text-sm font-medium transition">INCH</button>
+                            <button data-unit="cm" class="unit-btn px-4 py-2 rounded-xl text-sm font-medium transition">CM</button>
+                            <button data-unit="mm" class="unit-btn px-4 py-2 rounded-xl text-sm font-medium transition">MM</button>
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-2">* inch/cm/mm conversion based on 96 DPI</p>
+                    </div>
+
+                    <!-- Width & Height Inputs -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-gray-700 font-medium text-sm mb-1">Width</label>
+                            <div class="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 focus-within:ring-2 focus-within:ring-indigo-300">
+                                <input type="number" id="widthInput" placeholder="Width" class="w-full outline-none bg-transparent text-gray-800" step="any">
+                                <span id="widthUnitLabel" class="text-indigo-500 text-sm font-medium">px</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium text-sm mb-1">Height</label>
+                            <div class="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 focus-within:ring-2 focus-within:ring-indigo-300">
+                                <input type="number" id="heightInput" placeholder="Height" class="w-full outline-none bg-transparent text-gray-800" step="any">
+                                <span id="heightUnitLabel" class="text-indigo-500 text-sm font-medium">px</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aspect Ratio Lock -->
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="lockAspect" checked class="w-4 h-4 text-indigo-600 rounded">
+                            <label for="lockAspect" class="text-sm text-gray-700 cursor-pointer">Lock aspect ratio</label>
+                        </div>
+                        <button id="resetDimsBtn" class="text-xs text-indigo-500 hover:text-indigo-700">
+                            <i class="fas fa-undo-alt"></i> Reset to original
+                        </button>
+                    </div>
+
+                    <!-- Quality Option -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-gray-700 font-medium text-sm">JPEG Quality</label>
+                            <span id="qualityValue" class="text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-full text-sm">92%</span>
+                        </div>
+                        <input type="range" id="qualitySlider" class="quality-slider" min="30" max="100" value="92">
+                        <p class="text-[11px] text-gray-400 mt-1">Higher quality = larger file size</p>
+                    </div>
+
+                    <!-- Apply Button -->
+                    <button id="applyResizeBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-base">
+                        <i class="fas fa-magic"></i> Apply Resize
+                    </button>
+
+                    <!-- Template Presets -->
+                    <div class="mt-6 pt-4 border-t border-gray-100">
+                        <label class="block text-gray-700 font-medium text-sm mb-2">Quick presets</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button data-template="600x600" class="preset-btn bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-xs font-medium transition">600×600 px</button>
+                            <button data-template="1080x1080" class="preset-btn bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-xs font-medium transition">1080×1080 px</button>
+                            <button data-template="1920x1080" class="preset-btn bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-xs font-medium transition">1920×1080 px</button>
+                            <button data-template="2x2" class="preset-btn bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-xs font-medium transition">2×2 inch</button>
+                        </div>
+                    </div>
+
+                    <!-- Sample Images -->
+                    <div class="mt-6 pt-4 border-t border-gray-100">
+                        <p class="text-xs text-gray-500 mb-2"><i class="fas fa-flask"></i> Try with sample:</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="sampleNature" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition">Nature</button>
+                            <button id="sampleCity" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition">City</button>
+                            <button id="sampleFood" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition">Food</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center text-gray-400 text-xs mt-10 pb-4">
+            <i class="fas fa-laptop-code"></i> 100% client-side — your images never leave your device. All resizing happens locally in your browser.
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const selectImageBtn = document.getElementById('selectImageBtn');
+        const previewCard = document.getElementById('previewCard');
+        const originalImg = document.getElementById('originalImg');
+        const resizedImg = document.getElementById('resizedImg');
+        const originalMeta = document.getElementById('originalMeta');
+        const resizedMeta = document.getElementById('resizedMeta');
+        const widthInput = document.getElementById('widthInput');
+        const heightInput = document.getElementById('heightInput');
+        const widthUnitLabel = document.getElementById('widthUnitLabel');
+        const heightUnitLabel = document.getElementById('heightUnitLabel');
+        const lockAspect = document.getElementById('lockAspect');
+        const resetDimsBtn = document.getElementById('resetDimsBtn');
+        const applyResizeBtn = document.getElementById('applyResizeBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const qualitySlider = document.getElementById('qualitySlider');
+        const qualityValue = document.getElementById('qualityValue');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingText = document.getElementById('loadingText');
+
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        let urlUnit = urlParams.get('unit');
+        let urlWidth = urlParams.get('width');
+        let urlHeight = urlParams.get('height');
+
+        // State
+        let originalImage = null;
+        let originalFile = null;
+        let originalFileSize = 0;
+        let currentResizedBlob = null;
+        let currentUnit = 'px';
+        let originalWidth = 0;
+        let originalHeight = 0;
+        const DPI = 96;
+
+        function showLoading(message) {
+            loadingText.innerText = message;
+            loadingOverlay.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+        }
+
+        // Unit conversions
+        function toPixels(value, unit) {
+            if (unit === 'px') return parseFloat(value);
+            if (unit === 'inch') return parseFloat(value) * DPI;
+            if (unit === 'cm') return parseFloat(value) * (DPI / 2.54);
+            if (unit === 'mm') return parseFloat(value) * (DPI / 25.4);
+            return parseFloat(value);
+        }
+
+        function fromPixels(value, unit) {
+            if (unit === 'px') return value;
+            if (unit === 'inch') return value / DPI;
+            if (unit === 'cm') return value / (DPI / 2.54);
+            if (unit === 'mm') return value / (DPI / 25.4);
+            return value;
+        }
+
+        // Update unit labels
+        function updateUnitLabels() {
+            widthUnitLabel.innerText = currentUnit.toUpperCase();
+            heightUnitLabel.innerText = currentUnit.toUpperCase();
+        }
+
+        // Update unit buttons UI
+        function updateUnitButtons() {
+            document.querySelectorAll('.unit-btn').forEach(btn => {
+                btn.classList.remove('unit-btn-active');
+                btn.classList.add('unit-btn-inactive');
+            });
+            const activeBtn = document.querySelector(`.unit-btn[data-unit="${currentUnit}"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('unit-btn-inactive');
+                activeBtn.classList.add('unit-btn-active');
+            }
+        }
+
+        // Set unit from URL or default
+        function setUnit(unit) {
+            if (!originalImage) {
+                currentUnit = unit;
+                updateUnitLabels();
+                updateUnitButtons();
+                return;
+            }
+
+            const currentWidthPx = toPixels(widthInput.value, currentUnit);
+            const currentHeightPx = toPixels(heightInput.value, currentUnit);
+            currentUnit = unit;
+            updateUnitLabels();
+            updateUnitButtons();
+            
+            widthInput.value = Math.round(fromPixels(currentWidthPx, currentUnit) * 100) / 100;
+            heightInput.value = Math.round(fromPixels(currentHeightPx, currentUnit) * 100) / 100;
+        }
+
+        // Set dimensions from URL
+        function setDimensionsFromURL() {
+            if (urlWidth && urlHeight) {
+                widthInput.value = urlWidth;
+                heightInput.value = urlHeight;
+            }
+        }
+
+        // Sync dimensions with aspect ratio
+        let isUpdating = false;
+        function syncAspectRatio(changedField) {
+            if (!originalImage || !lockAspect.checked || isUpdating) return;
+            isUpdating = true;
+            
+            const ratio = originalWidth / originalHeight;
+            
+            if (changedField === 'width') {
+                let newWidthPx = toPixels(widthInput.value, currentUnit);
+                if (newWidthPx > 0) {
+                    let newHeightPx = newWidthPx / ratio;
+                    heightInput.value = Math.round(fromPixels(newHeightPx, currentUnit) * 100) / 100;
+                }
+            } else if (changedField === 'height') {
+                let newHeightPx = toPixels(heightInput.value, currentUnit);
+                if (newHeightPx > 0) {
+                    let newWidthPx = newHeightPx * ratio;
+                    widthInput.value = Math.round(fromPixels(newWidthPx, currentUnit) * 100) / 100;
+                }
+            }
+            
+            setTimeout(() => { isUpdating = false; }, 50);
+        }
+
+        widthInput.addEventListener('input', () => syncAspectRatio('width'));
+        heightInput.addEventListener('input', () => syncAspectRatio('height'));
+        lockAspect.addEventListener('change', () => {});
+
+        // Reset to original dimensions
+        resetDimsBtn.addEventListener('click', () => {
+            if (originalImage) {
+                widthInput.value = Math.round(fromPixels(originalWidth, currentUnit) * 100) / 100;
+                heightInput.value = Math.round(fromPixels(originalHeight, currentUnit) * 100) / 100;
+            }
+        });
+
+        // Apply resize
+        async function applyResize() {
+            if (!originalImage) {
+                alert('Please select an image first.');
+                return;
+            }
+            
+            showLoading('Resizing image...');
+            
+            let targetWidthPx = Math.round(toPixels(widthInput.value, currentUnit));
+            let targetHeightPx = Math.round(toPixels(heightInput.value, currentUnit));
+            
+            if (targetWidthPx < 1) targetWidthPx = 1;
+            if (targetHeightPx < 1) targetHeightPx = 1;
+            
+            const quality = parseInt(qualitySlider.value) / 100;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = targetWidthPx;
+            canvas.height = targetHeightPx;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, targetWidthPx, targetHeightPx);
+            ctx.drawImage(originalImage, 0, 0, targetWidthPx, targetHeightPx);
+            
+            const mimeType = originalFile.type === 'image/png' ? 'image/png' : 'image/jpeg';
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType, quality));
+            
+            currentResizedBlob = blob;
+            const url = URL.createObjectURL(blob);
+            resizedImg.src = url;
+            
+            const newSizeKB = (blob.size / 1024).toFixed(1);
+            const oldSizeKB = (originalFileSize / 1024).toFixed(1);
+            const savedPercent = ((originalFileSize - blob.size) / originalFileSize * 100).toFixed(0);
+            resizedMeta.innerHTML = `${newSizeKB} KB • ${targetWidthPx}×${targetHeightPx} px (${savedPercent}% saved)`;
+            
+            URL.revokeObjectURL(url);
+            hideLoading();
+        }
+
+        // Download resized image
+        function downloadImage() {
+            if (!currentResizedBlob) {
+                alert('Please resize an image first.');
+                return;
+            }
+            
+            const extension = originalFile.type === 'image/png' ? 'png' : 'jpg';
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(currentResizedBlob);
+            link.download = `resized_image.${extension}`;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+        }
+
+        // Load image from file
+        function loadImage(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file.');
+                return;
+            }
+            if (file.size > 20 * 1024 * 1024) {
+                alert('File too large. Maximum size is 20MB.');
+                return;
+            }
+            
+            originalFile = file;
+            originalFileSize = file.size;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    originalWidth = img.width;
+                    originalHeight = img.height;
+                    originalImg.src = e.target.result;
+                    originalMeta.innerHTML = `${(file.size / 1024).toFixed(1)} KB • ${img.width}×${img.height} px`;
+                    previewCard.classList.remove('hidden');
+                    uploadStatus.innerHTML = '✓ Image loaded <i class="fas fa-check-circle text-green-500"></i>';
+                    
+                    // Set dimensions based on current unit
+                    widthInput.value = Math.round(fromPixels(originalWidth, currentUnit) * 100) / 100;
+                    heightInput.value = Math.round(fromPixels(originalHeight, currentUnit) * 100) / 100;
+                    
+                    // Apply URL dimensions if present
+                    setDimensionsFromURL();
+                    
+                    // Auto-resize
+                    setTimeout(() => applyResize(), 100);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Preset templates
+        function applyTemplate(template) {
+            const templates = {
+                '600x600': { width: 600, height: 600, unit: 'px' },
+                '1080x1080': { width: 1080, height: 1080, unit: 'px' },
+                '1920x1080': { width: 1920, height: 1080, unit: 'px' },
+                '2x2': { width: 2, height: 2, unit: 'inch' }
+            };
+            
+            const preset = templates[template];
+            if (preset) {
+                if (preset.unit !== currentUnit) {
+                    setUnit(preset.unit);
+                }
+                widthInput.value = preset.width;
+                heightInput.value = preset.height;
+                if (originalImage) applyResize();
+            }
+        }
+
+        // Clear all
+        function clearAll() {
+            originalImage = null;
+            originalFile = null;
+            currentResizedBlob = null;
+            previewCard.classList.add('hidden');
+            fileInput.value = '';
+            uploadStatus.innerHTML = 'Upload your image';
+            originalImg.src = '';
+            resizedImg.src = '';
+        }
+
+        // Sample images
+        async function loadSampleImage(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
+                loadImage(file);
+            } catch (err) {
+                alert('Could not load sample image.');
+            }
+        }
+
+        // Event listeners
+        qualitySlider.addEventListener('input', (e) => {
+            qualityValue.innerText = e.target.value + '%';
+            if (originalImage) applyResize();
+        });
+
+        document.querySelectorAll('.unit-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setUnit(btn.dataset.unit);
+                if (originalImage) applyResize();
+            });
+        });
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                applyTemplate(btn.dataset.template);
+            });
+        });
+
+        applyResizeBtn.addEventListener('click', applyResize);
+        downloadBtn.addEventListener('click', downloadImage);
+        clearBtn.addEventListener('click', clearAll);
+        resetDimsBtn.addEventListener('click', () => {
+            if (originalImage) {
+                widthInput.value = Math.round(fromPixels(originalWidth, currentUnit) * 100) / 100;
+                heightInput.value = Math.round(fromPixels(originalHeight, currentUnit) * 100) / 100;
+                applyResize();
+            }
+        });
+
+        // Sample buttons
+        document.getElementById('sampleNature').addEventListener('click', () => loadSampleImage('https://picsum.photos/id/104/1200/800', 'nature.jpg'));
+        document.getElementById('sampleCity').addEventListener('click', () => loadSampleImage('https://picsum.photos/id/96/1200/800', 'city.jpg'));
+        document.getElementById('sampleFood').addEventListener('click', () => loadSampleImage('https://picsum.photos/id/30/1200/800', 'food.jpg'));
+
+        // File input handling
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                loadImage(e.target.files[0]);
+            }
+            fileInput.value = '';
+        });
+
+        selectImageBtn.addEventListener('click', () => fileInput.click());
+
+        // Drag and drop
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                loadImage(e.dataTransfer.files[0]);
+            }
+        });
+        dropzone.addEventListener('click', (e) => {
+            if (e.target !== selectImageBtn && !selectImageBtn.contains(e.target)) {
+                fileInput.click();
+            }
+        });
+
+        // Initialize with URL parameters
+        if (urlUnit && ['px', 'inch', 'cm', 'mm'].includes(urlUnit)) {
+            setUnit(urlUnit);
+        } else {
+            setUnit('px');
+        }
+        
+        setDimensionsFromURL();
+    </script>
+</body>
+</html>

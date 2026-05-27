@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inflation Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+
+  <body class="bg-gray-50 min-h-screen">
+    <nav>
+      <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 9999px;
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      }
+
+      .back-button i {
+        font-size: 1rem;
+      }
+
+      .back-button:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        transform: translateX(-0.25rem);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "finance-primary": "#4f46e5",
+              "finance-secondary": "#e0e7ff",
+              "finance-accent": "#10b981",
+              "finance-warning": "#f59e0b",
+            },
+          },
+        },
+      };
+    </script>
+    <div class="max-w-4xl mx-auto space-y-6 mt-10">
+      <!-- Header -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div
+          class="bg-gradient-to-r from-finance-primary to-indigo-600 p-6 text-white"
+        >
+          <h1 class="text-2xl font-bold">Inflation Calculator</h1>
+          <div class="flex items-center mt-4">
+            <input
+              type="checkbox"
+              id="modifyValues"
+              class="mr-2 rounded text-finance-primary focus:ring-finance-primary"
+            />
+            <label for="modifyValues" class="text-white opacity-90"
+              >Modify the values and click the Calculate button to use</label
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- CPI Calculator -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6 border-b">
+          <h2 class="text-xl font-bold text-gray-800 mb-2">
+            Inflation Calculator with U.S. CPI Data
+          </h2>
+          <p class="text-gray-600 mb-4">
+            Calculates the equivalent value of the U.S. dollar in any month from
+            1913 to 2025. Calculations are based on the average Consumer Price
+            Index (CPI) data for all urban consumers in the U.S.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-2 mb-4">
+            <div
+              class="flex items-center bg-finance-secondary rounded px-3 py-2"
+            >
+              <span class="font-medium mr-1">$</span>
+              <input
+                type="number"
+                id="cpiAmount"
+                class="w-20 bg-transparent focus:outline-none"
+                value="100"
+              />
+            </div>
+            <span class="text-gray-700">in</span>
+            <select id="cpiStartMonth" class="border rounded px-3 py-2">
+              <option value="0">Jan</option>
+              <option value="1">Feb</option>
+              <option value="2">Mar</option>
+              <option value="3">Apr</option>
+              <option value="4">May</option>
+              <option value="5">Jun</option>
+              <option value="6">Jul</option>
+              <option value="7">Aug</option>
+              <option value="8">Sep</option>
+              <option value="9">Oct</option>
+              <option value="10">Nov</option>
+              <option value="11">Dec</option>
+              <option value="12" selected>Average</option>
+            </select>
+            <select id="cpiStartYear" class="border rounded px-3 py-2">
+              <option value="2015" selected>2015</option>
+              <!-- More years would be added in a real implementation -->
+            </select>
+            <span class="text-gray-700">equals</span>
+            <div
+              class="flex items-center bg-finance-secondary rounded px-3 py-2"
+            >
+              <span class="font-medium mr-1">$</span>
+              <input
+                type="number"
+                id="cpiResult"
+                class="w-20 bg-transparent focus:outline-none"
+                readonly
+              />
+            </div>
+            <span class="text-gray-700">in</span>
+            <select id="cpiEndMonth" class="border rounded px-3 py-2">
+              <option value="4" selected>May</option>
+              <option value="0">Jan</option>
+              <option value="1">Feb</option>
+              <option value="2">Mar</option>
+              <option value="3">Apr</option>
+              <option value="5">Jun</option>
+              <option value="6">Jul</option>
+              <option value="7">Aug</option>
+              <option value="8">Sep</option>
+              <option value="9">Oct</option>
+              <option value="10">Nov</option>
+              <option value="11">Dec</option>
+              <option value="12">Average</option>
+            </select>
+            <select id="cpiEndYear" class="border rounded px-3 py-2">
+              <option value="2025" selected>2025</option>
+              <!-- More years would be added in a real implementation -->
+            </select>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              id="calculateCpi"
+              class="bg-finance-primary hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded shadow-md transition duration-200"
+            >
+              Calculate
+            </button>
+            <button
+              id="clearCpi"
+              class="border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-2 px-6 rounded shadow-sm transition duration-200"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- CPI Results -->
+        <div id="cpiResults" class="p-6 hidden">
+          <h2 class="text-xl font-bold text-gray-800 mb-4">Result</h2>
+
+          <div class="bg-finance-secondary rounded-lg p-4 mb-4">
+            <p class="text-lg font-medium">
+              <span id="resultAmount" class="text-finance-primary"
+                >$135.63</span
+              >
+              in <span id="resultEndDate">May 2025</span> equals
+              <span class="text-finance-primary">$100</span> of buying power in
+              <span id="resultStartDate">2015 (Average)</span>.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+              <p class="text-gray-700 mb-1">Total inflation rate</p>
+              <p class="text-2xl font-bold text-finance-warning">35.63%</p>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+              <p class="text-gray-700 mb-1">Average inflation rate per year</p>
+              <p class="text-2xl font-bold text-finance-accent">3.15%</p>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <p class="text-gray-700">
+              The CPI of <span id="cpiStartValue">2015 (Average)</span> is
+              <span class="font-medium">237.017</span> and the CPI of
+              <span id="cpiEndValue">May 2025</span> is
+              <span class="font-medium">321.465</span>.
+            </p>
+          </div>
+
+          <div class="border-t border-gray-200 pt-4">
+            <h3 class="font-bold text-gray-800 mb-3">
+              Purchasing power of $100 in 2015 (Average) over time: 2015
+              (Average)–May 2025
+            </h3>
+            <div class="flex justify-between text-sm text-gray-600 mb-2">
+              <span>Year</span>
+              <span>Value</span>
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span>2015</span>
+                <span class="font-medium">$100.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span>2020</span>
+                <span class="font-medium">$115.27</span>
+              </div>
+              <div class="flex justify-between">
+                <span>2025</span>
+                <span class="font-medium text-finance-primary">$135.63</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Forward Inflation Calculator -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6 border-b">
+          <h2 class="text-xl font-bold text-gray-800 mb-2">
+            Forward Flat Rate Inflation Calculator
+          </h2>
+          <p class="text-gray-600 mb-4">
+            Calculates an inflation based on a certain average inflation rate
+            after some years.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-2 mb-4">
+            <div
+              class="flex items-center bg-finance-secondary rounded px-3 py-2"
+            >
+              <span class="font-medium mr-1">$</span>
+              <input
+                type="number"
+                id="forwardAmount"
+                class="w-20 bg-transparent focus:outline-none"
+                value="100"
+              />
+            </div>
+            <span class="text-gray-700">with inflation rate</span>
+            <input
+              type="number"
+              id="forwardRate"
+              class="w-16 border rounded px-3 py-2"
+              value="3"
+            />
+            <span class="text-gray-700">% after</span>
+            <input
+              type="number"
+              id="forwardYears"
+              class="w-16 border rounded px-3 py-2"
+              value="10"
+            />
+            <span class="text-gray-700">years =</span>
+            <div
+              class="flex items-center bg-finance-secondary rounded px-3 py-2"
+            >
+              <span class="font-medium mr-1">$</span>
+              <input
+                type="number"
+                id="forwardResult"
+                class="w-20 bg-transparent focus:outline-none"
+                readonly
+              />
+            </div>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              id="calculateForward"
+              class="bg-finance-primary hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded shadow-md transition duration-200"
+            >
+              Calculate
+            </button>
+            <button
+              id="clearForward"
+              class="border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-2 px-6 rounded shadow-sm transition duration-200"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Forward Results -->
+        <div id="forwardResults" class="p-6 hidden">
+          <h2 class="text-xl font-bold text-gray-800 mb-4">Result</h2>
+
+          <div class="bg-finance-secondary rounded-lg p-4 mb-4">
+            <p class="text-lg font-medium">
+              <span class="text-finance-primary">$100</span> now equals
+              <span id="forwardResultAmount" class="text-finance-primary"
+                >$134.39</span
+              >
+              after <span id="forwardResultYears">10</span> years in purchasing
+              power with an average inflation rate of
+              <span id="forwardResultRate">3</span>%.
+            </p>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full border">
+              <tbody>
+                <tr class="border-b">
+                  <td class="px-4 py-2 font-medium">$100</td>
+                  <td class="px-4 py-2">with inflation rate</td>
+                  <td class="px-4 py-2 font-medium">3</td>
+                  <td class="px-4 py-2">%</td>
+                  <td class="px-4 py-2">after</td>
+                  <td class="px-4 py-2 font-medium">10</td>
+                  <td class="px-4 py-2">years</td>
+                  <td class="px-4 py-2">?</td>
+                </tr>
+                <tr>
+                  <td colspan="8" class="px-4 py-2">
+                    <button
+                      id="clearForwardResult"
+                      class="border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-1 px-4 rounded shadow-sm transition duration-200"
+                    >
+                      Clear
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Backward Inflation Calculator -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6 border-b">
+          <h2 class="text-xl font-bold text-gray-800 mb-2">
+            Backward Flat Rate Inflation Calculator
+          </h2>
+          <p class="text-gray-600 mb-4">
+            Calculates the equivalent purchasing power of an amount some years
+            ago based on a certain average inflation rate.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-2 mb-4">
+            <div
+              class="flex items-center bg-finance-secondary rounded px-3 py-2"
+            >
+              <span class="font-medium mr-1">$</span>
+              <input
+                type="number"
+                id="backwardAmount"
+                class="w-20 bg-transparent focus:outline-none"
+                value="100"
+              />
+            </div>
+            <span class="text-gray-700">with inflation rate</span>
+            <input
+              type="number"
+              id="backwardRate"
+              class="w-16 border rounded px-3 py-2"
+              value="3"
+            />
+            <span class="text-gray-700">% = ?</span>
+            <input
+              type="number"
+              id="backwardYears"
+              class="w-16 border rounded px-3 py-2"
+              value="10"
+            />
+            <span class="text-gray-700">years ago</span>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              id="calculateBackward"
+              class="bg-finance-primary hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded shadow-md transition duration-200"
+            >
+              Calculate
+            </button>
+            <button
+              id="clearBackward"
+              class="border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-2 px-6 rounded shadow-sm transition duration-200"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Backward Results -->
+        <div id="backwardResults" class="p-6 hidden">
+          <h2 class="text-xl font-bold text-gray-800 mb-4">Result</h2>
+
+          <div class="bg-finance-secondary rounded-lg p-4 mb-4">
+            <p class="text-lg font-medium">
+              <span class="text-finance-primary">$100</span> now equals
+              <span id="backwardResultAmount" class="text-finance-primary"
+                >$74.41</span
+              >
+              of purchasing power <span id="backwardResultYears">10</span> years
+              ago with an average inflation rate of
+              <span id="backwardResultRate">3</span>%.
+            </p>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full border">
+              <tbody>
+                <tr class="border-b">
+                  <td class="px-4 py-2 font-medium">$100</td>
+                  <td class="px-4 py-2">with inflation rate</td>
+                  <td class="px-4 py-2 font-medium">3</td>
+                  <td class="px-4 py-2">%</td>
+                  <td class="px-4 py-2">= ?</td>
+                  <td class="px-4 py-2 font-medium">10</td>
+                  <td class="px-4 py-2">years</td>
+                  <td class="px-4 py-2">ago</td>
+                </tr>
+                <tr>
+                  <td colspan="8" class="px-4 py-2">
+                    <button
+                      id="clearBackwardResult"
+                      class="border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-1 px-4 rounded shadow-sm transition duration-200"
+                    >
+                      Clear
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // CPI Calculator
+        const calculateCpiBtn = document.getElementById("calculateCpi");
+        const clearCpiBtn = document.getElementById("clearCpi");
+        const cpiResults = document.getElementById("cpiResults");
+
+        calculateCpiBtn.addEventListener("click", function () {
+          // In a real app, you would calculate these based on the input values
+          document.getElementById("cpiResult").value = "135.63";
+          document.getElementById("resultAmount").textContent = "$135.63";
+          document.getElementById("resultEndDate").textContent = "May 2025";
+          document.getElementById("resultStartDate").textContent =
+            "2015 (Average)";
+          document.getElementById("cpiStartValue").textContent =
+            "2015 (Average)";
+          document.getElementById("cpiEndValue").textContent = "May 2025";
+
+          cpiResults.classList.remove("hidden");
+          cpiResults.scrollIntoView({ behavior: "smooth" });
+        });
+
+        clearCpiBtn.addEventListener("click", function () {
+          document.getElementById("cpiAmount").value = "100";
+          document.getElementById("cpiStartMonth").value = "12";
+          document.getElementById("cpiStartYear").value = "2015";
+          document.getElementById("cpiResult").value = "";
+          document.getElementById("cpiEndMonth").value = "4";
+          document.getElementById("cpiEndYear").value = "2025";
+          cpiResults.classList.add("hidden");
+        });
+
+        // Forward Calculator
+        const calculateForwardBtn = document.getElementById("calculateForward");
+        const clearForwardBtn = document.getElementById("clearForward");
+        const forwardResults = document.getElementById("forwardResults");
+
+        calculateForwardBtn.addEventListener("click", function () {
+          // In a real app, you would calculate these based on the input values
+          document.getElementById("forwardResult").value = "134.39";
+          document.getElementById("forwardResultAmount").textContent =
+            "$134.39";
+          document.getElementById("forwardResultYears").textContent = "10";
+          document.getElementById("forwardResultRate").textContent = "3";
+
+          forwardResults.classList.remove("hidden");
+          forwardResults.scrollIntoView({ behavior: "smooth" });
+        });
+
+        clearForwardBtn.addEventListener("click", function () {
+          document.getElementById("forwardAmount").value = "100";
+          document.getElementById("forwardRate").value = "3";
+          document.getElementById("forwardYears").value = "10";
+          document.getElementById("forwardResult").value = "";
+          forwardResults.classList.add("hidden");
+        });
+
+        document
+          .getElementById("clearForwardResult")
+          .addEventListener("click", function () {
+            document.getElementById("forwardAmount").value = "100";
+            document.getElementById("forwardRate").value = "3";
+            document.getElementById("forwardYears").value = "10";
+            document.getElementById("forwardResult").value = "";
+            forwardResults.classList.add("hidden");
+          });
+
+        // Backward Calculator
+        const calculateBackwardBtn =
+          document.getElementById("calculateBackward");
+        const clearBackwardBtn = document.getElementById("clearBackward");
+        const backwardResults = document.getElementById("backwardResults");
+
+        calculateBackwardBtn.addEventListener("click", function () {
+          // In a real app, you would calculate these based on the input values
+          document.getElementById("backwardResultAmount").textContent =
+            "$74.41";
+          document.getElementById("backwardResultYears").textContent = "10";
+          document.getElementById("backwardResultRate").textContent = "3";
+
+          backwardResults.classList.remove("hidden");
+          backwardResults.scrollIntoView({ behavior: "smooth" });
+        });
+
+        clearBackwardBtn.addEventListener("click", function () {
+          document.getElementById("backwardAmount").value = "100";
+          document.getElementById("backwardRate").value = "3";
+          document.getElementById("backwardYears").value = "10";
+          backwardResults.classList.add("hidden");
+        });
+
+        document
+          .getElementById("clearBackwardResult")
+          .addEventListener("click", function () {
+            document.getElementById("backwardAmount").value = "100";
+            document.getElementById("backwardRate").value = "3";
+            document.getElementById("backwardYears").value = "10";
+            backwardResults.classList.add("hidden");
+          });
+      });
+    </script>
+  </body>
+</html>

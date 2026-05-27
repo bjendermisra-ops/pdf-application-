@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Net Worth Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3B82F6",
+              secondary: "#10B981",
+              accent: "#6366F1",
+              dark: "#1F2937",
+              light: "#F9FAFB",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .category-card {
+        transition: all 0.3s ease;
+      }
+      .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      }
+      .summary-card {
+        border-left: 4px solid;
+      }
+      .asset-card {
+        border-left-color: #10b981;
+      }
+      .liability-card {
+        border-left-color: #ef4444;
+      }
+      .net-worth-card {
+        border-left-color: #6366f1;
+      }
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <nav>
+      <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 9999px;
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      }
+
+      .back-button i {
+        font-size: 1rem;
+      }
+
+      .back-button:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        transform: translateX(-0.25rem);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+      <!-- Header -->
+      <header class="text-center mb-12">
+        <h1 class="text-3xl md:text-4xl font-bold text-primary mb-3">
+          Net Worth Calculator
+        </h1>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          Calculate your total assets minus liabilities to understand your
+          financial health
+        </p>
+      </header>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Assets Section -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold text-dark">Assets</h2>
+              <button
+                id="add-asset"
+                class="px-3 py-1 bg-primary text-white text-sm rounded-md hover:bg-blue-700 transition"
+              >
+                <i class="fas fa-plus mr-1"></i> Add Item
+              </button>
+            </div>
+
+            <div id="assets-container" class="space-y-4">
+              <!-- Asset items will be added here -->
+              <div
+                class="asset-item category-card bg-white border border-gray-200 rounded-lg p-4"
+              >
+                <div class="flex justify-between items-start mb-2">
+                  <input
+                    type="text"
+                    class="w-full font-medium border-0 focus:ring-0 focus:border-blue-500 px-0"
+                    placeholder="Asset Name"
+                    value="Savings Account"
+                  />
+                  <button class="text-red-500 hover:text-red-700 delete-btn">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div class="flex items-center">
+                  <span class="text-gray-500 mr-2">₹</span>
+                  <input
+                    type="number"
+                    class="w-full border-0 focus:ring-0 focus:border-blue-500 px-0 asset-value"
+                    placeholder="Value"
+                    value="150000"
+                  />
+                </div>
+              </div>
+
+              <div
+                class="asset-item category-card bg-white border border-gray-200 rounded-lg p-4"
+              >
+                <div class="flex justify-between items-start mb-2">
+                  <input
+                    type="text"
+                    class="w-full font-medium border-0 focus:ring-0 focus:border-blue-500 px-0"
+                    placeholder="Asset Name"
+                    value="Retirement Fund"
+                  />
+                  <button class="text-red-500 hover:text-red-700 delete-btn">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div class="flex items-center">
+                  <span class="text-gray-500 mr-2">₹</span>
+                  <input
+                    type="number"
+                    class="w-full border-0 focus:ring-0 focus:border-blue-500 px-0 asset-value"
+                    placeholder="Value"
+                    value="500000"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-gray-200">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-700">Total Assets</span>
+                <span id="total-assets" class="text-xl font-bold text-green-600"
+                  >₹0</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Liabilities Section -->
+          <div class="bg-white rounded-xl shadow-md p-6 mt-6">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold text-dark">Liabilities</h2>
+              <button
+                id="add-liability"
+                class="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-700 transition"
+              >
+                <i class="fas fa-plus mr-1"></i> Add Item
+              </button>
+            </div>
+
+            <div id="liabilities-container" class="space-y-4">
+              <!-- Liability items will be added here -->
+              <div
+                class="liability-item category-card bg-white border border-gray-200 rounded-lg p-4"
+              >
+                <div class="flex justify-between items-start mb-2">
+                  <input
+                    type="text"
+                    class="w-full font-medium border-0 focus:ring-0 focus:border-blue-500 px-0"
+                    placeholder="Liability Name"
+                    value="Home Loan"
+                  />
+                  <button class="text-red-500 hover:text-red-700 delete-btn">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div class="flex items-center">
+                  <span class="text-gray-500 mr-2">₹</span>
+                  <input
+                    type="number"
+                    class="w-full border-0 focus:ring-0 focus:border-blue-500 px-0 liability-value"
+                    placeholder="Value"
+                    value="2500000"
+                  />
+                </div>
+              </div>
+
+              <div
+                class="liability-item category-card bg-white border border-gray-200 rounded-lg p-4"
+              >
+                <div class="flex justify-between items-start mb-2">
+                  <input
+                    type="text"
+                    class="w-full font-medium border-0 focus:ring-0 focus:border-blue-500 px-0"
+                    placeholder="Liability Name"
+                    value="Credit Card Debt"
+                  />
+                  <button class="text-red-500 hover:text-red-700 delete-btn">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div class="flex items-center">
+                  <span class="text-gray-500 mr-2">₹</span>
+                  <input
+                    type="number"
+                    class="w-full border-0 focus:ring-0 focus:border-blue-500 px-0 liability-value"
+                    placeholder="Value"
+                    value="75000"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-gray-200">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-700">Total Liabilities</span>
+                <span
+                  id="total-liabilities"
+                  class="text-xl font-bold text-red-600"
+                  >₹0</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div>
+          <div class="bg-white rounded-xl shadow-md p-6 sticky top-6">
+            <h2 class="text-xl font-semibold text-dark mb-6">
+              Net Worth Summary
+            </h2>
+
+            <div class="space-y-6">
+              <div
+                class="summary-card asset-card bg-white border border-gray-200 rounded-lg p-4"
+              >
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-gray-700">Total Assets</span>
+                  <span
+                    id="summary-assets"
+                    class="text-lg font-bold text-green-600"
+                    >₹0</span
+                  >
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    id="assets-progress"
+                    class="bg-green-600 h-2.5 rounded-full"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+
+              <div
+                class="summary-card liability-card bg-white border border-gray-200 rounded-lg p-4"
+              >
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-gray-700">Total Liabilities</span>
+                  <span
+                    id="summary-liabilities"
+                    class="text-lg font-bold text-red-600"
+                    >₹0</span
+                  >
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    id="liabilities-progress"
+                    class="bg-red-600 h-2.5 rounded-full"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+
+              <div
+                class="summary-card net-worth-card bg-white border border-gray-200 rounded-lg p-4"
+              >
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-gray-700">Net Worth</span>
+                  <span id="net-worth" class="text-xl font-bold text-blue-600"
+                    >₹0</span
+                  >
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                  <div
+                    id="net-worth-progress"
+                    class="bg-blue-600 h-2.5 rounded-full"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <h3 class="font-medium text-blue-800 mb-2">Financial Health</h3>
+                <p id="financial-health" class="text-blue-700 text-sm">
+                  Enter your financial details to assess your financial health.
+                </p>
+              </div>
+
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <h3 class="font-medium text-gray-800 mb-2">
+                  Tips to Improve Net Worth
+                </h3>
+                <ul class="text-gray-700 text-sm list-disc pl-5 space-y-1">
+                  <li>Pay down high-interest debt first</li>
+                  <li>Increase retirement contributions</li>
+                  <li>Build an emergency fund</li>
+                  <li>Invest in appreciating assets</li>
+                  <li>Reduce unnecessary expenses</li>
+                </ul>
+              </div>
+
+              <button
+                id="reset-btn"
+                class="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition"
+              >
+                <i class="fas fa-redo mr-2"></i>Reset Calculator
+              </button>
+
+              <button
+                id="save-btn"
+                class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-blue-700 transition"
+              >
+                <i class="fas fa-download mr-2"></i>Save Results
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Information Section -->
+      <div class="max-w-4xl mx-auto mt-12 bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-xl font-semibold text-dark mb-4">
+          Understanding Net Worth
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="text-green-600 text-xl mb-2">
+              <i class="fas fa-wallet"></i>
+            </div>
+            <h3 class="font-medium text-dark">What are Assets?</h3>
+            <p class="text-sm text-gray-600 mt-1">
+              Assets are what you own that has value. This includes cash,
+              investments, property, and personal items that can be sold for
+              cash.
+            </p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="text-red-600 text-xl mb-2">
+              <i class="fas fa-credit-card"></i>
+            </div>
+            <h3 class="font-medium text-dark">What are Liabilities?</h3>
+            <p class="text-sm text-gray-600 mt-1">
+              Liabilities are what you owe to others. This includes loans,
+              credit card debt, mortgages, and other financial obligations.
+            </p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="text-blue-600 text-xl mb-2">
+              <i class="fas fa-calculator"></i>
+            </div>
+            <h3 class="font-medium text-dark">Calculating Net Worth</h3>
+            <p class="text-sm text-gray-600 mt-1">
+              Net Worth = Total Assets - Total Liabilities. This number
+              represents your financial health at a specific point in time.
+            </p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="text-purple-600 text-xl mb-2">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <h3 class="font-medium text-dark">Why It Matters</h3>
+            <p class="text-sm text-gray-600 mt-1">
+              Tracking your net worth over time helps you measure financial
+              progress, make informed decisions, and work toward financial
+              goals.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // DOM Elements
+      const addAssetBtn = document.getElementById("add-asset");
+      const addLiabilityBtn = document.getElementById("add-liability");
+      const assetsContainer = document.getElementById("assets-container");
+      const liabilitiesContainer = document.getElementById(
+        "liabilities-container"
+      );
+      const totalAssetsElement = document.getElementById("total-assets");
+      const totalLiabilitiesElement =
+        document.getElementById("total-liabilities");
+      const summaryAssetsElement = document.getElementById("summary-assets");
+      const summaryLiabilitiesElement = document.getElementById(
+        "summary-liabilities"
+      );
+      const netWorthElement = document.getElementById("net-worth");
+      const assetsProgress = document.getElementById("assets-progress");
+      const liabilitiesProgress = document.getElementById(
+        "liabilities-progress"
+      );
+      const netWorthProgress = document.getElementById("net-worth-progress");
+      const financialHealthElement =
+        document.getElementById("financial-health");
+      const resetBtn = document.getElementById("reset-btn");
+      const saveBtn = document.getElementById("save-btn");
+
+      // Add new asset item
+      addAssetBtn.addEventListener("click", () => {
+        const newAsset = document.createElement("div");
+        newAsset.className =
+          "asset-item category-card bg-white border border-gray-200 rounded-lg p-4";
+        newAsset.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <input type="text" class="w-full font-medium border-0 focus:ring-0 focus:border-blue-500 px-0" placeholder="Asset Name">
+                    <button class="text-red-500 hover:text-red-700 delete-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-gray-500 mr-2">₹</span>
+                    <input type="number" class="w-full border-0 focus:ring-0 focus:border-blue-500 px-0 asset-value" placeholder="Value" value="0">
+                </div>
+            `;
+        assetsContainer.appendChild(newAsset);
+
+        // Add event listeners to new inputs
+        const deleteBtn = newAsset.querySelector(".delete-btn");
+        const valueInput = newAsset.querySelector(".asset-value");
+
+        deleteBtn.addEventListener("click", () => {
+          newAsset.remove();
+          calculateNetWorth();
+        });
+
+        valueInput.addEventListener("input", calculateNetWorth);
+        valueInput.addEventListener("blur", calculateNetWorth);
+
+        // Focus on the new asset name input
+        newAsset.querySelector('input[type="text"]').focus();
+      });
+
+      // Add new liability item
+      addLiabilityBtn.addEventListener("click", () => {
+        const newLiability = document.createElement("div");
+        newLiability.className =
+          "liability-item category-card bg-white border border-gray-200 rounded-lg p-4";
+        newLiability.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <input type="text" class="w-full font-medium border-0 focus:ring-0 focus:border-blue-500 px-0" placeholder="Liability Name">
+                    <button class="text-red-500 hover:text-red-700 delete-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-gray-500 mr-2">₹</span>
+                    <input type="number" class="w-full border-0 focus:ring-0 focus:border-blue-500 px-0 liability-value" placeholder="Value" value="0">
+                </div>
+            `;
+        liabilitiesContainer.appendChild(newLiability);
+
+        // Add event listeners to new inputs
+        const deleteBtn = newLiability.querySelector(".delete-btn");
+        const valueInput = newLiability.querySelector(".liability-value");
+
+        deleteBtn.addEventListener("click", () => {
+          newLiability.remove();
+          calculateNetWorth();
+        });
+
+        valueInput.addEventListener("input", calculateNetWorth);
+        valueInput.addEventListener("blur", calculateNetWorth);
+
+        // Focus on the new liability name input
+        newLiability.querySelector('input[type="text"]').focus();
+      });
+
+      // Calculate net worth
+      function calculateNetWorth() {
+        let totalAssets = 0;
+        let totalLiabilities = 0;
+
+        // Calculate total assets
+        const assetValues = document.querySelectorAll(".asset-value");
+        assetValues.forEach((input) => {
+          const value = parseFloat(input.value) || 0;
+          totalAssets += value;
+        });
+
+        // Calculate total liabilities
+        const liabilityValues = document.querySelectorAll(".liability-value");
+        liabilityValues.forEach((input) => {
+          const value = parseFloat(input.value) || 0;
+          totalLiabilities += value;
+        });
+
+        // Calculate net worth
+        const netWorth = totalAssets - totalLiabilities;
+
+        // Update UI
+        totalAssetsElement.textContent = formatCurrency(totalAssets);
+        totalLiabilitiesElement.textContent = formatCurrency(totalLiabilities);
+        summaryAssetsElement.textContent = formatCurrency(totalAssets);
+        summaryLiabilitiesElement.textContent =
+          formatCurrency(totalLiabilities);
+        netWorthElement.textContent = formatCurrency(netWorth);
+
+        // Update progress bars
+        const total = Math.max(
+          totalAssets,
+          totalLiabilities,
+          Math.abs(netWorth)
+        );
+        if (total > 0) {
+          assetsProgress.style.width = `${(totalAssets / total) * 100}%`;
+          liabilitiesProgress.style.width = `${
+            (totalLiabilities / total) * 100
+          }%`;
+
+          if (netWorth >= 0) {
+            netWorthProgress.style.width = `${(netWorth / total) * 100}%`;
+          } else {
+            netWorthProgress.style.width = `${
+              (Math.abs(netWorth) / total) * 100
+            }%`;
+          }
+        }
+
+        // Update financial health message
+        updateFinancialHealth(netWorth, totalAssets, totalLiabilities);
+      }
+
+      // Format currency for display
+      function formatCurrency(amount) {
+        if (amount >= 10000000) {
+          return "₹" + (amount / 10000000).toFixed(2) + " Cr";
+        } else if (amount >= 100000) {
+          return "₹" + (amount / 100000).toFixed(2) + " L";
+        } else if (amount >= 1000) {
+          return "₹" + (amount / 1000).toFixed(2) + " K";
+        }
+        return "₹" + Math.round(amount).toLocaleString("en-IN");
+      }
+
+      // Update financial health message
+      function updateFinancialHealth(netWorth, totalAssets, totalLiabilities) {
+        let message = "";
+        let ratio = totalLiabilities > 0 ? totalAssets / totalLiabilities : 10;
+
+        if (netWorth < 0) {
+          message =
+            "Your liabilities exceed your assets. Focus on paying down debt.";
+        } else if (netWorth === 0) {
+          message =
+            "Your assets equal your liabilities. Work on building your assets.";
+        } else if (ratio < 1.5) {
+          message =
+            "Your debt level is high relative to assets. Consider debt reduction strategies.";
+        } else if (ratio < 3) {
+          message =
+            "You have a moderate debt-to-asset ratio. Keep building your assets.";
+        } else {
+          message =
+            "You have a healthy financial position with strong assets relative to liabilities.";
+        }
+
+        financialHealthElement.textContent = message;
+      }
+
+      // Reset calculator
+      resetBtn.addEventListener("click", () => {
+        if (confirm("Are you sure you want to reset all values?")) {
+          // Clear all asset items except the first two
+          const assetItems = document.querySelectorAll(".asset-item");
+          assetItems.forEach((item, index) => {
+            if (index > 1) item.remove();
+          });
+
+          // Clear all liability items except the first two
+          const liabilityItems = document.querySelectorAll(".liability-item");
+          liabilityItems.forEach((item, index) => {
+            if (index > 1) item.remove();
+          });
+
+          // Reset values of first two assets
+          const assetInputs = document.querySelectorAll(".asset-value");
+          assetInputs[0].value = 150000;
+          assetInputs[1].value = 500000;
+
+          // Reset values of first two liabilities
+          const liabilityInputs = document.querySelectorAll(".liability-value");
+          liabilityInputs[0].value = 2500000;
+          liabilityInputs[1].value = 75000;
+
+          // Reset names
+          document.querySelectorAll('.asset-item input[type="text"]')[0].value =
+            "Savings Account";
+          document.querySelectorAll('.asset-item input[type="text"]')[1].value =
+            "Retirement Fund";
+          document.querySelectorAll(
+            '.liability-item input[type="text"]'
+          )[0].value = "Home Loan";
+          document.querySelectorAll(
+            '.liability-item input[type="text"]'
+          )[1].value = "Credit Card Debt";
+
+          // Recalculate
+          calculateNetWorth();
+        }
+      });
+
+      // Save results (simulated)
+      saveBtn.addEventListener("click", () => {
+        alert(
+          "Results saved! In a real application, this would download your financial summary."
+        );
+      });
+
+      // Add event listeners to existing inputs
+      document.querySelectorAll("input").forEach((input) => {
+        input.addEventListener("input", calculateNetWorth);
+        input.addEventListener("blur", calculateNetWorth);
+      });
+
+      // Add event listeners to delete buttons
+      document.querySelectorAll(".delete-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          this.closest(".asset-item, .liability-item").remove();
+          calculateNetWorth();
+        });
+      });
+
+      // Initial calculation
+      calculateNetWorth();
+    </script>
+  </body>
+</html>

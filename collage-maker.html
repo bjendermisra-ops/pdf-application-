@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collage Maker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    .collage-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .collage-item {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .collage-item:hover .remove-btn {
+      opacity: 1;
+    }
+  </style>
+</head>
+
+
+<?php include 'includes/navbar.html'; ?>
+<nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+<div class="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 mt-8 mb-8">
+  <h1 class="text-3xl font-bold text-gray-800 mb-2">Collage Maker</h1>
+  <p class="text-gray-600 mb-6">Create Photo Collages Online</p>
+
+  <div class="flex flex-col lg:flex-row gap-8">
+    <!-- Main Collage Area -->
+    <div class="flex-1">
+      <div id="collageContainer"
+        class="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4 bg-gray-50 min-h-[400px]">
+        <div id="collageCanvas" class="collage-grid w-full h-full min-h-[400px]">
+          <!-- Collage items will be added here -->
+          <div class="text-center text-gray-500 flex items-center justify-center h-full">
+            <p>Add photos to create your collage</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-4 justify-between">
+        <button id="addPhotosBtn"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition">
+          Add Photos
+        </button>
+        <input type="file" id="imageUpload" accept="image/*" multiple class="hidden" />
+
+        <div class="flex items-center gap-2">
+          <label for="borderWidth" class="text-sm font-medium text-gray-700">Border:</label>
+          <input type="range" id="borderWidth" min="0" max="20" value="5" class="w-24" />
+          <span id="borderWidthValue" class="text-sm w-8">5px</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <label for="borderColor" class="text-sm font-medium text-gray-700">Color:</label>
+          <input type="color" id="borderColor" value="#000000" class="w-8 h-8" />
+        </div>
+
+        <div class="flex items-center gap-2">
+          <label for="gridSize" class="text-sm font-medium text-gray-700">Layout:</label>
+          <select id="gridSize" class="border rounded-md px-2 py-1 text-sm">
+            <option value="2">2x2</option>
+            <option value="3">3x3</option>
+            <option value="4">4x4</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Templates and Actions -->
+    <div class="lg:w-64 space-y-4">
+      <div>
+        <h3 class="font-medium text-gray-700 mb-2">Templates</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button data-template="2" class="border p-1 rounded-md hover:bg-gray-100">
+            <div class="grid grid-cols-2 gap-1 h-20">
+              <div class="bg-gray-300"></div>
+              <div class="bg-gray-300"></div>
+              <div class="bg-gray-300"></div>
+              <div class="bg-gray-300"></div>
+            </div>
+          </button>
+          <button data-template="3" class="border p-1 rounded-md hover:bg-gray-100">
+            <div class="grid grid-cols-3 gap-1 h-20">
+              <div class="bg-gray-300"></div>
+              <div class="bg-gray-300"></div>
+              <div class="bg-gray-300"></div>
+              <div class="bg-gray-300"></div>
+              <div class="bg-gray-300"></div>
+              <div class="bg-gray-300"></div>
+              <div class="bg-gray-300 col-span-3"></div>
+            </div>
+          </button>
+          <button data-template="4" class="border p-1 rounded-md hover:bg-gray-100">
+            <div class="grid grid-cols-2 gap-1 h-20">
+              <div class="bg-gray-300 row-span-2"></div>
+              <div class="bg-gray-300"></div>
+              <div class="bg-gray-300"></div>
+              <div class="bg-gray-300"></div>
+            </div>
+          </button>
+          <button data-template="custom"
+            class="border p-1 rounded-md hover:bg-gray-100 flex items-center justify-center">
+            <span class="text-sm">Custom</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="pt-4">
+        <button id="newCollageBtn"
+          class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition mb-2">
+          New Collage
+        </button>
+        <button id="downloadBtn"
+          class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition">
+          Download Collage
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<?php include 'includes/footer.html'; ?>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // DOM Elements
+    const addPhotosBtn = document.getElementById("addPhotosBtn");
+    const imageUpload = document.getElementById("imageUpload");
+    const collageCanvas = document.getElementById("collageCanvas");
+    const borderWidth = document.getElementById("borderWidth");
+    const borderWidthValue = document.getElementById("borderWidthValue");
+    const borderColor = document.getElementById("borderColor");
+    const gridSize = document.getElementById("gridSize");
+    const templateBtns = document.querySelectorAll("[data-template]");
+    const newCollageBtn = document.getElementById("newCollageBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    // State
+    let images = [];
+    let currentGridSize = 2;
+    let currentBorderWidth = 5;
+    let currentBorderColor = "#000000";
+
+    // Initialize
+    updateGridLayout(currentGridSize);
+
+    // Event Listeners
+    addPhotosBtn.addEventListener("click", () => imageUpload.click());
+    imageUpload.addEventListener("change", handleImageUpload);
+    borderWidth.addEventListener("input", updateBorderSettings);
+    borderColor.addEventListener("input", updateBorderSettings);
+    gridSize.addEventListener("change", updateGridSize);
+    templateBtns.forEach((btn) =>
+      btn.addEventListener("click", applyTemplate)
+    );
+    newCollageBtn.addEventListener("click", resetCollage);
+    downloadBtn.addEventListener("click", downloadCollage);
+
+    // Functions
+    function handleImageUpload(e) {
+      const files = Array.from(e.target.files);
+      if (files.length === 0) return;
+
+      files.forEach((file) => {
+        if (!file.type.startsWith("image/")) return;
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          images.push(event.target.result);
+          renderCollage();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Reset file input
+      e.target.value = "";
+    }
+
+    function renderCollage() {
+      if (images.length === 0) {
+        collageCanvas.innerHTML =
+          '<div class="text-center text-gray-500 flex items-center justify-center h-full"><p>Add photos to create your collage</p></div>';
+        return;
+      }
+
+      collageCanvas.innerHTML = "";
+
+      // Calculate how many cells we need to fill
+      const totalCells = currentGridSize * currentGridSize;
+      const cellsToFill = Math.min(images.length, totalCells);
+
+      // Create grid items
+      for (let i = 0; i < cellsToFill; i++) {
+        const imgUrl = images[i];
+        const cell = document.createElement("div");
+        cell.className = "collage-item relative bg-white";
+        cell.style.border = `${currentBorderWidth}px solid ${currentBorderColor}`;
+
+        const img = document.createElement("img");
+        img.src = imgUrl;
+        img.className = "w-full h-full object-cover";
+
+        const removeBtn = document.createElement("button");
+        removeBtn.className =
+          "remove-btn bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center";
+        removeBtn.innerHTML = "&times;";
+        removeBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          images.splice(i, 1);
+          renderCollage();
+        });
+
+        cell.appendChild(img);
+        cell.appendChild(removeBtn);
+        collageCanvas.appendChild(cell);
+      }
+
+      // Fill remaining cells with empty placeholders
+      for (let i = cellsToFill; i < totalCells; i++) {
+        const cell = document.createElement("div");
+        cell.className =
+          "collage-item bg-gray-200 flex items-center justify-center";
+        cell.style.border = `${currentBorderWidth}px solid ${currentBorderColor}`;
+
+        const plusIcon = document.createElement("span");
+        plusIcon.className = "text-gray-500 text-2xl";
+        plusIcon.textContent = "+";
+
+        cell.appendChild(plusIcon);
+        cell.addEventListener("click", () => imageUpload.click());
+        collageCanvas.appendChild(cell);
+      }
+    }
+
+    function updateBorderSettings() {
+      currentBorderWidth = borderWidth.value;
+      currentBorderColor = borderColor.value;
+      borderWidthValue.textContent = `${currentBorderWidth}px`;
+      renderCollage();
+    }
+
+    function updateGridSize() {
+      currentGridSize = parseInt(gridSize.value);
+      updateGridLayout(currentGridSize);
+      renderCollage();
+    }
+
+    function updateGridLayout(size) {
+      collageCanvas.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    }
+
+    function applyTemplate(e) {
+      const template = e.currentTarget.dataset.template;
+      if (template === "custom") return;
+
+      currentGridSize = parseInt(template);
+      gridSize.value = currentGridSize;
+      updateGridLayout(currentGridSize);
+      renderCollage();
+    }
+
+    function resetCollage() {
+      if (
+        confirm(
+          "Are you sure you want to start a new collage? All current photos will be removed."
+        )
+      ) {
+        images = [];
+        renderCollage();
+      }
+    }
+
+    function downloadCollage() {
+      if (images.length === 0) {
+        alert(
+          "Please add at least one photo to the collage before downloading."
+        );
+        return;
+      }
+
+      html2canvas(collageCanvas).then((canvas) => {
+        const link = document.createElement("a");
+        link.download = "my-collage.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+
+    // Load html2canvas library dynamically
+    const script = document.createElement("script");
+    script.src = "https://html2canvas.hertzen.com/dist/html2canvas.min.js";
+    document.head.appendChild(script);
+  });
+</script>
+</body>
+
+</html>

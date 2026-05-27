@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dentsu - SEO Tools</title>
+  <meta name="description"
+    content="Professional SEO tools and utilities for technical SEO analysis, crawling, rendering, and optimization." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="canonical" href="https://seo.vibeloopdaily.com/" />
+  <!-- Required -->
+  <meta property="og:title" content="Your Page Title Here" />
+  <meta property="og:description" content="A short description of the page content." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://seo.vibeloopdaily.com/" />
+  <meta property="og:image" content="https://seo.vibeloopdaily.com/path-to-your-image.jpg" />
+
+  <!-- Optional but good to include -->
+  <meta property="og:site_name" content="Vibeloop Daily SEO" />
+  <meta property="og:locale" content="en_US" />
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Vibeloop Daily SEO",
+  "url": "https://seo.vibeloopdaily.com/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://seo.vibeloopdaily.com/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
+  <style>
+    .sidebar-transition {
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .tool-card {
+      transition: all 0.3s ease;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .modal-backdrop {
+      backdrop-filter: blur(8px);
+    }
+
+    @media (max-width: 1023px) {
+      .sidebar-closed {
+        transform: translateX(-100%);
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-white text-black">
+  <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+<div class="bg-white rounded-lg shadow-lg max-w-7xl mt-6 m-6 overflow-hidden">
+  <!-- Header -->
+  <div class="bg-white text-black p-4">
+    <h1 class="text-xl font-bold">Blogger XML Sitemap Generator</h1>
+  </div>
+
+  <!-- Main Content -->
+  <div class="p-6">
+    <!-- Blog URL Input -->
+    <div class="mb-6">
+      <label class="block text-black font-medium mb-2">Blog URL</label>
+      <div class="flex">
+        <input type="url" id="blog-url"
+          class="flex-grow px-4 py-2 border border-gray-300 rounded-l focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white text-black placeholder-gray-500"
+          placeholder="https://yourblog.blogspot.com" value="https://labnol.blogspot.com">
+        <button id="generate-btn"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          Generate XML Sitemap
+        </button>
+      </div>
+    </div>
+
+    <hr class="my-6 border-gray-200">
+
+    <!-- Results Section -->
+    <div id="result-container">
+      <h2 class="text-lg font-medium text-black mb-2">XML Sitemap</h2>
+      <p class="mb-4 text-black">The XML sitemap for your blog <span id="result-url"
+          class="font-mono text-blue-600">https://labnol.blogspot.com</span> is ready</p>
+
+      <div class="border border-gray-200 rounded p-4 relative">
+        <button id="copy-btn"
+          class="copy-btn absolute top-3 right-3 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+          </svg>
+          Copy
+        </button>
+        <pre id="sitemap-content" class="text-sm text-black overflow-x-auto whitespace-pre-wrap font-mono"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="px-6 py-3 text-center text-sm text-black">
+    <p>Sitemap Generator Tool - <a href="https://www.labnol.org/" class="text-blue-600 hover:underline">labnol.org</a>
+    </p>
+  </div>
+</div>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const blogUrlInput = document.getElementById('blog-url');
+    const generateBtn = document.getElementById('generate-btn');
+    const resultUrl = document.getElementById('result-url');
+    const sitemapContent = document.getElementById('sitemap-content');
+    const copyBtn = document.getElementById('copy-btn');
+
+    // Generate sitemap when button is clicked
+    generateBtn.addEventListener('click', function () {
+      let blogUrl = blogUrlInput.value.trim();
+
+      // Add https:// if missing
+      if (!blogUrl.startsWith('http://') && !blogUrl.startsWith('https://')) {
+        blogUrl = 'https://' + blogUrl;
+      }
+
+      if (!blogUrl) {
+        alert('Please enter a valid blog URL');
+        return;
+      }
+
+      // Extract domain from URL
+      let domain;
+      try {
+        const urlObj = new URL(blogUrl);
+        domain = urlObj.hostname;
+      } catch (e) {
+        alert('Please enter a valid URL');
+        return;
+      }
+
+      // Update displayed URL
+      blogUrlInput.value = blogUrl;
+      resultUrl.textContent = blogUrl;
+
+      // Generate and display sitemap
+      generateSitemap(domain);
+    });
+
+    // Generate the sitemap content with complete links
+    function generateSitemap(domain) {
+      const now = new Date();
+      const dateStr = now.toUTCString();
+
+      let sitemap = `# XML Sitemap\n`;
+      sitemap += `# Generated for ${domain} on ${dateStr}\n`;
+      sitemap += `# Created with labnol.org/blogger/sitemap\n\n`;
+
+      // Add paginated sitemap entries
+      const entries = [
+        `${domain}/atom.xml?redirect=false&start-index=1&max-results=500`,
+        `${domain}/atom.xml?redirect=false&start-index=501&max-results=500`,
+        `${domain}/atom.xml?redirect=false&start-index=1001&max-results=500`,
+        `${domain}/atom.xml?redirect=false&start-index=1501&max-results=500`,
+        `${domain}/atom.xml?redirect=false&start-index=2001&max-results=500`,
+        `${domain}/atom.xml?redirect=false&start-index=2501&max-results=500`,
+        `${domain}/atom.xml?redirect=false&start-index=3001&max-results=500`
+      ];
+
+      entries.forEach(entry => {
+        sitemap += `https://${entry}\n`;
+      });
+
+      sitemapContent.textContent = sitemap;
+    }
+
+    // Copy to clipboard functionality
+    copyBtn.addEventListener('click', function () {
+      const textToCopy = sitemapContent.textContent;
+      navigator.clipboard.writeText(textToCopy).then(function () {
+        copyBtn.classList.add('copied');
+        copyBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          Copied!
+        `;
+
+        setTimeout(function () {
+          copyBtn.classList.remove('copied');
+          copyBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+            </svg>
+            Copy
+          `;
+        }, 2000);
+      }).catch(function (err) {
+        console.error('Failed to copy text: ', err);
+      });
+    });
+
+    // Generate initial sitemap
+    generateBtn.click();
+  });
+</script>
+</body>
+
+</html>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-7xl mx-auto bg-slate-800 rounded-lg shadow-md p-6">
+    <h1 class="text-2xl font-bold text-white mb-4">
+      Locale-Adaptive Pages Testing Tool
+    </h1>
+
+    <div class="prose prose-sm text-gray-200 mb-6">
+      <p>
+        Google might not crawl, index and rank "locale-adaptive" web pages.
+        More details about the locale-aware crawl configurations of
+        Googlebot can be found on the
+        <a href="https://support.google.com/webmasters/answer/62399" class="text-blue-400 hover:underline">Google
+          Support's website</a>.
+      </p>
+      <p>
+        A page is "locale-adaptive" when the content that is being served is
+        adapted based on the Accept-Language HTTP request header or the
+        perceived location (IP address). This tool allows you to quickly see
+        if a page is locale-adaptive.
+      </p>
+    </div>
+
+    <div class="border-t border-gray-700 pt-4">
+      <div class="grid grid-cols-12 gap-4 mb-2 font-medium text-gray-200">
+        <div class="col-span-5">URL</div>
+        <div class="col-span-3">Languages (Accept-Language Header)</div>
+        <div class="col-span-3">Country (IP Address)</div>
+        <div class="col-span-1">TEST</div>
+      </div>
+
+      <div class="grid grid-cols-12 gap-4 mb-4 items-center">
+        <div class="col-span-5">
+          <input type="text" id="url-input" placeholder="https://example.com"
+            class="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-800 text-white placeholder-gray-400" />
+        </div>
+        <div class="col-span-3">
+          <select id="language-select" multiple
+            class="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-[42px] bg-slate-800 text-white">
+            <option value="ab">Abkhazian (ab)</option>
+            <option value="hi">Hindi (hi)</option>
+            <option value="en">English (en)</option>
+            <option value="es">Spanish (es)</option>
+            <option value="fr">French (fr)</option>
+            <option value="de">German (de)</option>
+          </select>
+        </div>
+        <div class="col-span-3">
+          <select id="country-select"
+            class="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-800 text-white">
+            <option value="US">United States</option>
+            <option value="GB">United Kingdom</option>
+            <option value="IN">India</option>
+            <option value="ES">Spain</option>
+            <option value="FR">France</option>
+            <option value="DE">Germany</option>
+          </select>
+        </div>
+        <div class="col-span-1">
+          <button id="test-button"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition duration-200">
+            Test
+          </button>
+        </div>
+      </div>
+
+      <div id="results-container" class="hidden mt-6">
+        <div class="mb-6">
+          <h2 class="text-lg font-semibold text-white mb-2">
+            Search...
+          </h2>
+          <div class="bg-slate-700 p-4 rounded-md">
+            <h3 class="font-medium text-gray-200 mb-3">Location</h3>
+            <div class="overflow-x-auto">
+              <table id="location-table" class="min-w-full divide-y divide-gray-600">
+                <thead class="bg-slate-800">
+                  <tr>
+                    <th scope="col"
+                      class="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"></th>
+                    <th scope="col"
+                      class="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Accept-Language
+                    </th>
+                    <th scope="col"
+                      class="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th scope="col"
+                      class="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Redirect
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="location-results" class="bg-slate-800 divide-y divide-gray-700">
+                  <!-- Location results will be added here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-medium text-gray-200 mb-3">Detected Language</h3>
+          <div class="overflow-x-auto">
+            <table id="language-table" class="min-w-full divide-y divide-gray-600">
+              <thead class="bg-slate-800">
+                <tr>
+                  <th scope="col"
+                    class="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"></th>
+                  <th scope="col"
+                    class="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    Page*
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="language-results" class="bg-slate-800 divide-y divide-gray-700">
+                <!-- Language detection results will be added here -->
+              </tbody>
+            </table>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">
+            * Page language detected from content
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const urlInput = document.getElementById("url-input");
+    const languageSelect = document.getElementById("language-select");
+    const countrySelect = document.getElementById("country-select");
+    const testButton = document.getElementById("test-button");
+    const resultsContainer = document.getElementById("results-container");
+    const locationResults = document.getElementById("location-results");
+    const languageResults = document.getElementById("language-results");
+
+    testButton.addEventListener("click", function () {
+      const url = urlInput.value.trim();
+      const languages = Array.from(languageSelect.selectedOptions).map(
+        (opt) => opt.value
+      );
+      const country = countrySelect.value;
+
+      if (!url) {
+        alert("Please enter a URL to test");
+        return;
+      }
+
+      if (languages.length === 0) {
+        alert("Please select at least one language");
+        return;
+      }
+
+      // Show loading state
+      testButton.disabled = true;
+      testButton.textContent = "Testing...";
+      testButton.classList.remove("bg-blue-600", "hover:bg-blue-700");
+      testButton.classList.add("bg-blue-400");
+
+      // Clear previous results
+      locationResults.innerHTML = "";
+      languageResults.innerHTML = "";
+
+      // In a real implementation, you would make an API call here
+      // For this demo, we'll simulate a response after a short delay
+      setTimeout(() => {
+        // Reset button
+        testButton.disabled = false;
+        testButton.textContent = "Test";
+        testButton.classList.remove("bg-blue-400");
+        testButton.classList.add("bg-blue-600", "hover:bg-blue-700");
+
+        // Show results
+        resultsContainer.classList.remove("hidden");
+
+        // Generate location results
+        languages.forEach((lang, index) => {
+          const langName = languageSelect.querySelector(
+            `option[value="${lang}"]`
+          ).text;
+          const status = "302 Found";
+          const redirectUrl = `https://${url.split("/")[2]
+            }/v3/signin/identifier?continue=https%3A%2F%2F${url.split("/")[2]
+            }%2F`;
+
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">${countrySelect.options[countrySelect.selectedIndex]
+              .text
+            }</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">${index === 0 ? "-" : `${langName} (${lang})`
+            }</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">${status}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 truncate max-w-xs">${redirectUrl}</td>
+                        `;
+          locationResults.appendChild(row);
+        });
+
+        // Generate language detection results
+        const pageTitles = ["Sign I", "Bxon", "Goog"];
+        languages.forEach((lang, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">No Detection</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">${pageTitles[index] || "No title"
+            }</td>
+                        `;
+          languageResults.appendChild(row);
+        });
+      }, 1500);
+    });
+
+    // Add example URL on click for convenience
+    urlInput.addEventListener("click", function () {
+      if (!this.value) {
+        this.value = "https://accounts.google.com/bi/0/AddMailService";
+      }
+    });
+  });
+</script>
+</body>
+
+</html>

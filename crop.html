@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Cropping Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      .dropzone {
+        border: 2px dashed #ccc;
+        transition: all 0.3s ease;
+      }
+
+      .dropzone.active {
+        border-color: #4f46e5;
+        background-color: #f0f0ff;
+      }
+
+      #cropper {
+        max-width: 100%;
+        max-height: 70vh;
+      }
+
+      .cropper-container {
+        margin: 0 auto;
+      }
+
+      .aspect-ratio-btn.active {
+        background-color: #4f46e5;
+        color: white;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"
+    />
+  </head>
+
+  <body class="bg-gray-50 min-h-screen">
+    <?php include 'includes/navbar.html'; ?>
+    <nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="container mx-auto px-4 py-8">
+      <h1 class="text-3xl font-bold text-center text-indigo-700 mb-2">
+        Image Cropping Tool
+      </h1>
+
+      <div
+        class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6"
+      >
+        <div id="uploadSection">
+          <div
+            id="dropzone"
+            class="dropzone rounded-lg p-8 text-center cursor-pointer mb-6"
+          >
+            <input type="file" id="fileInput" class="hidden" accept="image/*" />
+            <div class="flex flex-col items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-12 w-12 text-indigo-500 mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
+              </svg>
+              <h3 class="text-lg font-medium text-gray-700 mb-1">
+                Upload from PC or Mobile
+              </h3>
+              <p class="text-gray-500 text-sm mb-4">or Drag files here</p>
+              <button
+                id="uploadBtn"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition"
+              >
+                Select Image
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="editorSection" class="hidden">
+          <div class="flex flex-col md:flex-row gap-6">
+            <div class="flex-1">
+              <div class="cropper-container">
+                <img id="cropper" src="" alt="Image to crop" />
+              </div>
+            </div>
+
+            <div class="w-full md:w-64 flex flex-col gap-4">
+              <div class="bg-gray-100 p-4 rounded-lg">
+                <h3 class="font-medium text-gray-700 mb-2">
+                  Original Image Size
+                </h3>
+                <div class="flex justify-between mb-2">
+                  <span class="text-gray-600">Width</span>
+                  <span id="originalWidth" class="font-medium">0</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Height</span>
+                  <span id="originalHeight" class="font-medium">0</span>
+                </div>
+              </div>
+
+              <div class="bg-gray-100 p-4 rounded-lg">
+                <h3 class="font-medium text-gray-700 mb-2">Crop Dimensions</h3>
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                  <div>
+                    <label class="block text-sm text-gray-600 mb-1"
+                      >Width</label
+                    >
+                    <input
+                      type="number"
+                      id="cropWidth"
+                      class="w-full px-2 py-1 border rounded"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm text-gray-600 mb-1"
+                      >Height</label
+                    >
+                    <input
+                      type="number"
+                      id="cropHeight"
+                      class="w-full px-2 py-1 border rounded"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-gray-100 p-4 rounded-lg">
+                <h3 class="font-medium text-gray-700 mb-2">Aspect Ratio</h3>
+                <div class="grid grid-cols-4 gap-2">
+                  <button
+                    data-ratio="1"
+                    class="aspect-ratio-btn px-2 py-1 rounded border text-sm"
+                  >
+                    1:1
+                  </button>
+                  <button
+                    data-ratio="1.33"
+                    class="aspect-ratio-btn px-2 py-1 rounded border text-sm"
+                  >
+                    4:3
+                  </button>
+                  <button
+                    data-ratio="1.77"
+                    class="aspect-ratio-btn px-2 py-1 rounded border text-sm active"
+                  >
+                    16:9
+                  </button>
+                  <button
+                    data-ratio="0.56"
+                    class="aspect-ratio-btn px-2 py-1 rounded border text-sm"
+                  >
+                    9:16
+                  </button>
+                </div>
+              </div>
+
+              <div class="bg-gray-100 p-4 rounded-lg">
+                <h3 class="font-medium text-gray-700 mb-2">Zoom</h3>
+                <input
+                  type="range"
+                  id="zoomSlider"
+                  min="0.1"
+                  max="3"
+                  step="0.1"
+                  value="1"
+                  class="w-full"
+                />
+              </div>
+
+              <div class="flex gap-2">
+                <button
+                  id="cropBtn"
+                  class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition"
+                >
+                  Crop
+                </button>
+                <button
+                  id="newImageBtn"
+                  class="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition"
+                >
+                  New Image
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="resultSection" class="hidden mt-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-gray-700">Cropped Image</h3>
+            <button
+              id="downloadBtn"
+              class="bg-indigo-600 text-white px-3 py-1 rounded-md text-sm hover:bg-indigo-700 transition"
+            >
+              Download
+            </button>
+          </div>
+          <div class="flex justify-center">
+            <img
+              id="resultImage"
+              class="max-w-full rounded-lg border"
+              alt="Cropped result"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <?php include 'includes/footer.html'; ?>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const fileInput = document.getElementById("fileInput");
+        const uploadBtn = document.getElementById("uploadBtn");
+        const dropzone = document.getElementById("dropzone");
+        const uploadSection = document.getElementById("uploadSection");
+        const editorSection = document.getElementById("editorSection");
+        const resultSection = document.getElementById("resultSection");
+        const cropperImage = document.getElementById("cropper");
+        const resultImage = document.getElementById("resultImage");
+        const originalWidth = document.getElementById("originalWidth");
+        const originalHeight = document.getElementById("originalHeight");
+        const cropWidth = document.getElementById("cropWidth");
+        const cropHeight = document.getElementById("cropHeight");
+        const zoomSlider = document.getElementById("zoomSlider");
+        const cropBtn = document.getElementById("cropBtn");
+        const newImageBtn = document.getElementById("newImageBtn");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const aspectRatioBtns = document.querySelectorAll(".aspect-ratio-btn");
+
+        let cropper;
+        let originalImage = null;
+
+        // Initialize
+        uploadBtn.addEventListener("click", () => fileInput.click());
+        fileInput.addEventListener("change", handleFileSelect);
+
+        // Drag and drop handlers
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+          dropzone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        ["dragenter", "dragover"].forEach((eventName) => {
+          dropzone.addEventListener(eventName, highlight, false);
+        });
+
+        ["dragleave", "drop"].forEach((eventName) => {
+          dropzone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+          dropzone.classList.add("active");
+        }
+
+        function unhighlight() {
+          dropzone.classList.remove("active");
+        }
+
+        dropzone.addEventListener("drop", handleDrop, false);
+
+        function handleDrop(e) {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+
+          if (files.length) {
+            fileInput.files = files;
+            handleFileSelect({ target: fileInput });
+          }
+        }
+
+        function handleFileSelect(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+
+          if (!file.type.match("image.*")) {
+            alert("Please select an image file.");
+            return;
+          }
+
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            originalImage = new Image();
+            originalImage.onload = function () {
+              initializeCropper();
+            };
+            originalImage.src = e.target.result;
+            cropperImage.src = e.target.result;
+          };
+
+          uploadSection.classList.add("hidden");
+          editorSection.classList.remove("hidden");
+          resultSection.classList.add("hidden");
+
+          reader.readAsDataURL(file);
+        }
+
+        function initializeCropper() {
+          // Destroy previous cropper instance if exists
+          if (cropper) {
+            cropper.destroy();
+          }
+
+          // Update original dimensions
+          originalWidth.textContent = originalImage.naturalWidth;
+          originalHeight.textContent = originalImage.naturalHeight;
+
+          // Initialize cropper with 16:9 aspect ratio by default
+          cropper = new Cropper(cropperImage, {
+            aspectRatio: 16 / 9,
+            viewMode: 1,
+            autoCropArea: 0.8,
+            responsive: true,
+            ready() {
+              updateCropDimensions();
+            },
+            crop(event) {
+              updateCropDimensions();
+            },
+          });
+
+          // Set up event listeners
+          zoomSlider.addEventListener("input", function () {
+            cropper.zoomTo(parseFloat(this.value));
+          });
+
+          cropWidth.addEventListener("change", function () {
+            const width = parseInt(this.value);
+            if (width > 0) {
+              const ratio = cropper.getData().height / cropper.getData().width;
+              cropper.setCropBoxData({
+                width: width,
+                height: width * ratio,
+              });
+            }
+          });
+
+          cropHeight.addEventListener("change", function () {
+            const height = parseInt(this.value);
+            if (height > 0) {
+              const ratio = cropper.getData().width / cropper.getData().height;
+              cropper.setCropBoxData({
+                height: height,
+                width: height * ratio,
+              });
+            }
+          });
+
+          // Aspect ratio buttons
+          aspectRatioBtns.forEach((btn) => {
+            btn.addEventListener("click", function () {
+              const ratio = parseFloat(this.dataset.ratio);
+              cropper.setAspectRatio(ratio);
+
+              // Update active button
+              aspectRatioBtns.forEach((b) => b.classList.remove("active"));
+              this.classList.add("active");
+            });
+          });
+        }
+
+        function updateCropDimensions() {
+          const data = cropper.getData();
+          cropWidth.value = Math.round(data.width);
+          cropHeight.value = Math.round(data.height);
+        }
+
+        // Crop button handler
+        cropBtn.addEventListener("click", function () {
+          const canvas = cropper.getCroppedCanvas();
+          resultImage.src = canvas.toDataURL("image/png");
+          editorSection.classList.add("hidden");
+          resultSection.classList.remove("hidden");
+        });
+
+        // New image button handler
+        newImageBtn.addEventListener("click", function () {
+          if (cropper) {
+            cropper.destroy();
+          }
+          fileInput.value = "";
+          uploadSection.classList.remove("hidden");
+          editorSection.classList.add("hidden");
+          resultSection.classList.add("hidden");
+        });
+
+        // Download button handler
+        downloadBtn.addEventListener("click", function () {
+          const link = document.createElement("a");
+          link.download = "cropped-image.png";
+          link.href = resultImage.src;
+          link.click();
+        });
+      });
+    </script>
+  </body>
+</html>

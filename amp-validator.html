@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dentsu - SEO Tools</title>
+    <meta
+      name="description"
+      content="Professional SEO tools and utilities for technical SEO analysis, crawling, rendering, and optimization."
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="canonical" href="https://seo.vibeloopdaily.com/" />
+    <!-- Required -->
+    <meta property="og:title" content="Your Page Title Here" />
+    <meta
+      property="og:description"
+      content="A short description of the page content."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://seo.vibeloopdaily.com/" />
+    <meta
+      property="og:image"
+      content="https://seo.vibeloopdaily.com/path-to-your-image.jpg"
+    />
+
+    <!-- Optional but good to include -->
+    <meta property="og:site_name" content="Vibeloop Daily SEO" />
+    <meta property="og:locale" content="en_US" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Vibeloop Daily SEO",
+        "url": "https://seo.vibeloopdaily.com/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://seo.vibeloopdaily.com/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
+    <style>
+      .sidebar-transition {
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .tool-card {
+        transition: all 0.3s ease;
+      }
+
+      .tool-card:hover {
+        transform: translateY(-4px);
+      }
+
+      .modal-backdrop {
+        backdrop-filter: blur(8px);
+      }
+
+      @media (max-width: 1023px) {
+        .sidebar-closed {
+          transform: translateX(-100%);
+        }
+      }
+
+      .custom-bg {
+        background: white;
+      }
+
+      .result-row {
+        transition: background-color 0.3s ease;
+      }
+
+      .result-row:hover {
+        background-color: #f3f4f6;
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen bg-white text-black">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto p-4">
+      <div class="flex items-center mb-4">
+        <button class="text-blue-600 mr-2"></button>
+        <h2 class="text-xl font-bold text-black">AMP Validator</h2>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow-lg">
+        <p class="text-sm text-gray-700 mb-4">
+          Use this bulk validator to check if one or more URLs (up to 10) are
+          valid Accelerated Mobile Pages (AMP). If a submitted URL is not AMP,
+          the tool will look for an AMP URL linked via the rel="amphtml" tag and
+          test it. This tool uses the official AMP Project validator but also
+          checks the implementation of your AMP URLs: does the referenced
+          canonical URL point back to the AMP with a rel="amphtml" tag?
+        </p>
+        <p class="text-sm text-gray-700 mb-4">
+          Looking for a validator with online HTML editor? Here you go:
+          <a href="#" class="text-blue-600">AMP HTML Code Testing Tool</a>
+        </p>
+        <form id="testForm" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div>
+              <label class="block text-sm text-gray-700"
+                >URLs (one per line)</label
+              >
+              <textarea
+                name="urls"
+                class="w-full bg-white border border-gray-300 rounded p-2 mt-1 h-24 text-black"
+                placeholder="https://example.com"
+              ></textarea>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-700">User Agent</label>
+              <select
+                name="userAgent"
+                class="w-full bg-white border border-gray-300 rounded p-2 mt-1 text-black"
+              >
+                <option value="googlebot">Googlebot Smartphone</option>
+                <option value="desktop">Desktop</option>
+                <option value="mobile">Mobile</option>
+              </select>
+            </div>
+            <div>
+              <button
+                type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                TEST
+              </button>
+            </div>
+          </div>
+        </form>
+        <div id="result" class="mt-4 text-green-600 hidden"></div>
+        <div class="mt-6 flex justify-between">
+          <div class="flex space-x-2">
+            <input
+              type="text"
+              class="w-48 bg-white border border-gray-300 rounded p-2 text-black"
+              placeholder="Search..."
+            />
+            <button
+              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Search
+            </button>
+          </div>
+          <div class="flex space-x-2">
+            <button
+              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Download
+            </button>
+            <button
+              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+        <div id="resultsList" class="mt-4">
+          <div class="flex items-center space-x-4 p-2 bg-white rounded">
+            <span class="text-sm text-black">URL</span>
+            <span class="text-sm text-black">Status</span>
+            <span class="text-sm text-black">Validation</span>
+            <span class="text-sm text-black">Implementation</span>
+          </div>
+          <div
+            id="resultItem"
+            class="flex items-center space-x-4 p-2 bg-white rounded mt-2 result-row hidden"
+          >
+            <span class="text-sm text-black"></span>
+            <span class="text-yellow-600"></span>
+            <span class="text-gray-700"></span>
+            <span class="text-gray-700"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Handle form submission and simulate AMP validation
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("testForm");
+        const resultDiv = document.getElementById("result");
+        const resultItem = document.getElementById("resultItem");
+
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+
+          const urls = form
+            .querySelector('textarea[name="urls"]')
+            .value.split("\n")
+            .filter((url) => url.trim());
+          const userAgent = form.querySelector(
+            'select[name="userAgent"]'
+          ).value;
+          if (urls.length === 0 || urls.length > 10) {
+            resultDiv.textContent = "Please enter 1-10 URLs.";
+            resultDiv.classList.remove("hidden");
+            return;
+          }
+
+          resultDiv.textContent = `Validating ${
+            urls.length
+          } URLs with ${userAgent} at ${new Date().toLocaleString("en-US", {
+            timeZone: "Asia/Kolkata",
+          })}...`;
+          resultDiv.classList.remove("hidden");
+
+          // Simulate validation after 2 seconds
+          setTimeout(() => {
+            if (urls.length > 0) {
+              const url = urls[0];
+              let status = "404 Forbidden"; // Simulated status
+              let validation = "⚠️ Partial Validation";
+              let implementation = "−";
+
+              // Simulate AMP validation logic
+              if (url.includes("x.ai")) {
+                status = "403 Forbidden";
+                validation = "❌ Invalid AMP";
+                implementation = "−";
+              } else {
+                status = "200 OK";
+                validation = "✔ Valid AMP";
+                implementation = "✔ Canonical Link OK";
+              }
+
+              resultItem.querySelector("span:first-child").textContent = url;
+              resultItem.querySelector("span:nth-child(2)").textContent =
+                status;
+              resultItem.querySelector("span:nth-child(3)").textContent =
+                validation;
+              resultItem.querySelector("span:nth-child(4)").textContent =
+                implementation;
+              resultItem.classList.remove("hidden");
+            }
+          }, 2000);
+        });
+
+        // Placeholder for search and action buttons
+        document
+          .querySelectorAll('button:not([type="submit"])')
+          .forEach((button) => {
+            button.addEventListener("click", (e) => {
+              if (e.target.textContent === "Search") {
+                alert("Search functionality not implemented yet.");
+              } else if (e.target.textContent === "Download") {
+                alert("Download functionality not implemented yet.");
+              } else if (e.target.textContent === "Save") {
+                alert("Save functionality not implemented yet.");
+              }
+            });
+          });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JPG to PNG Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+
+  <body class="bg-gray-100 min-h-screen">
+    <?php include 'includes/navbar.html'; ?>
+    <nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="container mx-auto px-4 py-8">
+      <div
+        class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl"
+      >
+        <div class="p-8">
+          <div class="text-center">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">
+              JPG to PNG Converter
+            </h1>
+            <p class="text-gray-600">Convert your JPG images to PNG format</p>
+          </div>
+
+          <div class="mt-6 space-y-6">
+            <!-- File Upload -->
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700"
+                >Select JPG Image</label
+              >
+              <div
+                class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md"
+              >
+                <div class="space-y-1 text-center">
+                  <svg
+                    class="mx-auto h-12 w-12 text-gray-400"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 48 48"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <div class="flex text-sm text-gray-600">
+                    <label
+                      for="file-upload"
+                      class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                    >
+                      <span>Upload a file</span>
+                      <input
+                        id="file-upload"
+                        name="file-upload"
+                        type="file"
+                        class="sr-only"
+                        accept="image/jpeg"
+                      />
+                    </label>
+                    <p class="pl-1">or drag and drop</p>
+                  </div>
+                  <p class="text-xs text-gray-500">JPG up to 10MB</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quality Slider -->
+            <div class="space-y-2">
+              <label
+                for="quality"
+                class="block text-sm font-medium text-gray-700"
+                >PNG Quality</label
+              >
+              <input
+                type="range"
+                id="quality"
+                min="0"
+                max="1"
+                step="0.01"
+                value="0.92"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <div class="flex justify-between text-xs text-gray-500">
+                <span>Low (smaller file)</span>
+                <span id="quality-value">0.92</span>
+                <span>High (better quality)</span>
+              </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700"
+                >Preview</label
+              >
+              <div
+                id="preview-container"
+                class="border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center h-64 bg-gray-50"
+              >
+                <p id="preview-placeholder" class="text-gray-400">
+                  Your image will appear here
+                </p>
+                <img
+                  id="image-preview"
+                  class="hidden max-h-full max-w-full object-contain"
+                />
+              </div>
+            </div>
+
+            <!-- Convert Button -->
+            <button
+              id="convert-btn"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled
+            >
+              Convert to PNG
+            </button>
+
+            <!-- Download Button -->
+            <button
+              id="download-btn"
+              class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md hidden"
+            >
+              Download PNG
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <?php include 'includes/footer.html'; ?>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // DOM Elements
+        const fileUpload = document.getElementById("file-upload");
+        const qualitySlider = document.getElementById("quality");
+        const qualityValue = document.getElementById("quality-value");
+        const convertBtn = document.getElementById("convert-btn");
+        const downloadBtn = document.getElementById("download-btn");
+        const previewContainer = document.getElementById("preview-container");
+        const previewPlaceholder = document.getElementById(
+          "preview-placeholder"
+        );
+        const imagePreview = document.getElementById("image-preview");
+
+        // Store the converted image data
+        let convertedImage = null;
+
+        // Update quality value display
+        qualitySlider.addEventListener("input", function () {
+          qualityValue.textContent = this.value;
+        });
+
+        // Handle file upload
+        fileUpload.addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          if (file) {
+            // Check if file is JPG
+            if (
+              !file.type.match("image/jpeg") &&
+              !file.type.match("image/jpg")
+            ) {
+              alert("Please upload a JPG image");
+              return;
+            }
+
+            // Check file size (10MB limit)
+            if (file.size > 10 * 1024 * 1024) {
+              alert("File size exceeds 10MB limit");
+              return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              imagePreview.src = event.target.result;
+              imagePreview.classList.remove("hidden");
+              previewPlaceholder.classList.add("hidden");
+              convertBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        // Handle conversion
+        convertBtn.addEventListener("click", function () {
+          if (!imagePreview.src) {
+            alert("Please upload an image first");
+            return;
+          }
+
+          // Show loading state
+          convertBtn.disabled = true;
+          convertBtn.innerHTML =
+            '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Converting...';
+
+          // Create a canvas element
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const img = new Image();
+
+          img.onload = function () {
+            // Set canvas dimensions
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            // Draw image on canvas
+            ctx.drawImage(img, 0, 0);
+
+            // Convert to PNG (quality setting doesn't affect PNG, but we'll keep it for consistency)
+            const quality = parseFloat(qualitySlider.value);
+            const pngData = canvas.toDataURL("image/png");
+
+            // Store the converted image
+            convertedImage = pngData;
+
+            // Update the preview
+            imagePreview.src = pngData;
+
+            // Show download button
+            downloadBtn.classList.remove("hidden");
+
+            // Reset convert button
+            convertBtn.disabled = false;
+            convertBtn.textContent = "Convert to PNG";
+          };
+
+          img.src = imagePreview.src;
+        });
+
+        // Handle download
+        downloadBtn.addEventListener("click", function () {
+          if (!convertedImage) {
+            alert("No converted image available");
+            return;
+          }
+
+          // Create a temporary link element
+          const link = document.createElement("a");
+          link.href = convertedImage;
+          link.download = "converted-image.png";
+
+          // Trigger download
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+
+        // Drag and drop functionality
+        previewContainer.addEventListener("dragover", function (e) {
+          e.preventDefault();
+          previewContainer.classList.add("border-blue-500");
+        });
+
+        previewContainer.addEventListener("dragleave", function () {
+          previewContainer.classList.remove("border-blue-500");
+        });
+
+        previewContainer.addEventListener("drop", function (e) {
+          e.preventDefault();
+          previewContainer.classList.remove("border-blue-500");
+
+          if (e.dataTransfer.files.length) {
+            fileUpload.files = e.dataTransfer.files;
+            const event = new Event("change");
+            fileUpload.dispatchEvent(event);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

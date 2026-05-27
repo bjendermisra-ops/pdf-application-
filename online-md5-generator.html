@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Online MD5 Generator | SEO Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .highlight {
+        background-color: #f59e0b;
+        color: #1e293b;
+        padding: 0 2px;
+        border-radius: 2px;
+      }
+    </style>
+  </head>
+  <body class="bg-white min-h-screen text-black">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-black mb-2">Online MD5 Generator</h1>
+        <p class="text-lg text-gray-700">
+          Generate MD5 hashes instantly for your SEO needs
+        </p>
+      </header>
+
+      <main
+        class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6"
+      >
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-2">
+            <label for="input-text" class="block text-sm font-medium text-black"
+              >Enter text to hash:</label
+            >
+            <div class="flex gap-2">
+              <button
+                onclick="clearText()"
+                class="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+              >
+                <i class="fas fa-eraser"></i> Clear
+              </button>
+              <button
+                onclick="copyInput()"
+                class="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+              >
+                <i class="fas fa-copy"></i> Copy
+              </button>
+            </div>
+          </div>
+          <textarea
+            id="input-text"
+            rows="4"
+            class="w-full px-4 py-3 bg-white text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Type or paste your text here..."
+          ></textarea>
+
+          <div class="mt-4 flex flex-wrap gap-3">
+            <button
+              onclick="generateMD5()"
+              class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2"
+            >
+              <i class="fas fa-lock"></i> Generate MD5
+            </button>
+            <button
+              onclick="generateRandom()"
+              class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2"
+            >
+              <i class="fas fa-random"></i> Random Text
+            </button>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-2">
+            <label for="output-md5" class="block text-sm font-medium text-black"
+              >MD5 Hash Result:</label
+            >
+            <button
+              onclick="copyOutput()"
+              class="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+            >
+              <i class="fas fa-copy"></i> Copy
+            </button>
+          </div>
+          <input
+            type="text"
+            id="output-md5"
+            readonly
+            class="w-full px-4 py-3 bg-white text-black border border-gray-300 rounded-md font-mono"
+            placeholder="Your MD5 hash will appear here..."
+          />
+
+          <div class="mt-2 flex items-center">
+            <input
+              type="checkbox"
+              id="uppercase"
+              class="mr-2 bg-white border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <label for="uppercase" class="text-sm text-black">Uppercase</label>
+          </div>
+        </div>
+
+        <div class="bg-blue-50 p-4 rounded-md border border-blue-200">
+          <h3 class="text-lg font-medium text-blue-800 mb-2">
+            About MD5 Hashes
+          </h3>
+          <ul class="list-disc pl-5 text-blue-700 space-y-1 text-sm">
+            <li>MD5 is a widely used cryptographic hash function</li>
+            <li>Produces a 128-bit (16-byte) hash value</li>
+            <li>Commonly used to verify data integrity</li>
+            <li>
+              Not recommended for security purposes as it's vulnerable to
+              collisions
+            </li>
+            <li>Still useful for checksums and non-critical applications</li>
+          </ul>
+        </div>
+      </main>
+    </div>
+
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm">
+      <p>
+        Online MD5 Generator Tool © 2023 | For developers and SEO professionals
+      </p>
+    </footer>
+
+    <script>
+      function generateMD5() {
+        const inputText = document.getElementById("input-text").value.trim();
+        const uppercase = document.getElementById("uppercase").checked;
+
+        if (!inputText) {
+          alert("Please enter some text to generate MD5 hash");
+          return;
+        }
+
+        // Generate MD5 hash using CryptoJS
+        const hash = CryptoJS.MD5(inputText).toString();
+        const result = uppercase ? hash.toUpperCase() : hash;
+
+        document.getElementById("output-md5").value = result;
+      }
+
+      function generateRandom() {
+        const randomText =
+          Math.random().toString(36).substring(2) +
+          Math.random().toString(36).substring(2);
+        document.getElementById("input-text").value = randomText.substring(
+          0,
+          32
+        );
+      }
+
+      function clearText() {
+        document.getElementById("input-text").value = "";
+        document.getElementById("output-md5").value = "";
+      }
+
+      function copyInput() {
+        const inputText = document.getElementById("input-text");
+        inputText.select();
+        document.execCommand("copy");
+
+        // Show feedback
+        const button = event.target.closest("button");
+        const originalHtml = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        button.classList.remove("text-blue-600");
+        button.classList.add("text-green-600");
+        setTimeout(() => {
+          button.innerHTML = originalHtml;
+          button.classList.remove("text-green-600");
+          button.classList.add("text-blue-600");
+        }, 2000);
+      }
+
+      function copyOutput() {
+        const outputMD5 = document.getElementById("output-md5");
+        if (!outputMD5.value) {
+          alert("No MD5 hash to copy!");
+          return;
+        }
+
+        outputMD5.select();
+        document.execCommand("copy");
+
+        // Show feedback
+        const button = event.target.closest("button");
+        const originalHtml = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        button.classList.remove("text-blue-600");
+        button.classList.add("text-green-600");
+        setTimeout(() => {
+          button.innerHTML = originalHtml;
+          button.classList.remove("text-green-600");
+          button.classList.add("text-blue-600");
+        }, 2000);
+      }
+
+      // Allow pressing Enter in textarea to generate MD5
+      document
+        .getElementById("input-text")
+        .addEventListener("keydown", function (e) {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            generateMD5();
+          }
+        });
+    </script>
+  </body>
+</html>

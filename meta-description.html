@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Meta Description Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#1e40af',
+                        accent: '#10b981',
+                        warning: '#f59e0b',
+                        error: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .tab-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .code-output {
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            background-color: #1e293b;
+            color: #e2e8f0;
+        }
+        .character-count {
+            transition: all 0.3s ease;
+        }
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        .preview-snippet {
+            font-family: Arial, sans-serif;
+            line-height: 1.4;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .keyword-highlight {
+            background-color: #fef3c7;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+        .pulse-ring {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Advanced Meta Description Generator</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Create compelling, SEO-friendly meta descriptions that improve click-through rates and search visibility.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Input Section -->
+            <div class="space-y-8">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Meta Description Builder</h2>
+                        <div class="flex border-b border-gray-200 mb-4">
+                            <button class="tab-btn px-4 py-2 font-medium text-gray-600 hover:text-primary active" data-tab="basic">Basic</button>
+                            <button class="tab-btn px-4 py-2 font-medium text-gray-600 hover:text-primary" data-tab="advanced">Advanced</button>
+                            <button class="tab-btn px-4 py-2 font-medium text-gray-600 hover:text-primary" data-tab="templates">Templates</button>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <!-- Basic Tab -->
+                        <div id="basic-tab" class="tab-content active">
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Page Title
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">The title of your page - used to generate relevant descriptions</span>
+                                    </span>
+                                </label>
+                                <input type="text" id="page-title" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g., Easy Smart Calculator - Free Online Tools" value="Easy Smart Calculator - Free Online Tools">
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Primary Keyword
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">Main keyword you want to rank for</span>
+                                    </span>
+                                </label>
+                                <input type="text" id="primary-keyword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g., online calculator" value="online calculator">
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Secondary Keywords
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">Additional relevant keywords (comma separated)</span>
+                                    </span>
+                                </label>
+                                <input type="text" id="secondary-keywords" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g., math calculator, finance calculator, health calculator" value="math calculator, finance calculator, health calculator">
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Description Focus
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">What aspect of your page should the description emphasize?</span>
+                                    </span>
+                                </label>
+                                <select id="description-focus" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="benefits">Benefits & Features</option>
+                                    <option value="problem-solving">Problem Solving</option>
+                                    <option value="how-to">How-To Guide</option>
+                                    <option value="comparison">Comparison</option>
+                                    <option value="review">Review/Testimonial</option>
+                                    <option value="urgency">Urgency/Scarcity</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Target Audience
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">Who are you writing this description for?</span>
+                                    </span>
+                                </label>
+                                <select id="target-audience" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="general">General Audience</option>
+                                    <option value="professionals">Professionals</option>
+                                    <option value="students">Students</option>
+                                    <option value="business">Business Users</option>
+                                    <option value="technical">Technical Users</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Tab -->
+                        <div id="advanced-tab" class="tab-content">
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Call to Action
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">What action do you want users to take?</span>
+                                    </span>
+                                </label>
+                                <select id="call-to-action" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="learn">Learn More</option>
+                                    <option value="discover">Discover</option>
+                                    <option value="get">Get Started</option>
+                                    <option value="try">Try Now</option>
+                                    <option value="find">Find Out</option>
+                                    <option value="explore">Explore</option>
+                                    <option value="calculate">Calculate</option>
+                                    <option value="compare">Compare</option>
+                                    <option value="custom">Custom CTA</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-6" id="custom-cta-container" style="display: none;">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Custom Call to Action</label>
+                                <input type="text" id="custom-cta" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter your custom call to action">
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Tone of Voice
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">What tone should the description have?</span>
+                                    </span>
+                                </label>
+                                <select id="tone-voice" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="professional">Professional</option>
+                                    <option value="friendly">Friendly</option>
+                                    <option value="authoritative">Authoritative</option>
+                                    <option value="enthusiastic">Enthusiastic</option>
+                                    <option value="urgent">Urgent</option>
+                                    <option value="helpful">Helpful</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Include Numbers/Statistics
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">Numbers can increase click-through rates</span>
+                                    </span>
+                                </label>
+                                <div class="flex space-x-4">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="include-numbers" value="yes" class="text-primary focus:ring-primary" checked>
+                                        <span class="ml-2 text-sm text-gray-700">Yes</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="include-numbers" value="no" class="text-primary focus:ring-primary">
+                                        <span class="ml-2 text-sm text-gray-700">No</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Power Words
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">Words that trigger emotional responses</span>
+                                    </span>
+                                </label>
+                                <select id="power-words" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="none">No Power Words</option>
+                                    <option value="discover">Discover, Amazing, Revolutionary</option>
+                                    <option value="results">Results, Proven, Effective</option>
+                                    <option value="easy">Easy, Simple, Quick</option>
+                                    <option value="free">Free, Bonus, Limited</option>
+                                    <option value="ultimate">Ultimate, Complete, Comprehensive</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Character Limit
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">Set your preferred character limit</span>
+                                    </span>
+                                </label>
+                                <div class="flex items-center space-x-4">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="character-limit" value="155" class="text-primary focus:ring-primary" checked>
+                                        <span class="ml-2 text-sm text-gray-700">155 (Recommended)</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="character-limit" value="160" class="text-primary focus:ring-primary">
+                                        <span class="ml-2 text-sm text-gray-700">160 (Extended)</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Templates Tab -->
+                        <div id="templates-tab" class="tab-content">
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-800 mb-3">Quick Templates</h3>
+                                <div class="grid grid-cols-1 gap-3">
+                                    <button class="template-btn text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-template="benefit-focused">
+                                        <div class="font-medium text-gray-800">Benefit-Focused Template</div>
+                                        <div class="text-sm text-gray-600 mt-1">Highlight the main benefits and value proposition</div>
+                                    </button>
+                                    <button class="template-btn text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-template="problem-solution">
+                                        <div class="font-medium text-gray-800">Problem-Solution Template</div>
+                                        <div class="text-sm text-gray-600 mt-1">Address a problem and present your solution</div>
+                                    </button>
+                                    <button class="template-btn text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-template="how-to-guide">
+                                        <div class="font-medium text-gray-800">How-To Guide Template</div>
+                                        <div class="text-sm text-gray-600 mt-1">Step-by-step guide format</div>
+                                    </button>
+                                    <button class="template-btn text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-template="list-based">
+                                        <div class="font-medium text-gray-800">List-Based Template</div>
+                                        <div class="text-sm text-gray-600 mt-1">Feature lists and bullet points</div>
+                                    </button>
+                                    <button class="template-btn text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-template="question-based">
+                                        <div class="font-medium text-gray-800">Question-Based Template</div>
+                                        <div class="text-sm text-gray-600 mt-1">Start with a compelling question</div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-800 mb-3">Industry Templates</h3>
+                                <div class="grid grid-cols-1 gap-3">
+                                    <button class="template-btn text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-template="ecommerce">
+                                        <div class="font-medium text-gray-800">E-commerce Product</div>
+                                        <div class="text-sm text-gray-600 mt-1">Product features, pricing, and benefits</div>
+                                    </button>
+                                    <button class="template-btn text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-template="blog-post">
+                                        <div class="font-medium text-gray-800">Blog Post/Article</div>
+                                        <div class="text-sm text-gray-600 mt-1">Article summary and key takeaways</div>
+                                    </button>
+                                    <button class="template-btn text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-template="service-page">
+                                        <div class="font-medium text-gray-800">Service Page</div>
+                                        <div class="text-sm text-gray-600 mt-1">Service benefits and differentiators</div>
+                                    </button>
+                                    <button class="template-btn text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-template="landing-page">
+                                        <div class="font-medium text-gray-800">Landing Page</div>
+                                        <div class="text-sm text-gray-600 mt-1">Conversion-focused with strong CTA</div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <button id="generate-btn" class="w-full px-4 py-3 bg-primary text-white rounded-lg hover:bg-secondary transition-colors flex items-center justify-center font-medium">
+                                <i class="fas fa-magic mr-2"></i> Generate Meta Descriptions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analysis & Tips -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800">SEO Analysis & Tips</h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 rounded-full bg-accent flex items-center justify-center mt-0.5">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Include Primary Keyword</p>
+                                    <p class="text-sm text-gray-600">Place your main keyword near the beginning of the description</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 rounded-full bg-accent flex items-center justify-center mt-0.5">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Create Urgency or Value</p>
+                                    <p class="text-sm text-gray-600">Use action-oriented language that encourages clicks</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 rounded-full bg-accent flex items-center justify-center mt-0.5">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Be Specific and Unique</p>
+                                    <p class="text-sm text-gray-600">Avoid generic descriptions that could apply to any page</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 rounded-full bg-warning flex items-center justify-center mt-0.5">
+                                    <i class="fas fa-exclamation text-white text-xs"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Avoid Duplication</p>
+                                    <p class="text-sm text-gray-600">Each page should have a unique meta description</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="space-y-8">
+                <!-- Generated Descriptions -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Generated Meta Descriptions</h2>
+                        <p class="text-gray-600">Choose the best description for your page and copy the code.</p>
+                    </div>
+                    <div class="p-6">
+                        <div id="descriptions-container" class="space-y-4">
+                            <!-- Descriptions will be generated here -->
+                            <div class="p-4 border border-gray-200 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="character-count flex items-center">
+                                        <div class="relative w-8 h-8 mr-2">
+                                            <svg class="w-8 h-8" viewBox="0 0 36 36">
+                                                <path class="text-gray-200" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                                <path class="text-accent" stroke-width="3" stroke-dasharray="90, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                                <text x="18" y="20.5" class="text-[8px] font-bold fill-gray-700 text-center" text-anchor="middle">90</text>
+                                            </svg>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-700">90/155 characters</span>
+                                    </div>
+                                    <button class="copy-desc-btn px-3 py-1 bg-primary text-white text-sm rounded hover:bg-secondary transition-colors">
+                                        <i class="fas fa-copy mr-1"></i> Copy
+                                    </button>
+                                </div>
+                                <p class="text-gray-700 preview-snippet">Easy Smart Calculator offers free online calculators for math, finance, health, and daily life. Simple, accurate, and user-friendly tools.</p>
+                                <div class="mt-2 flex items-center text-sm text-gray-500">
+                                    <i class="fas fa-lightbulb mr-1"></i>
+                                    <span>Includes primary keyword and clear value proposition</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Section -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Search Results Preview</h2>
+                        <p class="text-gray-600">See how your description will appear in Google search results.</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="preview-snippet bg-white border border-gray-200 rounded-lg p-4 max-w-2xl">
+                            <div class="text-sm text-green-700 mb-1">https://easysmartcalculator.com</div>
+                            <h3 class="text-lg text-blue-700 font-medium mb-1">Easy Smart Calculator - Free Online Tools</h3>
+                            <p id="preview-description" class="text-gray-600 text-sm">Easy Smart Calculator offers free online calculators for math, finance, health, and daily life. Simple, accurate, and user-friendly tools.</p>
+                        </div>
+                        <div class="mt-4 text-sm text-gray-600">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-search mr-2 text-gray-400"></i>
+                                <span>This is an approximation of how Google might display your page</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Implementation -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Implementation</h2>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Add your chosen meta description to the &lt;head&gt; section of your HTML:</p>
+                        
+                        <div class="code-output p-4 rounded-lg mb-4">
+                            &lt;!DOCTYPE html&gt;<br>
+                            &lt;html lang="en"&gt;<br>
+                            &lt;head&gt;<br>
+                            &nbsp;&nbsp;&lt;meta charset="UTF-8"&gt;<br>
+                            &nbsp;&nbsp;&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;<br>
+                            &nbsp;&nbsp;&lt;title&gt;Easy Smart Calculator - Free Online Tools&lt;/title&gt;<br>
+                            &nbsp;&nbsp;<span class="text-accent" id="implementation-example">&lt;meta name="description" content="Easy Smart Calculator offers free online calculators for math, finance, health, and daily life. Simple, accurate, and user-friendly tools."&gt;</span><br>
+                            &lt;/head&gt;<br>
+                            &lt;body&gt;<br>
+                            &nbsp;&nbsp;&lt;!-- Your website content --&gt;<br>
+                            &lt;/body&gt;<br>
+                            &lt;/html&gt;
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Keyword Analysis -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Keyword Analysis</h2>
+                    </div>
+                    <div class="p-6">
+                        <div id="keyword-analysis" class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-gray-700">Primary Keyword:</span>
+                                <span class="text-sm bg-accent text-white px-2 py-1 rounded">online calculator</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-gray-700">Secondary Keywords:</span>
+                                <div class="flex space-x-1">
+                                    <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">math calculator</span>
+                                    <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">finance calculator</span>
+                                    <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">health calculator</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-gray-700">Keyword Density:</span>
+                                <span class="text-sm font-medium text-accent">Optimal</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and tabs
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(tab => tab.classList.remove('active'));
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Show corresponding tab
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        // Custom CTA toggle
+        document.getElementById('call-to-action').addEventListener('change', function() {
+            const customCtaContainer = document.getElementById('custom-cta-container');
+            if (this.value === 'custom') {
+                customCtaContainer.style.display = 'block';
+            } else {
+                customCtaContainer.style.display = 'none';
+            }
+        });
+
+        // Template buttons
+        const templateButtons = document.querySelectorAll('.template-btn');
+        templateButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const template = this.getAttribute('data-template');
+                applyTemplate(template);
+            });
+        });
+
+        // Copy description buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('copy-desc-btn') || e.target.closest('.copy-desc-btn')) {
+                const button = e.target.classList.contains('copy-desc-btn') ? e.target : e.target.closest('.copy-desc-btn');
+                const description = button.closest('.border').querySelector('.preview-snippet').textContent;
+                navigator.clipboard.writeText(description).then(() => {
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                    }, 2000);
+                });
+            }
+        });
+
+        // Generate descriptions
+        document.getElementById('generate-btn').addEventListener('click', generateDescriptions);
+
+        // Apply template function
+        function applyTemplate(template) {
+            const templates = {
+                'benefit-focused': {
+                    focus: 'benefits',
+                    tone: 'friendly',
+                    cta: 'discover'
+                },
+                'problem-solution': {
+                    focus: 'problem-solving',
+                    tone: 'helpful',
+                    cta: 'find'
+                },
+                'how-to-guide': {
+                    focus: 'how-to',
+                    tone: 'authoritative',
+                    cta: 'learn'
+                },
+                'list-based': {
+                    focus: 'benefits',
+                    tone: 'professional',
+                    cta: 'explore'
+                },
+                'question-based': {
+                    focus: 'problem-solving',
+                    tone: 'friendly',
+                    cta: 'discover'
+                },
+                'ecommerce': {
+                    focus: 'benefits',
+                    tone: 'enthusiastic',
+                    cta: 'get'
+                },
+                'blog-post': {
+                    focus: 'benefits',
+                    tone: 'authoritative',
+                    cta: 'read'
+                },
+                'service-page': {
+                    focus: 'benefits',
+                    tone: 'professional',
+                    cta: 'get'
+                },
+                'landing-page': {
+                    focus: 'urgency',
+                    tone: 'urgent',
+                    cta: 'try'
+                }
+            };
+
+            if (templates[template]) {
+                const t = templates[template];
+                document.getElementById('description-focus').value = t.focus;
+                document.getElementById('tone-voice').value = t.tone;
+                document.getElementById('call-to-action').value = t.cta;
+                
+                // Switch to basic tab
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(tab => tab.classList.remove('active'));
+                document.querySelector('[data-tab="basic"]').classList.add('active');
+                document.getElementById('basic-tab').classList.add('active');
+            }
+        }
+
+        // Generate descriptions function
+        function generateDescriptions() {
+            const pageTitle = document.getElementById('page-title').value;
+            const primaryKeyword = document.getElementById('primary-keyword').value;
+            const secondaryKeywords = document.getElementById('secondary-keywords').value.split(',').map(k => k.trim()).filter(k => k);
+            const focus = document.getElementById('description-focus').value;
+            const audience = document.getElementById('target-audience').value;
+            const cta = document.getElementById('call-to-action').value;
+            const customCta = document.getElementById('custom-cta').value;
+            const tone = document.getElementById('tone-voice').value;
+            const includeNumbers = document.querySelector('input[name="include-numbers"]:checked').value;
+            const powerWords = document.getElementById('power-words').value;
+            const charLimit = document.querySelector('input[name="character-limit"]:checked').value;
+
+            const finalCta = cta === 'custom' ? customCta : cta;
+            
+            // Generate multiple description variations
+            const descriptions = generateDescriptionVariations(
+                pageTitle, primaryKeyword, secondaryKeywords, focus, audience, 
+                finalCta, tone, includeNumbers, powerWords, charLimit
+            );
+
+            // Display descriptions
+            displayDescriptions(descriptions);
+            
+            // Update preview
+            document.getElementById('preview-description').textContent = descriptions[0].text;
+            document.getElementById('implementation-example').textContent = 
+                `<meta name="description" content="${descriptions[0].text}">`;
+        }
+
+        // Generate description variations
+        function generateDescriptionVariations(title, primaryKeyword, secondaryKeywords, focus, audience, cta, tone, includeNumbers, powerWords, charLimit) {
+            const variations = [];
+            
+            // Template 1: Benefit-focused
+            variations.push({
+                text: `${title} - ${getPowerWords(powerWords)}free ${primaryKeyword} for ${secondaryKeywords.slice(0, 2).join(', ')} and more. ${getCTAPhrase(cta, tone)} today!`,
+                score: 95,
+                analysis: "Strong benefit focus with clear CTA"
+            });
+            
+            // Template 2: Problem-solution
+            variations.push({
+                text: `Need a ${primaryKeyword}? ${title} provides accurate calculations for ${secondaryKeywords.join(', ')}. ${getCTAPhrase(cta, tone)} now!`,
+                score: 88,
+                analysis: "Problem-solution approach with urgency"
+            });
+            
+            // Template 3: Feature-focused
+            const numberPhrase = includeNumbers === 'yes' ? '50+ ' : '';
+            variations.push({
+                text: `Discover ${numberPhrase}free ${primaryKeyword} tools including ${secondaryKeywords.slice(0, 3).join(', ')}. ${getTonePhrase(tone)} and easy to use.`,
+                score: 92,
+                analysis: "Feature-focused with social proof"
+            });
+            
+            // Template 4: Question-based
+            variations.push({
+                text: `Looking for the best ${primaryKeyword}? ${title} offers ${secondaryKeywords.length}+ specialized calculators. ${getCTAPhrase(cta, tone)} free!`,
+                score: 85,
+                analysis: "Engaging question format"
+            });
+            
+            // Template 5: Comprehensive
+            variations.push({
+                text: `${title}: Your complete ${primaryKeyword} solution. Calculate ${secondaryKeywords.slice(0, 2).join(', ')} and more with ${getToneAdjective(tone)} precision.`,
+                score: 90,
+                analysis: "Comprehensive and authoritative"
+            });
+            
+            // Trim to character limit and add scores
+            return variations.map(desc => {
+                let text = desc.text;
+                if (text.length > charLimit) {
+                    text = text.substring(0, charLimit - 3) + '...';
+                }
+                return {
+                    text: text,
+                    score: desc.score,
+                    analysis: desc.analysis,
+                    length: text.length
+                };
+            });
+        }
+
+        // Helper functions
+        function getPowerWords(type) {
+            const powerWords = {
+                'none': '',
+                'discover': 'Discover our amazing, ',
+                'results': 'Get proven results with our ',
+                'easy': 'Easy-to-use ',
+                'free': 'Completely free ',
+                'ultimate': 'The ultimate '
+            };
+            return powerWords[type] || '';
+        }
+
+        function getCTAPhrase(cta, tone) {
+            const phrases = {
+                'learn': 'Learn more',
+                'discover': 'Discover how',
+                'get': 'Get started',
+                'try': 'Try it',
+                'find': 'Find out',
+                'explore': 'Explore features',
+                'calculate': 'Calculate now',
+                'compare': 'Compare options'
+            };
+            return phrases[cta] || cta;
+        }
+
+        function getTonePhrase(tone) {
+            const phrases = {
+                'professional': 'Professional-grade tools',
+                'friendly': 'User-friendly interface',
+                'authoritative': 'Industry-leading accuracy',
+                'enthusiastic': 'Amazingly accurate results',
+                'urgent': 'Instant calculations',
+                'helpful': 'Helpful for everyone'
+            };
+            return phrases[tone] || 'Easy to use';
+        }
+
+        function getToneAdjective(tone) {
+            const adjectives = {
+                'professional': 'professional',
+                'friendly': 'user-friendly',
+                'authoritative': 'precise',
+                'enthusiastic': 'amazing',
+                'urgent': 'instant',
+                'helpful': 'reliable'
+            };
+            return adjectives[tone] || 'accurate';
+        }
+
+        // Display generated descriptions
+        function displayDescriptions(descriptions) {
+            const container = document.getElementById('descriptions-container');
+            container.innerHTML = '';
+            
+            descriptions.forEach((desc, index) => {
+                const percentage = Math.round((desc.length / parseInt(document.querySelector('input[name="character-limit"]:checked').value)) * 100);
+                const color = percentage <= 80 ? 'text-accent' : percentage <= 95 ? 'text-warning' : 'text-error';
+                
+                const descElement = document.createElement('div');
+                descElement.className = 'p-4 border border-gray-200 rounded-lg';
+                descElement.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="character-count flex items-center">
+                            <div class="relative w-8 h-8 mr-2">
+                                <svg class="w-8 h-8" viewBox="0 0 36 36">
+                                    <path class="text-gray-200" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    <path class="${color}" stroke-width="3" stroke-dasharray="${percentage}, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    <text x="18" y="20.5" class="text-[8px] font-bold fill-gray-700 text-center" text-anchor="middle">${desc.length}</text>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700">${desc.length}/${document.querySelector('input[name="character-limit"]:checked').value} characters</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="flex items-center bg-green-50 text-green-700 px-2 py-1 rounded text-sm">
+                                <i class="fas fa-star mr-1"></i>
+                                <span>${desc.score}%</span>
+                            </div>
+                            <button class="copy-desc-btn px-3 py-1 bg-primary text-white text-sm rounded hover:bg-secondary transition-colors">
+                                <i class="fas fa-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 preview-snippet">${desc.text}</p>
+                    <div class="mt-2 flex items-center text-sm text-gray-500">
+                        <i class="fas fa-lightbulb mr-1"></i>
+                        <span>${desc.analysis}</span>
+                    </div>
+                `;
+                container.appendChild(descElement);
+            });
+        }
+
+        // Initialize with a sample description
+        generateDescriptions();
+    </script>
+</body>
+</html>

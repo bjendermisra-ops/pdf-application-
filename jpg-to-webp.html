@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JPG to WEBP Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+
+  <body class="bg-gray-100 min-h-screen">
+    <?php include 'includes/navbar.html'; ?>
+    <nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="container mx-auto px-4 py-8">
+      <div
+        class="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 h-[400px]"
+      >
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
+          JPG to WEBP Converter
+        </h1>
+
+        <div class="mb-8">
+          <div
+            id="drop-area"
+            class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 transition"
+          >
+            <div class="flex flex-col items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-12 w-12 text-blue-500 mb-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <p class="text-lg font-medium text-gray-700">
+                Drag & Drop your JPG image here
+              </p>
+              <p class="text-sm text-gray-500 mt-1">or click to browse files</p>
+              <input
+                type="file"
+                id="file-input"
+                accept="image/jpeg"
+                class="hidden"
+              />
+            </div>
+          </div>
+          <p id="file-info" class="text-sm text-gray-500 mt-2 hidden"></p>
+        </div>
+
+        <div id="preview-section" class="hidden mb-8">
+          <h2 class="text-xl font-semibold text-gray-700 mb-4">Preview</h2>
+          <div class="flex flex-col md:flex-row gap-6">
+            <div class="flex-1">
+              <h3 class="text-md font-medium text-gray-600 mb-2">
+                Original JPG
+              </h3>
+              <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <img
+                  id="original-preview"
+                  class="max-w-full max-h-64 mx-auto"
+                  src=""
+                  alt="Original JPG"
+                />
+                <p
+                  id="original-info"
+                  class="text-xs text-gray-500 mt-2 text-center"
+                ></p>
+              </div>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-md font-medium text-gray-600 mb-2">
+                Converted WEBP
+              </h3>
+              <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <img
+                  id="webp-preview"
+                  class="max-w-full max-h-64 mx-auto"
+                  src=""
+                  alt="Converted WEBP"
+                />
+                <p
+                  id="webp-info"
+                  class="text-xs text-gray-500 mt-2 text-center"
+                ></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="controls" class="hidden">
+          <div class="bg-gray-50 p-4 rounded-lg mb-6">
+            <h3 class="text-lg font-medium text-gray-700 mb-3">
+              Conversion Options
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Quality (0-100)</label
+                >
+                <input
+                  type="range"
+                  id="quality"
+                  min="0"
+                  max="100"
+                  value="80"
+                  class="w-full"
+                />
+                <div class="flex justify-between">
+                  <span class="text-xs text-gray-500">Smaller file</span>
+                  <span id="quality-value" class="text-sm font-medium">80</span>
+                  <span class="text-xs text-gray-500">Better quality</span>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Resize (optional)</label
+                >
+                <div class="flex items-center gap-2">
+                  <input
+                    type="number"
+                    id="resize-width"
+                    placeholder="Width"
+                    class="border border-gray-300 rounded-lg px-3 py-2 w-20"
+                  />
+                  <span class="text-gray-500">×</span>
+                  <input
+                    type="number"
+                    id="resize-height"
+                    placeholder="Height"
+                    class="border border-gray-300 rounded-lg px-3 py-2 w-20"
+                  />
+                  <span class="text-xs text-gray-500"
+                    >px (keep aspect ratio)</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              id="convert-btn"
+              class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"
+            >
+              Convert to WEBP
+            </button>
+            <button
+              id="download-btn"
+              class="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition hidden"
+            >
+              Download WEBP
+            </button>
+            <button
+              id="reset-btn"
+              class="px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition"
+            >
+              Start Over
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="loading"
+          class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        >
+          <div
+            class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center"
+          >
+            <div
+              class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"
+            ></div>
+            <p class="text-lg font-medium text-gray-800">Converting Image...</p>
+            <p class="text-sm text-gray-600 mt-1">
+              This may take a few seconds
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <?php include 'includes/footer.html'; ?>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // DOM Elements
+        const dropArea = document.getElementById("drop-area");
+        const fileInput = document.getElementById("file-input");
+        const fileInfo = document.getElementById("file-info");
+        const previewSection = document.getElementById("preview-section");
+        const originalPreview = document.getElementById("original-preview");
+        const webpPreview = document.getElementById("webp-preview");
+        const originalInfo = document.getElementById("original-info");
+        const webpInfo = document.getElementById("webp-info");
+        const controls = document.getElementById("controls");
+        const qualityInput = document.getElementById("quality");
+        const qualityValue = document.getElementById("quality-value");
+        const resizeWidth = document.getElementById("resize-width");
+        const resizeHeight = document.getElementById("resize-height");
+        const convertBtn = document.getElementById("convert-btn");
+        const downloadBtn = document.getElementById("download-btn");
+        const resetBtn = document.getElementById("reset-btn");
+        const loading = document.getElementById("loading");
+
+        // App state
+        let originalFile = null;
+        let originalImage = new Image();
+        let webpBlob = null;
+        let originalSize = 0;
+
+        // Event Listeners
+        setupEventListeners();
+
+        function setupEventListeners() {
+          // File upload
+          ["dragenter", "dragover", "dragleave", "drop"].forEach(
+            (eventName) => {
+              dropArea.addEventListener(eventName, preventDefaults, false);
+            }
+          );
+
+          ["dragenter", "dragover"].forEach((eventName) => {
+            dropArea.addEventListener(eventName, highlight, false);
+          });
+
+          ["dragleave", "drop"].forEach((eventName) => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+          });
+
+          dropArea.addEventListener("drop", handleDrop, false);
+          dropArea.addEventListener("click", () => fileInput.click());
+          fileInput.addEventListener("change", handleFileSelect);
+
+          // Quality input
+          qualityInput.addEventListener("input", updateQualityValue);
+
+          // Aspect ratio maintenance
+          resizeWidth.addEventListener("change", maintainAspectRatio);
+          resizeHeight.addEventListener("change", maintainAspectRatio);
+
+          // Buttons
+          convertBtn.addEventListener("click", convertToWebP);
+          downloadBtn.addEventListener("click", downloadWebP);
+          resetBtn.addEventListener("click", resetConverter);
+        }
+
+        function preventDefaults(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        function highlight() {
+          dropArea.classList.add("border-blue-500", "bg-blue-50");
+        }
+
+        function unhighlight() {
+          dropArea.classList.remove("border-blue-500", "bg-blue-50");
+        }
+
+        function handleDrop(e) {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          if (files.length) {
+            handleFiles(files);
+          }
+        }
+
+        function handleFileSelect(e) {
+          if (e.target.files.length) {
+            handleFiles(e.target.files);
+          }
+        }
+
+        function handleFiles(files) {
+          const file = files[0];
+
+          // Check if file is JPG
+          if (
+            !file.type.match("image/jpeg") &&
+            !file.name.toLowerCase().endsWith(".jpg") &&
+            !file.name.toLowerCase().endsWith(".jpeg")
+          ) {
+            alert("Please upload a JPG image file.");
+            return;
+          }
+
+          originalFile = file;
+          originalSize = file.size;
+          fileInfo.textContent = `File: ${file.name} (${formatFileSize(
+            file.size
+          )})`;
+          fileInfo.classList.remove("hidden");
+
+          // Load image for preview
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            originalImage.onload = function () {
+              showOriginalPreview();
+              controls.classList.remove("hidden");
+            };
+            originalImage.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+
+        function showOriginalPreview() {
+          originalPreview.src = originalImage.src;
+          originalInfo.textContent = `Dimensions: ${originalImage.width} × ${
+            originalImage.height
+          }px | Size: ${formatFileSize(originalSize)}`;
+
+          // Set initial resize values
+          resizeWidth.value = originalImage.width;
+          resizeHeight.value = originalImage.height;
+
+          previewSection.classList.remove("hidden");
+        }
+
+        function updateQualityValue() {
+          qualityValue.textContent = qualityInput.value;
+        }
+
+        function maintainAspectRatio() {
+          if (!originalImage) return;
+
+          // Determine which field changed
+          const changedField = event.target.id;
+          const otherField =
+            changedField === "resize-width" ? "resize-height" : "resize-width";
+
+          // Calculate aspect ratio
+          const aspectRatio = originalImage.width / originalImage.height;
+
+          // Update the other field to maintain aspect ratio
+          if (changedField === "resize-width" && resizeWidth.value) {
+            resizeHeight.value = Math.round(resizeWidth.value / aspectRatio);
+          } else if (changedField === "resize-height" && resizeHeight.value) {
+            resizeWidth.value = Math.round(resizeHeight.value * aspectRatio);
+          }
+        }
+
+        async function convertToWebP() {
+          if (!originalFile) return;
+
+          loading.classList.remove("hidden");
+
+          try {
+            // Get conversion options
+            const quality = parseInt(qualityInput.value) / 100;
+            const width = parseInt(resizeWidth.value) || originalImage.width;
+            const height = parseInt(resizeHeight.value) || originalImage.height;
+
+            // Create canvas for conversion
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+
+            // Draw image to canvas (with resizing if needed)
+            ctx.drawImage(originalImage, 0, 0, width, height);
+
+            // Convert to WEBP
+            webpBlob = await new Promise((resolve) => {
+              canvas.toBlob(
+                (blob) => {
+                  resolve(blob);
+                },
+                "image/webp",
+                quality
+              );
+            });
+
+            // Show WEBP preview
+            const webpUrl = URL.createObjectURL(webpBlob);
+            webpPreview.src = webpUrl;
+            webpInfo.textContent = `Dimensions: ${width} × ${height}px | Size: ${formatFileSize(
+              webpBlob.size
+            )}`;
+
+            // Show download button
+            downloadBtn.classList.remove("hidden");
+
+            // Log conversion results
+            const reduction = (
+              ((originalSize - webpBlob.size) / originalSize) *
+              100
+            ).toFixed(2);
+            console.log(`Conversion complete. Size reduced by ${reduction}%`);
+          } catch (error) {
+            console.error("Conversion error:", error);
+            alert("Error converting image. Please try again.");
+          } finally {
+            loading.classList.add("hidden");
+          }
+        }
+
+        function downloadWebP() {
+          if (!webpBlob) return;
+
+          const link = document.createElement("a");
+          link.download = originalFile.name.replace(/\.jpe?g$/i, "") + ".webp";
+          link.href = URL.createObjectURL(webpBlob);
+          link.click();
+
+          // Clean up
+          setTimeout(() => {
+            URL.revokeObjectURL(link.href);
+          }, 100);
+        }
+
+        function resetConverter() {
+          // Reset file input
+          fileInput.value = "";
+          originalFile = null;
+          originalImage = new Image();
+          webpBlob = null;
+
+          // Reset previews
+          originalPreview.src = "";
+          webpPreview.src = "";
+          originalInfo.textContent = "";
+          webpInfo.textContent = "";
+
+          // Reset UI
+          previewSection.classList.add("hidden");
+          controls.classList.add("hidden");
+          fileInfo.classList.add("hidden");
+          downloadBtn.classList.add("hidden");
+
+          // Reset options
+          qualityInput.value = 80;
+          qualityValue.textContent = "80";
+
+          if (originalImage.width) {
+            resizeWidth.value = originalImage.width;
+            resizeHeight.value = originalImage.height;
+          } else {
+            resizeWidth.value = "";
+            resizeHeight.value = "";
+          }
+        }
+
+        function formatFileSize(bytes) {
+          if (bytes === 0) return "0 Bytes";
+
+          const k = 1024;
+          const sizes = ["Bytes", "KB", "MB", "GB"];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+          return (
+            parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+          );
+        }
+      });
+    </script>
+  </body>
+</html>

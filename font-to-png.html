@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Font Awesome Icons to PNG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .color-preview {
+        width: 30px;
+        height: 30px;
+        display: inline-block;
+        border: 1px solid #d1d5db;
+        vertical-align: middle;
+        margin-left: 10px;
+      }
+
+      .icon-preview {
+        font-size: 100px;
+        text-align: center;
+        margin: 20px 0;
+        padding: 20px;
+        background-color: #f3f4f6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      canvas {
+        display: none;
+      }
+
+      .icon-option {
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .icon-option:hover {
+        background-color: #e5e7eb;
+      }
+
+      .icon-option i {
+        margin-right: 8px;
+        width: 20px;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-100 min-h-screen">
+    <?php include 'includes/navbar.html'; ?>
+    <nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="container mx-auto px-4 py-12">
+      <div
+        class="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6"
+      >
+        <h1 class="text-2xl font-bold text-gray-800 mb-2 text-center">
+          Font Awesome Icons to PNG
+        </h1>
+        <p class="text-gray-600 text-center mb-6">
+          Convert Font Awesome Icons to PNG
+        </p>
+
+        <div class="mb-6">
+          <label
+            class="block text-gray-700 text-sm font-bold mb-2"
+            for="icon-select"
+          >
+            Select Font Icon
+          </label>
+          <div class="relative">
+            <select
+              id="icon-select"
+              class="block appearance-none w-full bg-gray-100 border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+            >
+              <option value="">Select Font Icon please</option>
+              <option value="fa-heart">Heart</option>
+              <option value="fa-star">Star</option>
+              <option value="fa-camera">Camera</option>
+              <option value="fa-home">Home</option>
+              <option value="fa-envelope">Envelope</option>
+              <option value="fa-bell">Bell</option>
+              <option value="fa-user">User</option>
+              <option value="fa-gear">Gear</option>
+              <option value="fa-search">Search</option>
+              <option value="fa-thumbs-up">Thumbs Up</option>
+              <option value="fa-shopping-cart">Shopping Cart</option>
+              <option value="fa-phone">Phone</option>
+              <option value="fa-globe">Globe</option>
+              <option value="fa-calendar">Calendar</option>
+              <option value="fa-clock">Clock</option>
+              <option value="fa-image">Image</option>
+              <option value="fa-music">Music</option>
+              <option value="fa-film">Film</option>
+              <option value="fa-book">Book</option>
+              <option value="fa-flag">Flag</option>
+              <option value="fa-trash">Trash</option>
+              <option value="fa-download">Download</option>
+              <option value="fa-upload">Upload</option>
+              <option value="fa-lock">Lock</option>
+              <option value="fa-unlock">Unlock</option>
+              <option value="fa-print">Print</option>
+              <option value="fa-save">Save</option>
+              <option value="fa-share">Share</option>
+              <option value="fa-plus">Plus</option>
+              <option value="fa-minus">Minus</option>
+              <option value="fa-times">Times</option>
+              <option value="fa-check">Check</option>
+              <option value="fa-arrow-right">Arrow Right</option>
+              <option value="fa-arrow-left">Arrow Left</option>
+              <option value="fa-arrow-up">Arrow Up</option>
+              <option value="fa-arrow-down">Arrow Down</option>
+              <option value="fa-info-circle">Info</option>
+              <option value="fa-exclamation-triangle">Warning</option>
+              <option value="fa-question-circle">Question</option>
+              <option value="fa-cog">Cog</option>
+              <option value="fa-wifi">Wifi</option>
+              <option value="fa-battery-full">Battery</option>
+            </select>
+            <div
+              class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+            >
+              <i class="fas fa-chevron-down"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="icon-preview" id="icon-preview">
+          <i class="fas fa-question"></i>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label
+              class="block text-gray-700 text-sm font-bold mb-2"
+              for="font-size"
+            >
+              Font Size: <span id="font-size-value">100</span>px
+            </label>
+            <input
+              type="range"
+              id="font-size"
+              min="10"
+              max="200"
+              value="100"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label
+              class="block text-gray-700 text-sm font-bold mb-2"
+              for="font-color"
+            >
+              Font Color
+            </label>
+            <div class="flex items-center">
+              <input
+                type="color"
+                id="font-color"
+                value="#000000"
+                class="w-10 h-10"
+              />
+              <div
+                class="color-preview"
+                id="color-preview"
+                style="background-color: #000000"
+              ></div>
+            </div>
+          </div>
+
+          <div>
+            <label
+              class="block text-gray-700 text-sm font-bold mb-2"
+              for="bg-color"
+            >
+              Background Color
+            </label>
+            <div class="flex items-center">
+              <input
+                type="color"
+                id="bg-color"
+                value="#f3f4f6"
+                class="w-10 h-10"
+              />
+              <div
+                class="color-preview"
+                id="bg-color-preview"
+                style="background-color: #f3f4f6"
+              ></div>
+              <div class="ml-4">
+                <input type="checkbox" id="transparent-bg" class="mr-2" />
+                <label for="transparent-bg" class="text-sm text-gray-700"
+                  >Transparent</label
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                class="block text-gray-700 text-sm font-bold mb-2"
+                for="hue"
+              >
+                Hue: <span id="hue-value">0</span>°
+              </label>
+              <input
+                type="range"
+                id="hue"
+                min="0"
+                max="360"
+                value="0"
+                class="w-full"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-gray-700 text-sm font-bold mb-2"
+                for="alpha"
+              >
+                Alpha: <span id="alpha-value">1</span>
+              </label>
+              <input
+                type="range"
+                id="alpha"
+                min="0"
+                max="1"
+                step="0.1"
+                value="1"
+                class="w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 flex justify-center">
+          <button
+            id="download-btn"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded focus:outline-none focus:shadow-outline"
+          >
+            Download PNG
+          </button>
+        </div>
+
+        <canvas id="canvas"></canvas>
+      </div>
+    </div>
+    <?php include 'includes/footer.html'; ?>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize elements
+        const iconSelect = document.getElementById("icon-select");
+        const iconPreview = document.getElementById("icon-preview");
+        const iconElement = iconPreview.querySelector("i");
+        const fontSize = document.getElementById("font-size");
+        const fontSizeValue = document.getElementById("font-size-value");
+        const fontColor = document.getElementById("font-color");
+        const colorPreview = document.getElementById("color-preview");
+        const bgColor = document.getElementById("bg-color");
+        const bgColorPreview = document.getElementById("bg-color-preview");
+        const transparentBg = document.getElementById("transparent-bg");
+        const hue = document.getElementById("hue");
+        const hueValue = document.getElementById("hue-value");
+        const alpha = document.getElementById("alpha");
+        const alphaValue = document.getElementById("alpha-value");
+        const downloadBtn = document.getElementById("download-btn");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        // Current selected icon
+        let currentIcon = "fa-question";
+
+        // Initialize event listeners
+        iconSelect.addEventListener("change", function () {
+          currentIcon = this.value;
+          if (currentIcon) {
+            // Check if it's a brand icon (fab) or regular (fas)
+            const isBrandIcon = [
+              "fa-facebook",
+              "fa-twitter",
+              "fa-instagram",
+              "fa-linkedin",
+              "fa-youtube",
+              "fa-pinterest",
+              "fa-reddit",
+              "fa-tiktok",
+              "fa-whatsapp",
+              "fa-telegram",
+              "fa-discord",
+              "fa-twitch",
+              "fa-snapchat",
+              "fa-skype",
+              "fa-viber",
+              "fa-apple",
+              "fa-google",
+              "fa-amazon",
+              "fa-microsoft",
+              "fa-spotify",
+              "fa-netflix",
+              "fa-paypal",
+              "fa-cc-visa",
+              "fa-cc-mastercard",
+              "fa-cc-amex",
+              "fa-bitcoin",
+              "fa-ethereum",
+              "fa-airbnb",
+              "fa-uber",
+              "fa-dropbox",
+              "fa-git",
+              "fa-github",
+              "fa-gitlab",
+              "fa-npm",
+              "fa-stack-overflow",
+              "fa-wordpress",
+              "fa-shopify",
+              "fa-dribbble",
+              "fa-behance",
+            ].includes(currentIcon);
+
+            iconElement.className = isBrandIcon
+              ? `fab ${currentIcon}`
+              : `fas ${currentIcon}`;
+            updateColor();
+          }
+        });
+
+        fontSize.addEventListener("input", function () {
+          const size = this.value;
+          fontSizeValue.textContent = size;
+          iconElement.style.fontSize = `${size}px`;
+        });
+
+        fontColor.addEventListener("input", function () {
+          const color = this.value;
+          colorPreview.style.backgroundColor = color;
+          updateColor();
+        });
+
+        bgColor.addEventListener("input", function () {
+          const color = this.value;
+          bgColorPreview.style.backgroundColor = color;
+          if (!transparentBg.checked) {
+            iconPreview.style.backgroundColor = color;
+          }
+        });
+
+        transparentBg.addEventListener("change", function () {
+          if (this.checked) {
+            iconPreview.style.backgroundColor = "transparent";
+          } else {
+            iconPreview.style.backgroundColor = bgColor.value;
+          }
+        });
+
+        hue.addEventListener("input", function () {
+          const value = this.value;
+          hueValue.textContent = value;
+          updateColor();
+        });
+
+        alpha.addEventListener("input", function () {
+          const value = this.value;
+          alphaValue.textContent = value;
+          updateColor();
+        });
+
+        downloadBtn.addEventListener("click", function () {
+          if (!currentIcon) {
+            alert("Please select an icon first");
+            return;
+          }
+
+          // Set canvas size (2x the icon size for better quality)
+          const size = parseInt(fontSize.value) * 2;
+          canvas.width = size;
+          canvas.height = size;
+
+          // Clear canvas
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Draw background if not transparent
+          if (!transparentBg.checked) {
+            ctx.fillStyle = bgColor.value;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          }
+
+          // Draw the icon
+          ctx.font = `${fontSize.value}px "Font Awesome 6 Free", "Font Awesome 6 Brands"`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = iconElement.style.color || fontColor.value;
+
+          // Get the Unicode value of the icon
+          const iconUnicode = getIconUnicode(currentIcon);
+          ctx.fillText(iconUnicode, canvas.width / 2, canvas.height / 2);
+
+          // Create download link
+          const link = document.createElement("a");
+          link.download = `${currentIcon.replace("fa-", "")}-icon.png`;
+          link.href = canvas.toDataURL("image/png");
+          link.click();
+        });
+
+        // Helper function to update icon color with hue and alpha
+        function updateColor() {
+          const color = applyHueAndAlpha(fontColor.value);
+          iconElement.style.color = color;
+        }
+
+        // Convert hex color with hue and alpha adjustments
+        function applyHueAndAlpha(hexColor) {
+          // Convert hex to RGB
+          let r = parseInt(hexColor.substr(1, 2), 16);
+          let g = parseInt(hexColor.substr(3, 2), 16);
+          let b = parseInt(hexColor.substr(5, 2), 16);
+          r /= 255;
+          g /= 255;
+          b /= 255;
+
+          // Convert RGB to HSL
+          let max = Math.max(r, g, b),
+            min = Math.min(r, g, b);
+          let h,
+            s,
+            l = (max + min) / 2;
+
+          if (max === min) {
+            h = s = 0; // achromatic
+          } else {
+            let d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+              case r:
+                h = (g - b) / d + (g < b ? 6 : 0);
+                break;
+              case g:
+                h = (b - r) / d + 2;
+                break;
+              case b:
+                h = (r - g) / d + 4;
+                break;
+            }
+            h /= 6;
+          }
+
+          // Apply hue adjustment
+          h = (parseInt(hue.value) / 360 + h) % 1;
+          if (h < 0) h += 1;
+
+          // Convert back to RGB
+          function hue2rgb(p, q, t) {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+          }
+
+          if (s === 0) {
+            r = g = b = l; // achromatic
+          } else {
+            let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            let p = 2 * l - q;
+            r = hue2rgb(p, q, h + 1 / 3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1 / 3);
+          }
+
+          // Apply alpha
+          const a = parseFloat(alpha.value);
+
+          return `rgba(${Math.round(
+            r * 255
+          )}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${a})`;
+        }
+
+        // Get Unicode value for Font Awesome icons
+        function getIconUnicode(iconClass) {
+          const iconMap = {
+            // Common icons
+            "fa-heart": "\u{f004}",
+            "fa-star": "\u{f005}",
+            "fa-camera": "\u{f030}",
+            "fa-home": "\u{f015}",
+            "fa-envelope": "\u{f0e0}",
+            "fa-bell": "\u{f0f3}",
+            "fa-user": "\u{f007}",
+            "fa-gear": "\u{f013}",
+            "fa-search": "\u{f002}",
+            "fa-thumbs-up": "\u{f164}",
+            "fa-question": "\u{f128}",
+            "fa-shopping-cart": "\u{f07a}",
+            "fa-phone": "\u{f095}",
+            "fa-globe": "\u{f0ac}",
+            "fa-calendar": "\u{f133}",
+            "fa-clock": "\u{f017}",
+            "fa-image": "\u{f03e}",
+            "fa-music": "\u{f001}",
+            "fa-film": "\u{f008}",
+            "fa-book": "\u{f02d}",
+            "fa-flag": "\u{f024}",
+            "fa-trash": "\u{f1f8}",
+            "fa-download": "\u{f019}",
+            "fa-upload": "\u{f093}",
+            "fa-lock": "\u{f023}",
+            "fa-unlock": "\u{f09c}",
+            "fa-print": "\u{f02f}",
+            "fa-save": "\u{f0c7}",
+            "fa-share": "\u{f064}",
+            "fa-plus": "\u{2b}",
+            "fa-minus": "\u{2212}",
+            "fa-times": "\u{f00d}",
+            "fa-check": "\u{f00c}",
+            "fa-arrow-right": "\u{f061}",
+            "fa-arrow-left": "\u{f060}",
+            "fa-arrow-up": "\u{f062}",
+            "fa-arrow-down": "\u{f063}",
+            "fa-info-circle": "\u{f05a}",
+            "fa-exclamation-triangle": "\u{f071}",
+            "fa-question-circle": "\u{f059}",
+            "fa-cog": "\u{f013}",
+            "fa-wifi": "\u{f1eb}",
+            "fa-battery-full": "\u{f240}",
+
+            // Brand icons
+            "fa-facebook": "\u{f39e}",
+            "fa-twitter": "\u{f099}",
+            "fa-instagram": "\u{f16d}",
+            "fa-linkedin": "\u{f08c}",
+            "fa-youtube": "\u{f167}",
+            "fa-pinterest": "\u{f0d2}",
+            "fa-reddit": "\u{f1a1}",
+            "fa-tiktok": "\u{e07b}",
+            "fa-whatsapp": "\u{f232}",
+            "fa-telegram": "\u{f2c6}",
+            "fa-discord": "\u{f392}",
+            "fa-twitch": "\u{f1e8}",
+            "fa-snapchat": "\u{f2ab}",
+            "fa-skype": "\u{f17e}",
+            "fa-viber": "\u{f409}",
+            "fa-apple": "\u{f179}",
+            "fa-google": "\u{f1a0}",
+            "fa-amazon": "\u{f270}",
+            "fa-microsoft": "\u{f3ca}",
+            "fa-spotify": "\u{f1bc}",
+            "fa-netflix": "\u{f3fa}",
+            "fa-paypal": "\u{f1ed}",
+            "fa-cc-visa": "\u{f1f0}",
+            "fa-cc-mastercard": "\u{f1f1}",
+            "fa-cc-amex": "\u{f1f3}",
+            "fa-bitcoin": "\u{f379}",
+            "fa-ethereum": "\u{f42e}",
+            "fa-airbnb": "\u{f834}",
+            "fa-uber": "\u{f402}",
+            "fa-dropbox": "\u{f16b}",
+            "fa-git": "\u{f1d3}",
+            "fa-github": "\u{f09b}",
+            "fa-gitlab": "\u{f296}",
+            "fa-npm": "\u{f3d4}",
+            "fa-stack-overflow": "\u{f16c}",
+            "fa-wordpress": "\u{f19a}",
+            "fa-shopify": "\u{f957}",
+            "fa-dribbble": "\u{f17d}",
+            "fa-behance": "\u{f1b4}",
+          };
+
+          return iconMap[iconClass] || iconMap["fa-question"];
+        }
+      });
+    </script>
+  </body>
+</html>

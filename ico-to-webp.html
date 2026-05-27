@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ICO to WebP Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      .dropzone {
+        border: 2px dashed #cbd5e0;
+        transition: all 0.3s ease;
+      }
+
+      .dropzone.active {
+        border-color: #4299e1;
+        background-color: #ebf8ff;
+      }
+
+      #preview-container {
+        max-width: 100%;
+        max-height: 300px;
+      }
+
+      .icon-size-option {
+        transition: all 0.2s ease;
+      }
+
+      .icon-size-option:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      .icon-size-option.selected {
+        border-color: #4299e1;
+        background-color: #ebf8ff;
+      }
+
+      .bg-pattern {
+        background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-100 min-h-screen">
+    <?php include 'includes/navbar.html'; ?>
+    <nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="container mx-auto py-8 px-4">
+      <div
+        class="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden"
+      >
+        <div class="p-8">
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            ICO to WebP Converter
+          </h1>
+          <p class="text-gray-600 mb-6">
+            Convert your ICO icon files to modern WebP images
+          </p>
+
+          <!-- File Drop Zone -->
+          <div
+            id="dropzone"
+            class="dropzone rounded-lg p-8 mb-6 text-center cursor-pointer"
+          >
+            <div class="flex flex-col items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-12 w-12 text-blue-500 mb-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
+              </svg>
+              <h3 class="text-lg font-medium text-gray-700 mb-1">
+                Drag & drop your ICO file here
+              </h3>
+              <p class="text-sm text-gray-500 mb-3">or click to browse files</p>
+              <input
+                type="file"
+                id="fileInput"
+                accept=".ico,image/x-icon"
+                class="hidden"
+              />
+              <button
+                id="browseBtn"
+                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
+              >
+                Select ICO File
+              </button>
+            </div>
+          </div>
+
+          <!-- Preview Section -->
+          <div id="preview-section" class="hidden mb-6">
+            <h3 class="text-lg font-medium text-gray-700 mb-3">
+              Available Sizes
+            </h3>
+            <div
+              id="preview-container"
+              class="flex flex-wrap justify-center items-center bg-gray-100 rounded-lg p-4 gap-4"
+            >
+              <!-- Preview images will be added here -->
+            </div>
+            <div class="mt-3 text-sm text-gray-600">
+              <span id="file-info"></span>
+            </div>
+          </div>
+
+          <!-- Options Section -->
+          <div id="options-section" class="hidden mb-6">
+            <h3 class="text-lg font-medium text-gray-700 mb-3">
+              Conversion Options
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Size Selection -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Select Icon Size</label
+                >
+                <div id="size-options" class="grid grid-cols-3 gap-3">
+                  <!-- Size options will be added here -->
+                </div>
+              </div>
+
+              <!-- Quality Options -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >WebP Quality</label
+                >
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="flex-1">
+                    <input
+                      type="range"
+                      id="quality-range"
+                      min="50"
+                      max="100"
+                      value="85"
+                      class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  <span
+                    id="quality-value"
+                    class="text-sm font-medium text-gray-700 w-12"
+                    >85%</span
+                  >
+                </div>
+
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Background</label
+                  >
+                  <div class="flex items-center gap-3">
+                    <div class="flex items-center">
+                      <input
+                        id="transparent-bg"
+                        name="background"
+                        type="radio"
+                        class="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                        checked
+                      />
+                      <label
+                        for="transparent-bg"
+                        class="ml-2 block text-sm text-gray-700"
+                        >Transparent</label
+                      >
+                    </div>
+                    <div class="flex items-center">
+                      <input
+                        id="white-bg"
+                        name="background"
+                        type="radio"
+                        class="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label
+                        for="white-bg"
+                        class="ml-2 block text-sm text-gray-700"
+                        >White</label
+                      >
+                    </div>
+                    <div class="flex items-center">
+                      <input
+                        id="custom-bg"
+                        name="background"
+                        type="radio"
+                        class="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label
+                        for="custom-bg"
+                        class="ml-2 block text-sm text-gray-700"
+                        >Custom</label
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div id="custom-color-container" class="hidden">
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Custom Color</label
+                  >
+                  <input
+                    type="color"
+                    id="bg-color"
+                    value="#ffffff"
+                    class="h-10 w-full rounded border-gray-300"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Convert Button -->
+          <div class="flex justify-center">
+            <button
+              id="convertBtn"
+              class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200 hidden"
+            >
+              Convert to WebP
+            </button>
+          </div>
+
+          <!-- Download Section -->
+          <div id="download-section" class="hidden mt-6 text-center">
+            <div class="mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-12 w-12 text-green-500 mx-auto"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              <h3 class="text-lg font-medium text-gray-700 mt-2">
+                Conversion Complete!
+              </h3>
+              <p class="text-sm text-gray-500 mt-1">
+                Your WebP image is ready to download
+              </p>
+            </div>
+            <div
+              id="download-buttons"
+              class="flex flex-wrap justify-center gap-3 mb-4"
+            >
+              <!-- Download buttons will be added here -->
+            </div>
+            <div id="result-preview" class="bg-pattern p-4 rounded-lg mb-4">
+              <!-- Result preview will be added here -->
+            </div>
+            <button
+              id="new-conversion"
+              class="px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-200"
+            >
+              Convert Another File
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <?php include 'includes/footer.html'; ?>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const dropzone = document.getElementById("dropzone");
+        const fileInput = document.getElementById("fileInput");
+        const browseBtn = document.getElementById("browseBtn");
+        const previewSection = document.getElementById("preview-section");
+        const previewContainer = document.getElementById("preview-container");
+        const fileInfo = document.getElementById("file-info");
+        const optionsSection = document.getElementById("options-section");
+        const sizeOptions = document.getElementById("size-options");
+        const convertBtn = document.getElementById("convertBtn");
+        const downloadSection = document.getElementById("download-section");
+        const downloadButtons = document.getElementById("download-buttons");
+        const resultPreview = document.getElementById("result-preview");
+        const newConversionBtn = document.getElementById("new-conversion");
+        const qualityRange = document.getElementById("quality-range");
+        const qualityValue = document.getElementById("quality-value");
+        const customBgContainer = document.getElementById(
+          "custom-color-container"
+        );
+        const customBgRadio = document.getElementById("custom-bg");
+        const bgColorInput = document.getElementById("bg-color");
+
+        let selectedFile = null;
+        let iconSizes = [];
+        let selectedSize = null;
+
+        // Update quality value display
+        qualityRange.addEventListener("input", function () {
+          qualityValue.textContent = `${this.value}%`;
+        });
+
+        // Toggle custom color input
+        document
+          .querySelectorAll('input[name="background"]')
+          .forEach((radio) => {
+            radio.addEventListener("change", function () {
+              customBgContainer.style.display =
+                this.id === "custom-bg" ? "block" : "none";
+            });
+          });
+
+        // Handle file selection
+        function handleFile(file) {
+          if (
+            !file.name.toLowerCase().endsWith(".ico") &&
+            !file.type.includes("x-icon")
+          ) {
+            alert("Please select an ICO file");
+            return;
+          }
+
+          selectedFile = file;
+
+          // Show file info
+          const fileSize = (file.size / 1024).toFixed(2);
+          fileInfo.textContent = `${file.name} (${fileSize} KB)`;
+
+          // Create preview
+          createPreview(file);
+        }
+
+        // Create preview of ICO file
+        function createPreview(file) {
+          previewContainer.innerHTML = "";
+          sizeOptions.innerHTML = "";
+
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const icoUrl = e.target.result;
+
+            // ICO files can contain multiple sizes, we'll try to extract them
+            const img = new Image();
+            img.onload = function () {
+              // Create canvas to draw the icon
+              const canvas = document.createElement("canvas");
+              const ctx = canvas.getContext("2d");
+
+              // Common icon sizes to check
+              const sizesToCheck = [16, 24, 32, 48, 64, 128, 256];
+              iconSizes = [];
+
+              sizesToCheck.forEach((size) => {
+                canvas.width = size;
+                canvas.height = size;
+                ctx.clearRect(0, 0, size, size);
+                ctx.drawImage(img, 0, 0, size, size);
+
+                // Check if the image has data (not transparent)
+                const imageData = ctx.getImageData(0, 0, size, size).data;
+                let hasData = false;
+
+                for (let i = 0; i < imageData.length; i += 4) {
+                  if (imageData[i + 3] !== 0) {
+                    // Check alpha channel
+                    hasData = true;
+                    break;
+                  }
+                }
+
+                if (hasData) {
+                  iconSizes.push(size);
+
+                  // Create preview
+                  const previewImg = document.createElement("img");
+                  previewImg.src = canvas.toDataURL("image/png");
+                  previewImg.alt = `${size}x${size} icon`;
+                  previewImg.className = "max-h-20 mx-auto";
+
+                  const previewDiv = document.createElement("div");
+                  previewDiv.className = "text-center";
+                  previewDiv.innerHTML = `
+                                    <div class="font-medium mb-1">${size}x${size}</div>
+                                    <div class="inline-block border rounded p-1 bg-white">
+                                        ${previewImg.outerHTML}
+                                    </div>
+                                `;
+                  previewContainer.appendChild(previewDiv);
+
+                  // Create size option
+                  const sizeOption = document.createElement("div");
+                  sizeOption.className =
+                    "icon-size-option border rounded-lg p-3 text-center cursor-pointer";
+                  sizeOption.dataset.size = size;
+                  sizeOption.innerHTML = `
+                                    <div class="font-medium">${size}x${size}</div>
+                                    <img src="${canvas.toDataURL(
+                                      "image/png"
+                                    )}" alt="${size}x${size}" class="max-h-12 mx-auto mt-1">
+                                `;
+
+                  sizeOption.addEventListener("click", function () {
+                    document
+                      .querySelectorAll(".icon-size-option")
+                      .forEach((opt) => {
+                        opt.classList.remove("selected");
+                      });
+                    this.classList.add("selected");
+                    selectedSize = parseInt(this.dataset.size);
+                  });
+
+                  sizeOptions.appendChild(sizeOption);
+                }
+              });
+
+              if (iconSizes.length > 0) {
+                // Show sections
+                previewSection.classList.remove("hidden");
+                optionsSection.classList.remove("hidden");
+                convertBtn.classList.remove("hidden");
+
+                // Select first size by default
+                if (sizeOptions.firstChild) {
+                  sizeOptions.firstChild.click();
+                }
+              } else {
+                alert("No valid icon sizes found in the ICO file");
+              }
+            };
+
+            img.src = icoUrl;
+          };
+          reader.readAsDataURL(file);
+        }
+
+        // Convert to WebP
+        function convertToWebP() {
+          if (!selectedFile || !selectedSize) return;
+
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const img = new Image();
+            img.onload = function () {
+              const canvas = document.createElement("canvas");
+              const ctx = canvas.getContext("2d");
+
+              canvas.width = selectedSize;
+              canvas.height = selectedSize;
+
+              // Get background option
+              const bgOption = document.querySelector(
+                'input[name="background"]:checked'
+              ).id;
+              let bgColor = "#ffffff";
+
+              if (bgOption === "transparent-bg") {
+                // Clear canvas for transparent background
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+              } else if (bgOption === "custom-bg") {
+                bgColor = bgColorInput.value;
+              }
+
+              // Fill background if not transparent
+              if (bgOption !== "transparent-bg") {
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+              }
+
+              // Draw the icon
+              ctx.drawImage(img, 0, 0, selectedSize, selectedSize);
+
+              // Get quality
+              const quality = parseInt(qualityRange.value) / 100;
+
+              // Create download link
+              downloadButtons.innerHTML = "";
+              resultPreview.innerHTML = "";
+
+              // Convert to WebP
+              const dataUrl = canvas.toDataURL("image/webp", quality);
+
+              const fileName = selectedFile.name.replace(
+                ".ico",
+                `_${selectedSize}x${selectedSize}.webp`
+              );
+
+              const btn = document.createElement("a");
+              btn.href = dataUrl;
+              btn.download = fileName;
+              btn.className =
+                "px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200";
+              btn.textContent = `Download ${selectedSize}x${selectedSize} WebP`;
+              downloadButtons.appendChild(btn);
+
+              // Create result preview
+              const resultImg = document.createElement("img");
+              resultImg.src = dataUrl;
+              resultImg.alt = `Converted ${selectedSize}x${selectedSize} WebP`;
+              resultImg.className = "max-h-40 mx-auto border rounded";
+
+              const resultText = document.createElement("div");
+              resultText.className = "mt-2 text-sm text-gray-600";
+              resultText.textContent = `Preview: ${selectedSize}x${selectedSize} WebP (${qualityRange.value}% quality)`;
+
+              resultPreview.appendChild(resultImg);
+              resultPreview.appendChild(resultText);
+
+              // Show download section
+              downloadSection.classList.remove("hidden");
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(selectedFile);
+        }
+
+        // Drag and drop events
+        dropzone.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          dropzone.classList.add("active");
+        });
+
+        dropzone.addEventListener("dragleave", () => {
+          dropzone.classList.remove("active");
+        });
+
+        dropzone.addEventListener("drop", (e) => {
+          e.preventDefault();
+          dropzone.classList.remove("active");
+
+          if (e.dataTransfer.files.length) {
+            handleFile(e.dataTransfer.files[0]);
+          }
+        });
+
+        // Browse button click
+        browseBtn.addEventListener("click", () => {
+          fileInput.click();
+        });
+
+        // File input change
+        fileInput.addEventListener("change", () => {
+          if (fileInput.files.length) {
+            handleFile(fileInput.files[0]);
+          }
+        });
+
+        // Convert button click
+        convertBtn.addEventListener("click", convertToWebP);
+
+        // New conversion button
+        newConversionBtn.addEventListener("click", () => {
+          // Reset the UI
+          previewSection.classList.add("hidden");
+          optionsSection.classList.add("hidden");
+          convertBtn.classList.add("hidden");
+          downloadSection.classList.add("hidden");
+
+          // Clear file input
+          fileInput.value = "";
+          selectedFile = null;
+          selectedSize = null;
+          iconSizes = [];
+
+          // Reset options
+          document.getElementById("transparent-bg").checked = true;
+          qualityRange.value = "85";
+          qualityValue.textContent = "85%";
+          customBgContainer.style.display = "none";
+        });
+      });
+    </script>
+  </body>
+</html>

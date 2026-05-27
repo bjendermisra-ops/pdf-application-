@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pension Calculator — Pro (₹ INR)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    .back-wrapper {
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .back-wrapper.hidden {
+      transform: translateX(-150%);
+      opacity: 0;
+    }
+    .info-tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    .info-tooltip .tooltip-text {
+      visibility: hidden;
+      width: 300px;
+      background-color: #1f2937;
+      color: #fff;
+      text-align: left;
+      border-radius: 8px;
+      padding: 12px;
+      position: absolute;
+      z-index: 1000;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -150px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 13px;
+      line-height: 1.5;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .info-tooltip .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #1f2937 transparent transparent transparent;
+    }
+    .info-tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 min-h-screen p-6">
+
+  <!-- Back Button -->
+  <div class="fixed top-6 left-6 z-50 back-wrapper">
+    <a href="/" 
+       class="flex items-center gap-2.5 px-5 py-2.5 text-sm font-semibold text-white
+              bg-blue-700
+              rounded-full shadow-lg
+              hover:from-teal-700 hover:blue-800
+              hover:shadow-xl hover:-translate-x-1
+              transition-all duration-300 ease-in-out">
+      <i class="fas fa-arrow-left text-base"></i>
+      <span>Back to All Tools</span>
+    </a>
+  </div>
+
+  <!-- Title -->
+  <div class="max-w-6xl mx-auto text-center mb-10">
+    <h1 class="text-4xl font-bold text-slate-800">Pension Calculator</h1>
+    <p class="mt-3 text-lg text-slate-600">NPS + EPS + Family Pension — Live updates!</p>
+  </div>
+
+  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+    <!-- Left: Controls -->
+    <div class="lg:col-span-4 space-y-6">
+
+      <!-- Mode -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 border border-teal-100">
+        <h3 class="font-bold text-lg mb-4 text-teal-800">Pension Type</h3>
+        <div class="grid grid-cols-3 gap-2">
+          <button id="modeNPS" class="py-2.5 rounded-lg font-medium bg-teal-600 text-white shadow">NPS</button>
+          <button id="modeEPS" class="py-2.5 rounded-lg font-medium bg-slate-200 text-slate-700">EPS</button>
+          <button id="modeFamily" class="py-2.5 rounded-lg font-medium bg-slate-200 text-slate-700">Family</button>
+        </div>
+      </div>
+
+      <!-- Common Inputs -->
+      <div id="commonInputs" class="bg-white rounded-2xl shadow-xl p-6 border border-slate-100 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 flex items-center gap-2">
+            Current Age
+            <div class="info-tooltip">
+              <i class="fas fa-info-circle text-teal-500 text-xs"></i>
+              <span class="tooltip-text">Retirement at 60 (NPS/EPS) or death age (Family).</span>
+            </div>
+          </label>
+          <input id="age" type="number" min="20" max="60" value="35" class="w-full p-3 border rounded-xl live-updating" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 flex items-center gap-2">
+            Monthly Contribution
+            <div class="info-tooltip">
+              <i class="fas fa-info-circle text-teal-500 text-xs"></i>
+              <span class="tooltip-text">NPS: Employee + Employer. EPS: 8.33% of ₹15,000.</span>
+            </div>
+          </label>
+          <input id="contrib" type="number" value="5000" class="w-full p-3 border rounded-xl live-updating" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 flex items-center gap-2">
+            Current Corpus
+            <div class="info-tooltip">
+              <i class="fas fa-info-circle text-teal-500 text-xs"></i>
+              <span class="tooltip-text">Existing NPS/EPS balance.</span>
+            </div>
+          </label>
+          <input id="balance" type="number" value="200000" class="w-full p-3 border rounded-xl live-updating" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 flex items-center gap-2">
+            Expected Return (% p.a.)
+            <div class="info-tooltip">
+              <i class="fas fa-info-circle text-teal-500 text-xs"></i>
+              <span class="tooltip-text">NPS: 8-10%. EPS: 8.1%.</span>
+            </div>
+          </label>
+          <input id="return" type="number" step="0.1" value="8.5" class="w-full p-3 border rounded-xl live-updating" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 flex items-center gap-2">
+            Annuity Rate (% p.a.)
+            <div class="info-tooltip">
+              <i class="fas fa-info-circle text-teal-500 text-xs"></i>
+              <span class="tooltip-text">NPS: 6-7%. Family: 50% of pension.</span>
+            </div>
+          </label>
+          <input id="annuity" type="number" step="0.1" value="6.5" class="w-full p-3 border rounded-xl live-updating" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 flex items-center gap-2">
+            Inflation (% p.a.)
+            <div class="info-tooltip">
+              <i class="fas fa-info-circle text-teal-500 text-xs"></i>
+              <span class="tooltip-text">Reduces real pension value.</span>
+            </div>
+          </label>
+          <input id="inflation" type="number" step="0.1" value="6" class="w-full p-3 border rounded-xl live-updating" />
+        </div>
+      </div>
+
+      <!-- NPS Specific -->
+      <div id="npsInputs" class="bg-white rounded-2xl shadow-xl p-6 border border-teal-100 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700">Employer Match (%)</label>
+          <input id="match" type="number" value="10" class="w-full p-3 border rounded-xl live-updating" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700">Lump Sum %</label>
+          <input id="lumpsum" type="number" min="40" max="100" value="60" class="w-full p-3 border rounded-xl live-updating" />
+        </div>
+      </div>
+
+      <!-- EPS/Family Hidden -->
+      <div id="epsInputs" class="hidden space-y-4">
+        <div class="bg-white rounded-2xl shadow-xl p-6 border border-slate-100">
+          <p class="text-sm text-slate-600">EPS: 8.33% of ₹15,000 cap. Auto-calculated.</p>
+        </div>
+      </div>
+
+      <!-- Export -->
+      <div class="space-y-3">
+        <button id="exportCSV" class="w-full p-3 bg-green-600 text-white rounded-xl shadow-lg hover:bg-green-700 transition font-medium">
+          <i class="fas fa-file-csv mr-2"></i>Export CSV
+        </button>
+        <button id="exportPDF" class="w-full p-3 bg-teal-600 text-white rounded-xl shadow-lg hover:bg-teal-700 transition font-medium">
+          <i class="fas fa-file-pdf mr-2"></i>Export PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Right: Results -->
+    <div class="lg:col-span-8 space-y-6">
+
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white border-2 border-teal-200 rounded-2xl p-6 shadow-lg flex flex-col">
+          <h3 class="font-bold text-lg text-teal-700 mb-2">At Retirement</h3>
+          <p id="corpus" class="text-3xl font-bold text-slate-900">₹1,25,00,000</p>
+          <p class="text-sm text-slate-600 mt-1">Total Corpus</p>
+        </div>
+        <div class="bg-white border-2 border-green-200 rounded-2xl p-6 shadow-lg flex flex-col">
+          <h3 class="font-bold text-lg text-green-700 mb-2">Monthly Pension</h3>
+          <p id="pension" class="text-3xl font-bold text-green-700">₹35,000</p>
+          <p class="text-sm text-slate-600 mt-1">Real Value: <span id="realPension">₹18,000</span></p>
+        </div>
+        <div class="bg-white border-2 border-amber-200 rounded-2xl p-6 shadow-lg flex flex-col">
+          <h3 class="font-bold text-lg text-amber-700 mb-2">Lump Sum</h3>
+          <p id="lump" class="text-3xl font-bold text-amber-700">₹75,00,000</p>
+          <p class="text-sm text-slate-600 mt-1">Tax-free</p>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="bg-white p-6 rounded-2xl shadow-xl">
+        <h3 class="font-semibold text-lg mb-4">Corpus Growth</h3>
+        <canvas id="growthChart"></canvas>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 overflow-auto">
+        <h3 class="font-bold text-xl mb-6">Year-by-Year</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gradient-to-r from-teal-50 to-cyan-50">
+              <tr class="text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                <th class="p-4">Age</th>
+                <th class="p-4 text-right">Start</th>
+                <th class="p-4 text-right">Contrib</th>
+                <th class="p-4 text-right">Growth</th>
+                <th class="p-4 text-right">End</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody" class="divide-y divide-slate-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Back button
+    const backWrapper = document.querySelector('.back-wrapper');
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const current = window.scrollY;
+      if (current > lastScroll && current > 80) backWrapper.classList.add('hidden');
+      else backWrapper.classList.remove('hidden');
+      lastScroll = current;
+    });
+
+    // Mode Toggle
+    const modes = { nps: document.getElementById('modeNPS'), eps: document.getElementById('modeEPS'), family: document.getElementById('modeFamily') };
+    const npsInputs = document.getElementById('npsInputs');
+    const epsInputs = document.getElementById('epsInputs');
+
+    function switchMode(mode) {
+      Object.values(modes).forEach(m => m.className = 'py-2.5 rounded-lg font-medium bg-slate-200 text-slate-700');
+      modes[mode].className = 'py-2.5 rounded-lg font-medium bg-teal-600 text-white shadow';
+      npsInputs.classList.toggle('hidden', mode !== 'nps');
+      epsInputs.classList.toggle('hidden', mode !== 'eps');
+      window.currentMode = mode;
+      calculate();
+    }
+    Object.keys(modes).forEach(m => modes[m].onclick = () => switchMode(m));
+
+    // Chart
+    const ctx = document.getElementById('growthChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Corpus', data: [], borderColor: '#14b8a6', tension: 0.3, fill: true }] },
+      options: { responsive: true, plugins: { legend: { position: 'top' } } }
+    });
+
+    // Format
+    function fmtINR(val) {
+      return '₹' + Number(val).toLocaleString('en-IN');
+    }
+
+    // Debounce
+    function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func(...args), wait);
+      };
+    }
+
+    // Calculate
+    const calculate = debounce(function() {
+      const mode = window.currentMode || 'nps';
+      const age = parseInt(document.getElementById('age').value) || 35;
+      const contrib = parseFloat(document.getElementById('contrib').value) || 0;
+      const balance = parseFloat(document.getElementById('balance').value) || 0;
+      const rate = parseFloat(document.getElementById('return').value) / 100 || 0.085;
+      const annuity = parseFloat(document.getElementById('annuity').value) / 100 || 0.065;
+      const inflation = parseFloat(document.getElementById('inflation').value) / 100 || 0.06;
+
+      const retireAge = mode === 'family' ? age + 20 : 60;
+      const years = retireAge - age;
+      if (years <= 0) return;
+
+      let monthlyContrib = contrib;
+      if (mode === 'nps') {
+        const match = parseFloat(document.getElementById('match').value) / 100 || 0;
+        monthlyContrib += contrib * match;
+      } else if (mode === 'eps') {
+        monthlyContrib = 1250; // 8.33% of 15,000
+      }
+
+      const monthlyRate = rate / 12;
+      const monthlyInflation = inflation / 12;
+      let bal = balance;
+      const data = [];
+      let corpus = balance;
+
+      for (let y = 0; y <= years; y++) {
+        const start = bal;
+        bal = bal * (1 + monthlyRate) + monthlyContrib * 12;
+        if (y % 1 === 0) {
+          data.push({ age: age + y, start, contrib: monthlyContrib * 12, growth: bal - start - monthlyContrib * 12, end: bal });
+        }
+        corpus = bal;
+      }
+
+      let lump = 0, annuityAmount = 0, pension = 0;
+      if (mode === 'nps') {
+        const lumpPct = parseFloat(document.getElementById('lumpsum').value) / 100 || 0.6;
+        lump = corpus * lumpPct;
+        annuityAmount = corpus * (1 - lumpPct);
+        pension = annuityAmount * annuity / 12;
+      } else if (mode === 'eps') {
+        pension = (balance + years * 12 * 1250) * 8.1 / 100 / 12;
+        lump = 0;
+      } else {
+        pension = 35000 * 0.5; // 50% of last pension
+        lump = 0;
+      }
+
+      const realPension = pension / Math.pow(1 + inflation, years);
+
+      // Update UI
+      document.getElementById('corpus').textContent = fmtINR(corpus);
+      document.getElementById('pension').textContent = fmtINR(pension);
+      document.getElementById('realPension').textContent = fmtINR(realPension);
+      document.getElementById('lump').textContent = fmtINR(lump);
+
+      // Chart
+      chart.data.labels = data.map(d => d.age);
+      chart.data.datasets[0].data = data.map(d => d.end);
+      chart.update('none');
+
+      // Table
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+      data.forEach(d => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-4 font-medium">${d.age}</td>
+          <td class="p-4 text-right font-mono">${fmtINR(d.start)}</td>
+          <td class="p-4 text-right text-teal-600">${fmtINR(d.contrib)}</td>
+          <td class="p-4 text-right text-green-600">${fmtINR(d.growth)}</td>
+          <td class="p-4 text-right font-bold">${fmtINR(d.end)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      window.__pensionData = { mode, corpus, pension, realPension, lump, data };
+    }, 200);
+
+    // Events
+    document.querySelectorAll('input, button[id^="mode"]').forEach(el => el.addEventListener('input', calculate));
+    document.querySelectorAll('input').forEach(el => el.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); }));
+
+    // Export
+    document.getElementById('exportCSV').onclick = () => {
+      if (!window.__pensionData) return alert('Calculating...');
+      const d = window.__pensionData;
+      const rows = [['Age', 'Start', 'Contribution', 'Growth', 'End']];
+      d.data.forEach(r => rows.push([r.age, r.start, r.contrib, r.growth, r.end]));
+      const csv = rows.map(row => row.join(',')).join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `${d.mode}_pension.csv`; a.click();
+    };
+
+    document.getElementById('exportPDF').onclick = () => {
+      if (!window.__pensionData) return alert('Calculating...');
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const d = window.__pensionData;
+      doc.setFontSize(20); doc.text(`${d.mode.toUpperCase()} Report`, 20, 20);
+      doc.setFontSize(12);
+      doc.text(`Corpus: ${fmtINR(d.corpus)}`, 20, 40);
+      doc.text(`Monthly Pension: ${fmtINR(d.pension)}`, 20, 50);
+      doc.save(`${d.mode}_report.pdf`);
+    };
+
+    // Init
+    switchMode('nps');
+    calculate();
+  </script>
+</body>
+</html>

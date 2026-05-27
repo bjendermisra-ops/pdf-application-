@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF to ZIP Converter</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- pdf.js for PDF preview -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <!-- pdf-lib for PDF processing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <!-- jszip for ZIP creation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background: #fff;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1.5rem;
+      }
+      .drop-zone {
+        border: 3px dashed #93c5fd;
+        border-radius: 16px;
+        padding: 2.5rem;
+        text-align: center;
+        background: #eef2ff;
+        transition: all 0.3s ease;
+      }
+      .drop-zone.dragover {
+        border-color: #2563eb;
+        background: #dbeafe;
+        transform: scale(1.02);
+      }
+      .preview-box {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        display: none;
+      }
+      #pdfPreview {
+        width: 100%;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-top: 1rem;
+        text-align: center;
+        background-color: #f9f9f9;
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 10px;
+      }
+      #previewImages {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+      #previewImages img {
+        max-width: 100%;
+        height: auto;
+        border: none;
+      }
+      .preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .preview-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+      }
+      .preview-close {
+        cursor: pointer;
+        color: #6b7280;
+        transition: color 0.2s;
+      }
+      .preview-close:hover {
+        color: #ef4444;
+      }
+      .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        justify-content: center;
+      }
+      #folderNameInput {
+        width: 100%;
+        max-width: 300px;
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        outline: none;
+        margin-bottom: 1rem;
+      }
+      #folderNameInput:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+      #output {
+        margin-top: 1rem;
+      }
+      .folder h3 {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 1rem;
+        color: #1f2937;
+      }
+      .file-link {
+        display: block;
+        color: #2563eb;
+        text-decoration: none;
+        margin: 0.5rem 0;
+      }
+      .file-link:hover {
+        text-decoration: underline;
+      }
+      @media (max-width: 640px) {
+        .container {
+          padding: 1rem;
+        }
+        .drop-zone {
+          padding: 1.5rem;
+        }
+        .action-buttons {
+          flex-direction: column;
+        }
+        button {
+          width: 100%;
+        }
+      }
+      .loading-spinner {
+        display: inline-block;
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1
+        class="text-5xl font-extrabold text-center text-black mt-10 mb-4 sm:text-3xl"
+      >
+        PDF to ZIP Converter
+      </h1>
+      <p class="text-xl text-center text-gray-500 mb-10 sm:text-xl">
+        This PDF to ZIP Converter compresses one or multiple PDF files into a
+        single .zip archive.<br />
+        It helps users bundle and reduce file sizes for easy sharing, emailing,
+        and uploading.
+      </p>
+
+      <!-- Drop Zone -->
+      <div
+        class="drop-zone max-w-3xl mx-auto"
+        id="dropZone"
+        style="min-height: 300px"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-12 w-12 mx-auto text-indigo-500"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+          />
+        </svg>
+        <p class="text-gray-700 text-xl font-medium sm:text-base mt-3">
+          Drop your PDF file here
+        </p>
+        <input
+          type="file"
+          id="pdfInput"
+          accept="application/pdf"
+          style="display: none"
+        />
+        <button
+          id="selectFileBtn"
+          class="mt-4 px-6 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition text-base sm:text-sm shadow-md"
+        >
+          Select File
+        </button>
+        <p class="text-gray-500 text-sm mt-3">Supports PDF (.pdf) files</p>
+      </div>
+
+      <!-- Preview Box -->
+      <div class="preview-box max-w-3xl mx-auto" id="previewBox">
+        <div class="preview-header">
+          <h3 class="preview-title">PDF Preview</h3>
+          <span class="preview-close" id="closePreview">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </span>
+        </div>
+        <input
+          type="text"
+          id="folderNameInput"
+          placeholder="Enter folder name..."
+          class="w-full max-w-xs"
+        />
+        <div id="pdfPreview">
+          <div id="previewImages"></div>
+          <p id="previewStatus" class="text-gray-600 text-sm mt-2"></p>
+        </div>
+        <div id="output"></div>
+
+        <div class="action-buttons">
+          <button
+            id="convertBtn"
+            class="px-6 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition text-base sm:text-sm shadow-md flex items-center justify-center gap-2"
+            disabled
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Convert to ZIP
+          </button>
+        </div>
+
+        <p
+          id="status"
+          class="text-gray-600 mt-4 text-sm text-center hidden"
+        ></p>
+      </div>
+    </div>
+
+    <script>
+      // Setup pdf.js worker
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js";
+
+      $(document).ready(function () {
+        const $dropZone = $("#dropZone");
+        const $input = $("#pdfInput");
+        const $previewBox = $("#previewBox");
+        const $pdfPreview = $("#pdfPreview");
+        const $status = $("#status");
+        const $selectFileBtn = $("#selectFileBtn");
+        const $convertBtn = $("#convertBtn");
+        const $closePreview = $("#closePreview");
+        const $previewStatus = $("#previewStatus");
+        const $folderNameInput = $("#folderNameInput");
+
+        let currentPDFFile = null;
+
+        // Setup drag and drop
+        $dropZone.on({
+          dragover: function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).addClass("dragover");
+          },
+          dragleave: function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).removeClass("dragover");
+          },
+          drop: function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).removeClass("dragover");
+            if (e.originalEvent.dataTransfer.files.length) {
+              $input[0].files = e.originalEvent.dataTransfer.files;
+              previewPDF();
+            }
+          },
+        });
+
+        // Trigger file input
+        $selectFileBtn.on("click", function (e) {
+          e.preventDefault();
+          $input[0].click();
+        });
+
+        $input.on("change", function () {
+          if (this.files.length) {
+            previewPDF();
+          }
+        });
+
+        $closePreview.on("click", function () {
+          $previewBox.slideUp(300);
+          $dropZone.slideDown(300);
+          currentPDFFile = null;
+          $input.val("");
+          $convertBtn.prop("disabled", true);
+          $previewStatus.text("");
+          $("#previewImages").html("");
+          $("#output").html("");
+          $folderNameInput.val("");
+        });
+
+        // Show status messages
+        function showStatus(message, type = "info") {
+          $status
+            .removeClass("hidden")
+            .text(message)
+            .removeClass("text-blue-600 text-green-600 text-red-600")
+            .addClass(
+              type === "error"
+                ? "text-red-600"
+                : type === "success"
+                ? "text-green-600"
+                : "text-blue-600"
+            );
+
+          if (type !== "info") {
+            setTimeout(() => {
+              $status.addClass("hidden");
+            }, 5000);
+          }
+        }
+
+        // Original PDF to ZIP logic (unchanged)
+        async function previewPDF() {
+          const fileInput = document.getElementById("pdfInput");
+          const previewImages = document.getElementById("previewImages");
+          const previewStatus = document.getElementById("previewStatus");
+          const convertButton = document.getElementById("convertBtn");
+          const folderNameInput = document.getElementById("folderNameInput");
+
+          const file = fileInput.files[0];
+          if (file && file.type === "application/pdf") {
+            previewStatus.textContent = "Loading PDF preview...";
+            currentPDFFile = file;
+            $dropZone.slideUp(300);
+            $previewBox.removeClass("hidden").slideDown(300);
+            const fileReader = new FileReader();
+            fileReader.onload = async function () {
+              try {
+                const typedarray = new Uint8Array(this.result);
+                const pdfDoc = await pdfjsLib.getDocument(typedarray).promise;
+                previewImages.innerHTML = ""; // Clear previous images
+                for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+                  const page = await pdfDoc.getPage(pageNum);
+                  const viewport = page.getViewport({ scale: 0.5 }); // Reduced scale for preview
+                  const canvas = document.createElement("canvas");
+                  const context = canvas.getContext("2d");
+                  canvas.height = viewport.height;
+                  canvas.width = viewport.width;
+
+                  await page.render({
+                    canvasContext: context,
+                    viewport: viewport,
+                  }).promise;
+                  const img = document.createElement("img");
+                  img.src = canvas.toDataURL("image/png"); // Using PNG for preview
+                  previewImages.appendChild(img);
+                }
+                previewStatus.textContent = "PDF preview loaded successfully.";
+                if (folderNameInput.value.trim() !== "") {
+                  convertButton.disabled = false; // Enable convert button after successful preview and valid folder name
+                }
+              } catch (error) {
+                previewStatus.textContent = `Error loading PDF preview: ${error.message}.`;
+                previewImages.innerHTML = "";
+                convertButton.disabled = true;
+                showStatus(
+                  `Error loading PDF preview: ${error.message}.`,
+                  "error"
+                );
+              }
+            };
+            fileReader.onerror = function () {
+              previewStatus.textContent = "Error loading PDF preview.";
+              previewImages.innerHTML = "";
+              convertButton.disabled = true;
+              showStatus("Error loading PDF preview.", "error");
+            };
+            fileReader.readAsArrayBuffer(file);
+          } else {
+            previewStatus.textContent = "Please select a valid PDF file.";
+            previewImages.innerHTML = "";
+            convertButton.disabled = true;
+            showStatus("Please select a valid PDF file.", "error");
+          }
+        }
+
+        // Update button state based on folder name input
+        $folderNameInput.on("input", function () {
+          const fileInput = document.getElementById("pdfInput");
+          const convertButton = document.getElementById("convertBtn");
+          if (
+            fileInput.files.length > 0 &&
+            $folderNameInput.val().trim() !== ""
+          ) {
+            convertButton.disabled = false;
+          } else {
+            convertButton.disabled = true;
+          }
+        });
+
+        document
+          .getElementById("convertBtn")
+          .addEventListener("click", function () {
+            const fileInput = document.getElementById("pdfInput");
+            const folderNameInput = document.getElementById("folderNameInput");
+            const file = fileInput.files[0];
+            const folderName = folderNameInput.value.trim();
+            const output = document.getElementById("output");
+
+            if (!file || !folderName) {
+              showStatus(
+                "Please select a PDF file and enter a folder name.",
+                "error"
+              );
+              return;
+            }
+
+            $convertBtn.prop("disabled", true);
+            $convertBtn.html(
+              '<span class="loading-spinner"></span> Converting...'
+            );
+            $status
+              .removeClass("hidden")
+              .text("Converting PDF to ZIP...")
+              .addClass("text-blue-600")
+              .removeClass("text-red-600 text-green-600");
+
+            const reader = new FileReader();
+            reader.onload = async function () {
+              try {
+                const uint8Array = new Uint8Array(this.result);
+                const pdfDoc = await PDFLib.PDFDocument.load(uint8Array);
+
+                const totalPages = pdfDoc.getPageCount();
+                const folderElement = createFolderElement(folderName);
+                const folder = {
+                  name: folderName,
+                  files: [],
+                };
+
+                for (let i = 0; i < totalPages; i++) {
+                  const newPdf = await PDFLib.PDFDocument.create();
+                  const [copiedPage] = await newPdf.copyPages(pdfDoc, [i]);
+                  newPdf.addPage(copiedPage);
+
+                  const fileName = `page_${i + 1}.pdf`;
+                  const fileElement = createFileElement(fileName);
+                  folderElement.appendChild(fileElement);
+
+                  folder.files.push({
+                    name: fileName,
+                    data: await newPdf.save(),
+                  });
+                }
+
+                output.innerHTML = "";
+                output.appendChild(folderElement);
+
+                const downloadButton = createDownloadButton(folder);
+                output.appendChild(downloadButton);
+
+                $convertBtn.prop("disabled", false);
+                $convertBtn.html(`
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                            Convert to ZIP
+                        `);
+                $status
+                  .text(
+                    `Conversion complete! Click "Download Folder" to save ZIP.`
+                  )
+                  .removeClass("text-blue-600")
+                  .addClass("text-green-600");
+              } catch (error) {
+                console.error("Conversion error:", error);
+                $convertBtn.prop("disabled", false);
+                $convertBtn.html(`
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                            Convert to ZIP
+                        `);
+                $status
+                  .text(`Failed to convert PDF to ZIP: ${error.message}`)
+                  .removeClass("text-blue-600")
+                  .addClass("text-red-600");
+              }
+            };
+
+            reader.readAsArrayBuffer(file);
+          });
+
+        function createFolderElement(folderName) {
+          const folderElement = document.createElement("div");
+          folderElement.classList.add("folder");
+          const folderTitle = document.createElement("h3");
+          folderTitle.textContent = `Folder: ${folderName}`;
+          folderElement.appendChild(folderTitle);
+          return folderElement;
+        }
+
+        function createFileElement(fileName) {
+          const fileElement = document.createElement("a");
+          fileElement.classList.add("file-link");
+          fileElement.href = "#";
+          fileElement.textContent = fileName;
+          fileElement.addEventListener("click", (event) => {
+            event.preventDefault();
+            showStatus(`File ${fileName} clicked.`, "info");
+            // Original comment: You can implement file preview or additional functionality here
+          });
+          return fileElement;
+        }
+
+        function createDownloadButton(folder) {
+          const downloadButton = document.createElement("button");
+          downloadButton.textContent = "Download Folder";
+          downloadButton.classList.add(
+            "px-6",
+            "py-3",
+            "bg-indigo-600",
+            "text-white",
+            "rounded-full",
+            "hover:bg-indigo-700",
+            "transition",
+            "text-base",
+            "sm:text-sm",
+            "shadow-md",
+            "flex",
+            "items-center",
+            "justify-center",
+            "gap-2"
+          );
+          downloadButton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Download Folder
+                `;
+          downloadButton.addEventListener("click", () =>
+            downloadFolder(folder)
+          );
+          return downloadButton;
+        }
+
+        function downloadFolder(folder) {
+          const zip = new JSZip();
+
+          folder.files.forEach((file) => {
+            zip.file(file.name, file.data);
+          });
+
+          zip.generateAsync({ type: "blob" }).then(function (content) {
+            const url = URL.createObjectURL(content);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${folder.name}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showStatus(
+              `ZIP file ${folder.name}.zip downloaded successfully.`,
+              "success"
+            );
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

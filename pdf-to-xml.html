@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF to XML Converter</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- pdf.js for PDF parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background: #fff;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1.5rem;
+      }
+      .drop-zone {
+        border: 3px dashed #93c5fd;
+        border-radius: 16px;
+        padding: 2.5rem;
+        text-align: center;
+        background: #eef2ff;
+        transition: all 0.3s ease;
+      }
+      .drop-zone.dragover {
+        border-color: #2563eb;
+        background: #dbeafe;
+        transform: scale(1.02);
+      }
+      .preview-box {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        display: none;
+      }
+      #pdfPreview {
+        width: 100%;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-top: 1rem;
+        text-align: left;
+        background-color: #f9f9f9;
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 10px;
+        white-space: pre-wrap;
+        font-family: monospace;
+      }
+      .preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .preview-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+      }
+      .preview-close {
+        cursor: pointer;
+        color: #6b7280;
+        transition: color 0.2s;
+      }
+      .preview-close:hover {
+        color: #ef4444;
+      }
+      .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        justify-content: center;
+      }
+      @media (max-width: 640px) {
+        .container {
+          padding: 1rem;
+        }
+        .drop-zone {
+          padding: 1.5rem;
+        }
+        .action-buttons {
+          flex-direction: column;
+        }
+        button {
+          width: 100%;
+        }
+      }
+      .loading-spinner {
+        display: inline-block;
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1
+        class="text-5xl font-extrabold text-center text-black mt-10 mb-4 sm:text-3xl"
+      >
+        PDF to XML Converter
+      </h1>
+      <p class="text-xl text-center text-gray-500 mb-10 sm:text-xl">
+        This PDF to XML Converter extracts content from PDF files<br />
+        and converts it into structured XML (Extensible Markup Language) format.
+      </p>
+
+      <!-- Drop Zone -->
+      <div
+        class="drop-zone max-w-3xl mx-auto"
+        id="dropZone"
+        style="min-height: 300px"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-12 w-12 mx-auto text-indigo-500"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+          />
+        </svg>
+        <p class="text-gray-700 text-xl font-medium sm:text-base mt-3">
+          Drop your PDF file here
+        </p>
+        <input
+          type="file"
+          id="pdfInput"
+          accept="application/pdf"
+          style="display: none"
+        />
+        <button
+          id="selectFileBtn"
+          class="mt-4 px-6 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition text-base sm:text-sm shadow-md"
+        >
+          Select File
+        </button>
+        <p class="text-gray-500 text-sm mt-3">Supports PDF (.pdf) files</p>
+      </div>
+
+      <!-- Preview Box -->
+      <div class="preview-box max-w-3xl mx-auto" id="previewBox">
+        <div class="preview-header">
+          <h3 class="preview-title">PDF XML Preview</h3>
+          <span class="preview-close" id="closePreview">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </span>
+        </div>
+        <div id="pdfPreview">
+          <pre id="previewText"></pre>
+          <p id="previewStatus" class="text-gray-600 text-sm mt-2"></p>
+        </div>
+
+        <div class="action-buttons">
+          <button
+            id="convertBtn"
+            class="px-6 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition text-base sm:text-sm shadow-md flex items-center justify-center gap-2"
+            disabled
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Convert to XML
+          </button>
+        </div>
+
+        <p
+          id="status"
+          class="text-gray-600 mt-4 text-sm text-center hidden"
+        ></p>
+      </div>
+    </div>
+
+    <script>
+      // Setup pdf.js worker
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js";
+
+      $(document).ready(function () {
+        const $dropZone = $("#dropZone");
+        const $input = $("#pdfInput");
+        const $previewBox = $("#previewBox");
+        const $pdfPreview = $("#pdfPreview");
+        const $status = $("#status");
+        const $selectFileBtn = $("#selectFileBtn");
+        const $convertBtn = $("#convertBtn");
+        const $closePreview = $("#closePreview");
+        const $previewStatus = $("#previewStatus");
+
+        let currentPDFFile = null;
+
+        // Setup drag and drop
+        $dropZone.on({
+          dragover: function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).addClass("dragover");
+          },
+          dragleave: function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).removeClass("dragover");
+          },
+          drop: function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).removeClass("dragover");
+            if (e.originalEvent.dataTransfer.files.length) {
+              $input[0].files = e.originalEvent.dataTransfer.files;
+              previewPDF();
+            }
+          },
+        });
+
+        // Trigger file input
+        $selectFileBtn.on("click", function (e) {
+          e.preventDefault();
+          $input[0].click();
+        });
+
+        $input.on("change", function () {
+          if (this.files.length) {
+            previewPDF();
+          }
+        });
+
+        $closePreview.on("click", function () {
+          $previewBox.slideUp(300);
+          $dropZone.slideDown(300);
+          currentPDFFile = null;
+          $input.val("");
+          $convertBtn.prop("disabled", true);
+          $previewStatus.text("");
+          $("#previewText").text("");
+        });
+
+        // Show status messages
+        function showStatus(message, type = "info") {
+          $status
+            .removeClass("hidden")
+            .text(message)
+            .removeClass("text-blue-600 text-green-600 text-red-600")
+            .addClass(
+              type === "error"
+                ? "text-red-600"
+                : type === "success"
+                ? "text-green-600"
+                : "text-blue-600"
+            );
+
+          if (type !== "info") {
+            setTimeout(() => {
+              $status.addClass("hidden");
+            }, 5000);
+          }
+        }
+
+        // Original PDF to XML logic (unchanged)
+        async function previewPDF() {
+          const fileInput = document.getElementById("pdfInput");
+          const previewText = document.getElementById("previewText");
+          const previewStatus = document.getElementById("previewStatus");
+          const convertButton = document.getElementById("convertBtn");
+
+          const file = fileInput.files[0];
+          if (file && file.type === "application/pdf") {
+            previewStatus.textContent = "Loading PDF preview...";
+            currentPDFFile = file;
+            $dropZone.slideUp(300);
+            $previewBox.removeClass("hidden").slideDown(300);
+            const fileReader = new FileReader();
+            fileReader.onload = async function () {
+              try {
+                const typedarray = new Uint8Array(this.result);
+                const pdfDoc = await pdfjsLib.getDocument(typedarray).promise;
+                let xmlPreview =
+                  '<?xml version="1.0" encoding="UTF-8"?>\n<pdf>\n';
+                for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+                  const page = await pdfDoc.getPage(pageNum);
+                  const textContent = await page.getTextContent();
+                  xmlPreview += `  <page number="${pageNum}">\n`;
+                  textContent.items.forEach((item) => {
+                    xmlPreview += `    <text>${item.str}</text>\n`;
+                  });
+                  xmlPreview += "  </page>\n";
+                }
+                xmlPreview += "</pdf>";
+                previewText.textContent = xmlPreview;
+                previewStatus.textContent = "PDF preview loaded successfully.";
+                convertButton.disabled = false; // Enable convert button after successful preview
+              } catch (error) {
+                previewStatus.textContent = `Error loading PDF preview: ${error.message}.`;
+                previewText.textContent = "";
+                convertButton.disabled = true;
+                showStatus(
+                  `Error loading PDF preview: ${error.message}.`,
+                  "error"
+                );
+              }
+            };
+            fileReader.onerror = function () {
+              previewStatus.textContent = "Error loading PDF preview.";
+              previewText.textContent = "";
+              convertButton.disabled = true;
+              showStatus("Error loading PDF preview.", "error");
+            };
+            fileReader.readAsArrayBuffer(file);
+          } else {
+            previewStatus.textContent = "Please select a valid PDF file.";
+            previewText.textContent = "";
+            convertButton.disabled = true;
+            showStatus("Please select a valid PDF file.", "error");
+          }
+        }
+
+        document
+          .getElementById("convertBtn")
+          .addEventListener("click", function () {
+            const fileInput = document.getElementById("pdfInput");
+            const file = fileInput.files[0];
+
+            if (!file) {
+              showStatus("Please select a PDF file to convert.", "error");
+              return;
+            }
+
+            $convertBtn.prop("disabled", true);
+            $convertBtn.html(
+              '<span class="loading-spinner"></span> Converting...'
+            );
+            $status
+              .removeClass("hidden")
+              .text("Converting PDF to XML...")
+              .addClass("text-blue-600")
+              .removeClass("text-red-600 text-green-600");
+
+            const fileReader = new FileReader();
+            fileReader.onload = async function () {
+              try {
+                const typedarray = new Uint8Array(this.result);
+                const pdfDoc = await pdfjsLib.getDocument(typedarray).promise;
+                let xmlContent =
+                  '<?xml version="1.0" encoding="UTF-8"?>\n<pdf>\n';
+                for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+                  const page = await pdfDoc.getPage(pageNum);
+                  const textContent = await page.getTextContent();
+                  xmlContent += `  <page number="${pageNum}">\n`;
+                  textContent.items.forEach((item) => {
+                    xmlContent += `    <text>${item.str}</text>\n`;
+                  });
+                  xmlContent += "  </page>\n";
+                }
+                xmlContent += "</pdf>";
+
+                const blob = new Blob([xmlContent], {
+                  type: "application/xml",
+                });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "converted.pdf.xml";
+                link.click();
+
+                $convertBtn.prop("disabled", false);
+                $convertBtn.html(`
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                            Convert to XML
+                        `);
+                $status
+                  .text(`Conversion complete! XML downloaded.`)
+                  .removeClass("text-blue-600")
+                  .addClass("text-green-600");
+              } catch (error) {
+                console.error("Conversion error:", error);
+                $convertBtn.prop("disabled", false);
+                $convertBtn.html(`
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                            Convert to XML
+                        `);
+                $status
+                  .text(`Failed to convert PDF to XML: ${error.message}`)
+                  .removeClass("text-blue-600")
+                  .addClass("text-red-600");
+              }
+            };
+            fileReader.readAsArrayBuffer(file);
+          });
+      });
+    </script>
+  </body>
+</html>

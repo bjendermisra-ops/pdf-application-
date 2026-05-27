@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advanced Credit Limit Eligibility</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Inter -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f0f4f8; /* Very light blue/gray background */
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        padding: 20px;
+      }
+      .calculator-container {
+        width: 100%;
+        max-width: 1000px;
+      }
+      .input-card,
+      .result-dashboard {
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(45, 85, 120, 0.1);
+        padding: 30px;
+      }
+      /* Style for number input fields */
+      input[type="number"] {
+        /* Mimic the old value-display look for better integration */
+        background-color: #e0f2fe; /* Light blue background */
+        color: #1e40af; /* Darker blue text */
+        font-weight: 600;
+        padding: 10px 14px;
+        border-radius: 8px;
+        text-align: right;
+        border: 1px solid #93c5fd; /* Light blue border */
+        transition: all 0.2s;
+      }
+
+      input[type="number"]:focus {
+        outline: none;
+        border-color: #3b82f6; /* Primary blue focus */
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      }
+
+      /* Hide default number spin buttons for a cleaner look */
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      .section-header {
+        border-bottom: 2px solid #eff6ff;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+      }
+      .status-box {
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+      }
+      .eligible-status {
+        background-color: #d1fae5; /* Light Green */
+        color: #059669; /* Green text */
+        border: 2px solid #059669;
+      }
+      .not-eligible-status {
+        background-color: #fee2e2; /* Light Red */
+        color: #ef4444; /* Red text */
+        border: 2px solid #ef4444;
+      }
+      .conditional-status {
+        background-color: #fffbeb; /* Light Yellow */
+        color: #f59e0b; /* Yellow/Orange text */
+        border: 2px solid #f59e0b;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+    <!-- Back Button -->
+    <div class="fixed top-6 left-6 z-50">
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      />
+      <a
+        href="/"
+        class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-full shadow-md w-fit bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 hover:-translate-x-1 hover:shadow-lg transition-all duration-300 ease-in-out"
+      >
+        <i class="fas fa-arrow-left text-sm"></i>
+        <span>Back to All Tools</span>
+      </a>
+    </div>
+
+    <div class="calculator-container">
+      <h1 class="text-4xl font-extrabold text-blue-800 mb-2">
+        Advanced Credit Eligibility Analyzer
+      </h1>
+      <p class="text-gray-500 mb-8">
+        Estimate your potential credit limit using multiple financial and
+        behavioral factors.
+      </p>
+
+      <div class="lg:grid lg:grid-cols-3 gap-8">
+        <!-- 1. Input Section (2/3 width on desktop) -->
+        <div class="lg:col-span-2 input-card space-y-8 mb-8 lg:mb-0">
+          <div class="section-header">
+            <h2 class="text-xl font-semibold text-blue-700">
+              Applicant Details & Income
+            </h2>
+          </div>
+
+          <!-- Employment Type -->
+          <div>
+            <label
+              for="employment-type"
+              class="block text-gray-700 text-sm font-medium mb-2"
+              >Employment Type</label
+            >
+            <select
+              id="employment-type"
+              onchange="calculateCreditLimit();"
+              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="salaried">Salaried</option>
+              <option value="self-employed">
+                Self-Employed / Business Owner
+              </option>
+            </select>
+          </div>
+
+          <!-- Monthly Income -->
+          <div>
+            <label
+              for="monthly-income"
+              class="block text-gray-700 text-sm font-medium mb-2"
+              >Monthly Net Income (₹)</label
+            >
+            <div class="flex items-center space-x-4">
+              <span class="text-gray-500 text-lg font-bold min-w-[20px]"
+                >₹</span
+              >
+              <input
+                type="number"
+                id="monthly-income"
+                min="20000"
+                max="1000000"
+                value="100000"
+                step="5000"
+                oninput="calculateCreditLimit();"
+                class="w-full"
+              />
+            </div>
+          </div>
+
+          <div class="section-header">
+            <h2 class="text-xl font-semibold text-blue-700">
+              Existing Debt Profile
+            </h2>
+          </div>
+
+          <!-- Total Monthly Debt (EMI) -->
+          <div>
+            <label
+              for="monthly-debt"
+              class="block text-gray-700 text-sm font-medium mb-2"
+              >Total Monthly Debt / EMI (₹)</label
+            >
+            <div class="flex items-center space-x-4">
+              <span class="text-gray-500 text-lg font-bold min-w-[20px]"
+                >₹</span
+              >
+              <input
+                type="number"
+                id="monthly-debt"
+                min="0"
+                max="500000"
+                value="20000"
+                step="1000"
+                oninput="calculateCreditLimit();"
+                class="w-full"
+              />
+            </div>
+            <p class="text-xs text-gray-400 mt-1">
+              Used to calculate **Debt-to-Income (DTI)** ratio.
+            </p>
+          </div>
+
+          <!-- Credit Score -->
+          <div>
+            <label
+              for="credit-score"
+              class="block text-gray-700 text-sm font-medium mb-2"
+              >Credit Score (CIBIL/Equifax)</label
+            >
+            <div class="flex items-center space-x-4">
+              <input
+                type="number"
+                id="credit-score"
+                min="550"
+                max="850"
+                value="780"
+                step="10"
+                oninput="calculateCreditLimit();"
+                class="w-full"
+              />
+            </div>
+          </div>
+
+          <div class="section-header">
+            <h2 class="text-xl font-semibold text-blue-700">
+              Existing Credit Usage (CUR)
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Existing Credit Limit -->
+            <div>
+              <label
+                for="existing-limit"
+                class="block text-gray-700 text-sm font-medium mb-2"
+                >Total Existing Credit Limit (₹)</label
+              >
+              <div class="flex items-center space-x-4">
+                <span class="text-gray-500 text-lg font-bold min-w-[20px]"
+                  >₹</span
+                >
+                <input
+                  type="number"
+                  id="existing-limit"
+                  min="0"
+                  max="3000000"
+                  value="300000"
+                  step="5000"
+                  oninput="calculateCreditLimit();"
+                  class="w-full"
+                />
+              </div>
+            </div>
+            <!-- Current Outstanding Balance -->
+            <div>
+              <label
+                for="current-balance"
+                class="block text-gray-700 text-sm font-medium mb-2"
+                >Current Outstanding Balance (₹)</label
+              >
+              <div class="flex items-center space-x-4">
+                <span class="text-gray-500 text-lg font-bold min-w-[20px]"
+                  >₹</span
+                >
+                <input
+                  type="number"
+                  id="current-balance"
+                  min="0"
+                  max="3000000"
+                  value="60000"
+                  step="5000"
+                  oninput="calculateCreditLimit();"
+                  class="w-full"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Results Dashboard (1/3 width on desktop) -->
+        <div class="lg:col-span-1 result-dashboard space-y-6">
+          <!-- Main Status -->
+          <div
+            id="result-container"
+            class="status-box bg-blue-50 border-blue-400"
+          >
+            <p class="text-lg font-semibold text-blue-700 mb-1">
+              Eligibility Status
+            </p>
+            <p
+              id="eligibility-status"
+              class="text-3xl font-extrabold text-blue-900"
+            >
+              Awaiting Input
+            </p>
+          </div>
+
+          <!-- Estimated Limit - NOTE: text-right applied here -->
+          <div class="p-5 rounded-lg border border-blue-200 bg-blue-50">
+            <p class="text-sm text-gray-600">Estimated Maximum Credit Limit</p>
+            <p
+              id="estimated-limit"
+              class="text-4xl font-extrabold text-blue-700 mt-1 text-right"
+            >
+              ₹0
+            </p>
+          </div>
+
+          <!-- Key Metrics -->
+          <div class="space-y-3">
+            <h3 class="text-lg font-semibold text-gray-700 border-b pb-1">
+              Key Financial Ratios
+            </h3>
+
+            <!-- DTI Ratio - NOTE: text-right applied to value span -->
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-gray-500">Debt-to-Income (DTI) Ratio:</span>
+              <span
+                id="dti-ratio"
+                class="font-bold text-red-600 text-right w-1/4"
+                >0.0%</span
+              >
+            </div>
+
+            <!-- CUR Ratio - NOTE: text-right applied to value span -->
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-gray-500">Credit Utilization (CUR):</span>
+              <span
+                id="cur-ratio"
+                class="font-bold text-green-600 text-right w-1/4"
+                >0.0%</span
+              >
+            </div>
+          </div>
+
+          <!-- Detailed Breakdown (Optional visual feedback) -->
+          <div class="pt-4 border-t border-gray-100 space-y-3">
+            <h3 class="text-lg font-semibold text-gray-700">
+              Limit Adjustment Factors
+            </h3>
+
+            <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <p class="font-bold text-sm text-gray-800">Score & CUR Impact:</p>
+              <p id="impact-message" class="text-xs text-gray-600 mt-1">
+                Enter your numbers to see the impact.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Utility function to format numbers as Indian Rupees
+      const formatter = new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+
+      function calculateCreditLimit() {
+        // 1. Get Inputs
+        const income =
+          parseFloat(document.getElementById("monthly-income").value) || 0;
+        const debt =
+          parseFloat(document.getElementById("monthly-debt").value) || 0;
+        const score =
+          parseInt(document.getElementById("credit-score").value) || 0;
+        const existingLimit =
+          parseFloat(document.getElementById("existing-limit").value) || 0;
+        const currentBalance =
+          parseFloat(document.getElementById("current-balance").value) || 0;
+        const employmentType = document.getElementById("employment-type").value;
+
+        // --- UI Elements ---
+        const resultContainer = document.getElementById("result-container");
+        const statusElement = document.getElementById("eligibility-status");
+        const limitElement = document.getElementById("estimated-limit");
+        const dtiElement = document.getElementById("dti-ratio");
+        const curElement = document.getElementById("cur-ratio");
+        const impactMessage = document.getElementById("impact-message");
+
+        // Reset classes
+        resultContainer.classList.remove(
+          "eligible-status",
+          "not-eligible-status",
+          "conditional-status"
+        );
+        resultContainer.classList.add("bg-blue-50", "border-blue-400"); // Default styling
+
+        // --- Constants & Variables ---
+        const maxDTI = 0.45; // Max DTI accepted (45%)
+        const maxCreditLimitCap = 5000000; // 50 Lakhs
+        let limitMultiplier = 0; // Base multiplier
+        let statusClass = "conditional-status";
+        let finalLimit = 0;
+        let impactMsg = "Calculating based on income and score...";
+
+        // --- Core Logic ---
+
+        // A. Debt-to-Income (DTI) Calculation
+        const dti = income > 0 ? debt / income : 1;
+        const dtiPercentage = (dti * 100).toFixed(1);
+
+        // B. Credit Utilization Ratio (CUR) Calculation
+        // Handle division by zero case for existingLimit
+        const cur =
+          existingLimit > 0
+            ? currentBalance / existingLimit
+            : currentBalance > 0
+            ? 1
+            : 0; // If no limit but balance, CUR is 100% (High Risk)
+        const curPercentage = (cur * 100).toFixed(1);
+        let curFactor = 1.0;
+
+        if (cur <= 0.1) {
+          // Excellent CUR (<= 10%)
+          curFactor = 1.15; // +15% bonus
+          impactMsg =
+            "Excellent Credit Utilization ($\le 10\%$) provides a limit bonus.";
+        } else if (cur > 0.1 && cur <= 0.3) {
+          // Good CUR (10% to 30%)
+          curFactor = 1.0; // Neutral
+          impactMsg =
+            "Good CUR (10-30\%). Limit based primarily on income and DTI.";
+        } else if (cur > 0.3 && cur <= 0.5) {
+          // High CUR (30% to 50%)
+          curFactor = 0.8; // -20% penalty
+          impactMsg = "High CUR (over 30\%) results in a limit reduction.";
+        } else if (cur > 0.5) {
+          // Very High CUR (> 50%)
+          curFactor = 0.5; // Severe penalty
+          impactMsg =
+            "Very high CUR (over 50\%) severely limits approval and credit.";
+        }
+
+        // C. Score-Based Multiplier (Risk Assessment)
+        if (score >= 780) {
+          limitMultiplier = 5.0; // Excellent
+          statusElement.textContent = "HIGHLY ELIGIBLE";
+          statusClass = "eligible-status";
+        } else if (score >= 720) {
+          limitMultiplier = 4.0; // Good
+          statusElement.textContent = "ELIGIBLE";
+          statusClass = "eligible-status";
+        } else if (score >= 650) {
+          limitMultiplier = 3.0; // Fair
+          statusElement.textContent = "CONDITIONALLY ELIGIBLE";
+          statusClass = "conditional-status";
+        } else {
+          limitMultiplier = 0; // Poor
+          statusElement.textContent = "NOT ELIGIBLE";
+          statusClass = "not-eligible-status";
+        }
+
+        // D. Employment Type Adjustment
+        if (employmentType === "self-employed") {
+          limitMultiplier *= 0.85; // Self-employed income often discounted slightly
+          if (statusClass === "eligible-status")
+            statusClass = "conditional-status";
+        }
+
+        // E. DTI Override and Adjustment
+        if (dti > maxDTI || income <= 0 || isNaN(dti)) {
+          finalLimit = 0;
+          statusElement.textContent = "REJECTED (High DTI / Zero Income)";
+          statusClass = "not-eligible-status";
+          impactMsg =
+            "Your Debt-to-Income Ratio is too high or income is zero. Limit is 0.";
+        } else if (dti > 0.35) {
+          limitMultiplier *= 0.9; // DTI 35%-45% penalty
+          if (statusClass === "eligible-status")
+            statusClass = "conditional-status";
+        }
+
+        // F. Final Limit Calculation (Income * Multiplier * CUR Factor)
+        if (limitMultiplier > 0 && finalLimit === 0) {
+          // Calculation uses 12 * Monthly Income * Multiplier * CUR Factor
+          let potentialLimit = income * 12 * limitMultiplier * curFactor;
+
+          // Apply the maximum limit cap
+          finalLimit = Math.min(potentialLimit, maxCreditLimitCap);
+
+          // Round to the nearest 10,000 for standard credit limits
+          finalLimit = Math.round(finalLimit / 10000) * 10000;
+        } else if (finalLimit === 0) {
+          // Not eligible path
+          finalLimit = 0;
+        }
+
+        // --- Update UI ---
+        limitElement.textContent = formatter.format(finalLimit);
+        resultContainer.className = "status-box " + statusClass;
+        dtiElement.textContent = `${dtiPercentage}% (Max ${maxDTI * 100}%)`;
+        curElement.textContent = `${curPercentage}% (Target $\le 30\%$)`;
+        impactMessage.textContent = impactMsg;
+
+        // Update DTI/CUR color based on risk
+        dtiElement.classList.toggle("text-red-600", dti > 0.45);
+        dtiElement.classList.toggle(
+          "text-yellow-600",
+          dti > 0.35 && dti <= 0.45
+        );
+        dtiElement.classList.toggle("text-green-600", dti <= 0.35);
+
+        curElement.classList.toggle("text-red-600", cur > 0.5);
+        curElement.classList.toggle("text-yellow-600", cur > 0.3 && cur <= 0.5);
+        curElement.classList.toggle("text-green-600", cur <= 0.3);
+      }
+
+      // --- Initial setup ---
+      document.addEventListener("DOMContentLoaded", () => {
+        calculateCreditLimit(); // Perform initial calculation on load
+      });
+    </script>
+  </body>
+</html>

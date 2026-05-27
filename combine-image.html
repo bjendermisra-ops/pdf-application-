@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Combiner Tool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    .drop-zone-highlight {
+      border-color: #3b82f6;
+      background-color: #f0f9ff;
+    }
+
+    .image-preview {
+      background-color: #f3f4f6;
+      background-image: linear-gradient(45deg,
+          #e5e7eb 25%,
+          transparent 25%,
+          transparent 75%,
+          #e5e7eb 75%,
+          #e5e7eb),
+        linear-gradient(45deg,
+          #e5e7eb 25%,
+          transparent 25%,
+          transparent 75%,
+          #e5e7eb 75%,
+          #e5e7eb);
+      background-size: 20px 20px;
+      background-position: 0 0, 10px 10px;
+    }
+  </style>
+</head>
+
+
+<?php include 'includes/navbar.html'; ?>
+<nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+<div class="max-w-4xl mx-auto bg-gray-100 rounded-lg shadow-sm p-6 mt-8 mb-8">
+  <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">
+    Image Combiner Tool
+  </h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <!-- Image Upload Area 1 -->
+    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center image-preview" id="dropZone1">
+      <div id="previewContainer1" class="hidden mb-2">
+        <img id="preview1" class="max-h-48 w-full object-contain mx-auto" src="" alt="First image preview" />
+      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-gray-400 mb-2" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" id="uploadIcon1">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <p class="text-gray-600 mb-1">Drag & drop image here</p>
+      <p class="text-sm text-gray-500 mb-2">or</p>
+      <label for="fileInput1"
+        class="inline-block px-3 py-1 bg-blue-600 text-white rounded-md cursor-pointer hover:bg-blue-700 transition text-sm">
+        Select Image
+      </label>
+      <input type="file" id="fileInput1" accept="image/*" class="hidden" />
+    </div>
+
+    <!-- Image Upload Area 2 -->
+    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center image-preview" id="dropZone2">
+      <div id="previewContainer2" class="hidden mb-2">
+        <img id="preview2" class="max-h-48 w-full object-contain mx-auto" src="" alt="Second image preview" />
+      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-gray-400 mb-2" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" id="uploadIcon2">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <p class="text-gray-600 mb-1">Drag & drop image here</p>
+      <p class="text-sm text-gray-500 mb-2">or</p>
+      <label for="fileInput2"
+        class="inline-block px-3 py-1 bg-blue-600 text-white rounded-md cursor-pointer hover:bg-blue-700 transition text-sm">
+        Select Image
+      </label>
+      <input type="file" id="fileInput2" accept="image/*" class="hidden" />
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-3">
+      Combine Options
+    </h2>
+    <div class="grid grid-cols-2 gap-4">
+      <button id="sideBySideBtn"
+        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        Side By Side
+      </button>
+      <button id="verticalBtn"
+        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        Vertically
+      </button>
+    </div>
+  </div>
+
+  <div id="resultContainer" class="hidden mb-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-3">Combined Image</h2>
+    <div class="border rounded-lg p-2 image-preview">
+      <img id="resultPreview" class="w-full object-contain mx-auto" src="" alt="Combined image result" />
+    </div>
+  </div>
+
+  <div class="flex justify-center gap-4">
+    <button id="combineBtn" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition hidden">
+      Combine Images
+    </button>
+    <button id="downloadBtn" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition hidden">
+      Download Image
+    </button>
+    <button id="resetBtn" class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
+      Reset
+    </button>
+  </div>
+</div>
+<?php include 'includes/footer.html'; ?>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Elements
+    const fileInput1 = document.getElementById("fileInput1");
+    const fileInput2 = document.getElementById("fileInput2");
+    const dropZone1 = document.getElementById("dropZone1");
+    const dropZone2 = document.getElementById("dropZone2");
+    const preview1 = document.getElementById("preview1");
+    const preview2 = document.getElementById("preview2");
+    const previewContainer1 = document.getElementById("previewContainer1");
+    const previewContainer2 = document.getElementById("previewContainer2");
+    const uploadIcon1 = document.getElementById("uploadIcon1");
+    const uploadIcon2 = document.getElementById("uploadIcon2");
+    const resultPreview = document.getElementById("resultPreview");
+    const resultContainer = document.getElementById("resultContainer");
+    const combineBtn = document.getElementById("combineBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const sideBySideBtn = document.getElementById("sideBySideBtn");
+    const verticalBtn = document.getElementById("verticalBtn");
+
+    // State
+    let image1 = null;
+    let image2 = null;
+    let combinedImageUrl = null;
+    let combineMode = "sideBySide"; // 'sideBySide' or 'vertical'
+
+    // Setup drag and drop for both zones
+    setupDropZone(dropZone1, fileInput1, (img) => {
+      image1 = img;
+      updateUI();
+    });
+    setupDropZone(dropZone2, fileInput2, (img) => {
+      image2 = img;
+      updateUI();
+    });
+
+    // Combine mode buttons
+    sideBySideBtn.addEventListener("click", () => {
+      combineMode = "sideBySide";
+      sideBySideBtn.classList.add("bg-blue-600", "text-white");
+      sideBySideBtn.classList.remove("bg-gray-200", "text-gray-800");
+      verticalBtn.classList.add("bg-gray-200", "text-gray-800");
+      verticalBtn.classList.remove("bg-blue-600", "text-white");
+    });
+
+    verticalBtn.addEventListener("click", () => {
+      combineMode = "vertical";
+      verticalBtn.classList.add("bg-blue-600", "text-white");
+      verticalBtn.classList.remove("bg-gray-200", "text-gray-800");
+      sideBySideBtn.classList.add("bg-gray-200", "text-gray-800");
+      sideBySideBtn.classList.remove("bg-blue-600", "text-white");
+    });
+
+    // Set initial mode
+    sideBySideBtn.click();
+
+    // Combine button
+    combineBtn.addEventListener("click", combineImages);
+
+    // Download button
+    downloadBtn.addEventListener("click", () => {
+      if (!combinedImageUrl) return;
+
+      const a = document.createElement("a");
+      a.href = combinedImageUrl;
+      a.download = "combined-image.jpg";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+      }, 100);
+    });
+
+    // Reset button
+    resetBtn.addEventListener("click", resetAll);
+
+    function setupDropZone(dropZone, fileInput, callback) {
+      // Handle file selection
+      fileInput.addEventListener("change", (e) =>
+        handleFileSelect(e, callback)
+      );
+
+      // Drag and drop events
+      ["dragenter", "dragover", "dragleave", "drop"].forEach(
+        (eventName) => {
+          dropZone.addEventListener(eventName, preventDefaults, false);
+        }
+      );
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropZone.addEventListener(
+          eventName,
+          () => {
+            dropZone.classList.add("drop-zone-highlight");
+          },
+          false
+        );
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropZone.addEventListener(
+          eventName,
+          () => {
+            dropZone.classList.remove("drop-zone-highlight");
+          },
+          false
+        );
+      });
+
+      dropZone.addEventListener(
+        "drop",
+        (e) => {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+
+          if (files.length) {
+            fileInput.files = files;
+            handleFileSelect({ target: fileInput }, callback);
+          }
+        },
+        false
+      );
+    }
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    function handleFileSelect(event, callback) {
+      const file = event.target.files[0];
+
+      if (!file) return;
+
+      if (!file.type.match("image.*")) {
+        alert("Please select an image file.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        callback(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function updateUI() {
+      // Update previews
+      if (image1) {
+        preview1.src = image1;
+        previewContainer1.classList.remove("hidden");
+        uploadIcon1.classList.add("hidden");
+      } else {
+        previewContainer1.classList.add("hidden");
+        uploadIcon1.classList.remove("hidden");
+      }
+
+      if (image2) {
+        preview2.src = image2;
+        previewContainer2.classList.remove("hidden");
+        uploadIcon2.classList.add("hidden");
+      } else {
+        previewContainer2.classList.add("hidden");
+        uploadIcon2.classList.remove("hidden");
+      }
+
+      // Show/hide combine button
+      if (image1 && image2) {
+        combineBtn.classList.remove("hidden");
+      } else {
+        combineBtn.classList.add("hidden");
+      }
+    }
+
+    function combineImages() {
+      if (!image1 || !image2) return;
+
+      // Create canvas
+      const img1 = new Image();
+      const img2 = new Image();
+
+      img1.onload = function () {
+        img2.onload = function () {
+          let canvas, ctx;
+
+          if (combineMode === "sideBySide") {
+            // Side by side
+            canvas = document.createElement("canvas");
+            canvas.width = img1.width + img2.width;
+            canvas.height = Math.max(img1.height, img2.height);
+            ctx = canvas.getContext("2d");
+
+            // Draw white background
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw images
+            ctx.drawImage(img1, 0, (canvas.height - img1.height) / 2);
+            ctx.drawImage(
+              img2,
+              img1.width,
+              (canvas.height - img2.height) / 2
+            );
+          } else {
+            // Vertical
+            canvas = document.createElement("canvas");
+            canvas.width = Math.max(img1.width, img2.width);
+            canvas.height = img1.height + img2.height;
+            ctx = canvas.getContext("2d");
+
+            // Draw white background
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw images
+            ctx.drawImage(img1, (canvas.width - img1.width) / 2, 0);
+            ctx.drawImage(
+              img2,
+              (canvas.width - img2.width) / 2,
+              img1.height
+            );
+          }
+
+          // Convert to JPG and display
+          canvas.toBlob(
+            function (blob) {
+              // Clean up previous URL
+              if (combinedImageUrl) {
+                URL.revokeObjectURL(combinedImageUrl);
+              }
+
+              combinedImageUrl = URL.createObjectURL(blob);
+              resultPreview.src = combinedImageUrl;
+              resultContainer.classList.remove("hidden");
+              downloadBtn.classList.remove("hidden");
+            },
+            "image/jpeg",
+            0.92
+          );
+        };
+        img2.src = image2;
+      };
+      img1.src = image1;
+    }
+
+    function resetAll() {
+      // Reset images
+      image1 = null;
+      image2 = null;
+
+      // Reset file inputs
+      fileInput1.value = "";
+      fileInput2.value = "";
+
+      // Reset previews
+      preview1.src = "";
+      preview2.src = "";
+      previewContainer1.classList.add("hidden");
+      previewContainer2.classList.add("hidden");
+      uploadIcon1.classList.remove("hidden");
+      uploadIcon2.classList.remove("hidden");
+
+      // Reset result
+      if (combinedImageUrl) {
+        URL.revokeObjectURL(combinedImageUrl);
+        combinedImageUrl = null;
+      }
+      resultPreview.src = "";
+      resultContainer.classList.add("hidden");
+
+      // Reset buttons
+      combineBtn.classList.add("hidden");
+      downloadBtn.classList.add("hidden");
+    }
+  });
+</script>
+</body>
+
+</html>

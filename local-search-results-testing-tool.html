@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dentsu - SEO Tools</title>
+    <meta
+      name="description"
+      content="Professional SEO tools and utilities for technical SEO analysis, crawling, rendering, and optimization."
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="canonical" href="https://seo.vibeloopdaily.com/" />
+    <!-- Required -->
+    <meta property="og:title" content="Your Page Title Here" />
+    <meta
+      property="og:description"
+      content="A short description of the page content."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://seo.vibeloopdaily.com/" />
+    <meta
+      property="og:image"
+      content="https://seo.vibeloopdaily.com/path-to-your-image.jpg"
+    />
+
+    <!-- Optional but good to include -->
+    <meta property="og:site_name" content="Vibeloop Daily SEO" />
+    <meta property="og:locale" content="en_US" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Vibeloop Daily SEO",
+        "url": "https://seo.vibeloopdaily.com/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://seo.vibeloopdaily.com/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
+    <style>
+      .sidebar-transition {
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .tool-card {
+        transition: all 0.3s ease;
+      }
+
+      .tool-card:hover {
+        transform: translateY(-4px);
+      }
+
+      .modal-backdrop {
+        backdrop-filter: blur(8px);
+      }
+
+      @media (max-width: 1023px) {
+        .sidebar-closed {
+          transform: translateX(-100%);
+        }
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen bg-white text-black">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+      <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold text-black mb-6">
+          Local Search Results Testing Tool
+        </h1>
+
+        <!-- Configuration Section -->
+        <div class="mb-8 space-y-4">
+          <div>
+            <h2 class="text-lg font-semibold text-black mb-2">
+              Search Parameters
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-black mb-1"
+                  >Country</label
+                >
+                <select
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+                >
+                  <option value="">Select country</option>
+                  <option>United States</option>
+                  <option>United Kingdom</option>
+                  <option>Canada</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-black mb-1"
+                  >Language</label
+                >
+                <select
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+                >
+                  <option value="">Select language</option>
+                  <option>English</option>
+                  <option>Spanish</option>
+                  <option>French</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-black mb-1"
+                  >Location</label
+                >
+                <input
+                  type="text"
+                  placeholder="City or postal code"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black placeholder-gray-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-black mb-1"
+                  >Search Engine</label
+                >
+                <select
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+                >
+                  <option value="">Select engine</option>
+                  <option>Google</option>
+                  <option>Bing</option>
+                  <option>Yahoo</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-black mb-1"
+                  >Device Type</label
+                >
+                <select
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+                >
+                  <option value="">Select device</option>
+                  <option>Desktop</option>
+                  <option>Mobile</option>
+                  <option>Tablet</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-black mb-1"
+                  >Search Query</label
+                >
+                <input
+                  type="text"
+                  placeholder="Enter search term"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black placeholder-gray-500"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Display Section -->
+        <div class="border-t border-gray-200 pt-4">
+          <div class="flex flex-wrap gap-4 mb-6">
+            <button
+              class="search-tab active px-4 py-2 text-sm font-medium text-white bg-blue-600"
+            >
+              Web
+            </button>
+            <button
+              class="search-tab px-4 py-2 text-sm font-medium text-gray-700 hover:text-white bg-gray-200 hover:bg-blue-600"
+            >
+              Images
+            </button>
+            <button
+              class="search-tab px-4 py-2 text-sm font-medium text-gray-700 hover:text-white bg-gray-200 hover:bg-blue-600"
+            >
+              Maps
+            </button>
+            <button
+              class="search-tab px-4 py-2 text-sm font-medium text-gray-700 hover:text-white bg-gray-200 hover:bg-blue-600"
+            >
+              Shopping
+            </button>
+          </div>
+
+          <div class="mb-6">
+            <div class="flex justify-between items-center mb-4">
+              <div class="text-sm text-gray-700">Results will appear here</div>
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="precise-location"
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                />
+                <label
+                  for="precise-location"
+                  class="ml-2 block text-sm text-black"
+                  >Use precise location</label
+                >
+              </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg mb-6">
+              <p class="text-sm text-gray-700">
+                Configure your search parameters and run the test to see
+                results.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div class="border border-gray-200 rounded-lg p-4 bg-white">
+                <h4 class="text-sm font-medium text-black mb-2">Sample Data</h4>
+                <p class="text-sm text-gray-700">
+                  Test results will appear in this format.
+                </p>
+              </div>
+              <div class="border border-gray-200 rounded-lg p-4 bg-white">
+                <h4 class="text-sm font-medium text-black mb-2">Sample Data</h4>
+                <p class="text-sm text-gray-700">
+                  Test results will appear in this format.
+                </p>
+              </div>
+              <div class="border border-gray-200 rounded-lg p-4 bg-white">
+                <h4 class="text-sm font-medium text-black mb-2">Sample Data</h4>
+                <p class="text-sm text-gray-700">
+                  Test results will appear in this format.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button
+          id="run-test"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition duration-200"
+        >
+          Run Search Test
+        </button>
+      </div>
+    </div>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Tab switching functionality
+        const tabs = document.querySelectorAll(".search-tab");
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", function () {
+            tabs.forEach((t) => t.classList.remove("active"));
+            this.classList.add("active");
+            updateActiveTab(this.textContent.trim());
+          });
+        });
+
+        // Mock API function (replace with real API call)
+        async function fetchSearchResults(params) {
+          // Mock response
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              resolve({
+                status: "success",
+                results: {
+                  web: [
+                    "Example result 1 for " + params.query,
+                    "Example result 2 for " + params.query,
+                    "Example result 3 for " + params.query,
+                  ],
+                  images: [
+                    "Image result 1 for " + params.query,
+                    "Image result 2 for " + params.query,
+                  ],
+                  maps: [
+                    "Map location for " + params.location,
+                    "Nearby places in " + params.location,
+                  ],
+                  shopping: [
+                    "Product 1 related to " + params.query,
+                    "Product 2 related to " + params.query,
+                  ],
+                },
+              });
+            }, 1000);
+          });
+        }
+
+        // Update results display
+        function displayResults(results, tabType) {
+          const resultsContainer = document.querySelector(
+            ".bg-white.p-4.rounded-lg.mb-6"
+          );
+          const sampleDataContainers = document.querySelectorAll(
+            ".border-gray-200.rounded-lg"
+          );
+
+          if (results && results[tabType.toLowerCase()]) {
+            resultsContainer.innerHTML = `
+          <h3 class="text-md font-medium text-black mb-2">${tabType} Results</h3>
+          <ul class="space-y-2">
+            ${results[tabType.toLowerCase()]
+              .map(
+                (result) => `<li class="text-sm text-gray-700">• ${result}</li>`
+              )
+              .join("")}
+          </ul>
+        `;
+
+            sampleDataContainers.forEach((container, index) => {
+              container.innerHTML = `
+            <h4 class="text-sm font-medium text-black mb-2">Detail ${
+              index + 1
+            }</h4>
+            <p class="text-sm text-gray-700">Additional information about result ${
+              index + 1
+            }</p>
+          `;
+            });
+          }
+        }
+
+        // Update active tab display
+        function updateActiveTab(tabName) {
+          const resultsInfo = document.querySelector(".text-sm.text-gray-700");
+          if (resultsInfo) {
+            resultsInfo.textContent = `Showing ${tabName} results`;
+          }
+        }
+
+        // Run test button functionality
+        const runButton = document.getElementById("run-test");
+        if (runButton) {
+          runButton.addEventListener("click", async function () {
+            const countrySelect = document.querySelector(
+              "select:nth-of-type(1)"
+            );
+            const languageSelect = document.querySelector(
+              "select:nth-of-type(2)"
+            );
+            const locationInput = document.querySelector(
+              'input[placeholder="City or postal code"]'
+            );
+            const engineSelect = document.querySelector(
+              "select:nth-of-type(3)"
+            );
+            const deviceSelect = document.querySelector(
+              "select:nth-of-type(4)"
+            );
+            const queryInput = document.querySelector(
+              'input[placeholder="Enter search term"]'
+            );
+            const activeTab = document.querySelector(".search-tab.active");
+
+            if (
+              !countrySelect ||
+              !languageSelect ||
+              !queryInput ||
+              !activeTab
+            ) {
+              alert("Please fill in all required fields");
+              return;
+            }
+
+            const country = countrySelect.value;
+            const language = languageSelect.value;
+            const location = locationInput.value;
+            const engine = engineSelect.value;
+            const device = deviceSelect.value;
+            const query = queryInput.value;
+            const tabName = activeTab.textContent.trim();
+
+            if (!country || !language || !query) {
+              alert(
+                "Please select country, language, and enter a search query"
+              );
+              return;
+            }
+
+            // Disable button during processing
+            runButton.disabled = true;
+            runButton.textContent = "Testing...";
+            runButton.classList.remove("bg-blue-600", "hover:bg-blue-700");
+            runButton.classList.add("bg-blue-400");
+
+            try {
+              const params = {
+                country,
+                language,
+                location,
+                engine,
+                device,
+                query,
+              };
+
+              const response = await fetchSearchResults(params);
+              displayResults(response.results, tabName);
+            } catch (error) {
+              console.error("Error:", error);
+              alert("Error fetching results. Please try again.");
+            } finally {
+              // Re-enable button
+              runButton.disabled = false;
+              runButton.textContent = "Run Search Test";
+              runButton.classList.remove("bg-blue-400");
+              runButton.classList.add("bg-blue-600", "hover:bg-blue-700");
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

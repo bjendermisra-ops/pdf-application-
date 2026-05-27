@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cash Flow Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      .calculator-container {
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        background: white;
+      }
+
+      .input-group {
+        transition: all 0.2s ease;
+      }
+
+      .input-group:focus-within {
+        transform: translateY(-2px);
+      }
+
+      .btn-primary {
+        background: linear-gradient(to right, #667eea, #764ba2);
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(to right, #5a6fd8, #6a4190);
+        transform: translateY(-2px);
+      }
+
+      .result-card {
+        background: linear-gradient(to right, #ecfdf5, #d1fae5);
+        border-left: 4px solid #10b981;
+      }
+
+      .explanation-card {
+        background: linear-gradient(to right, #eff6ff, #dbeafe);
+        border-left: 4px solid #3b82f6;
+      }
+
+      .glow {
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .tab-active {
+        background: linear-gradient(to right, #667eea, #764ba2);
+        color: white;
+      }
+
+      .cashflow-btn.active {
+        background: linear-gradient(to right, #667eea, #764ba2);
+        color: white;
+        border-color: #667eea;
+      }
+
+      .cashflow-value {
+        font-family: "Courier New", monospace;
+        font-weight: bold;
+      }
+
+      .chart-container {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+      }
+
+      .cashflow-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .cashflow-table th {
+        background: #f1f5f9;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid #e2e8f0;
+      }
+
+      .cashflow-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .cashflow-table tr:hover {
+        background: #f8fafc;
+      }
+
+      .income-row {
+        border-left: 4px solid #10b981;
+      }
+
+      .expense-row {
+        border-left: 4px solid #ef4444;
+      }
+
+      .net-row {
+        border-left: 4px solid #3b82f6;
+        font-weight: 600;
+        background: #f0f9ff;
+      }
+
+      .positive {
+        color: #10b981;
+        font-weight: 600;
+      }
+
+      .negative {
+        color: #ef4444;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-100 min-h-screen flex flex-col items-center p-4 pt-20">
+    <!-- Added pt-20 for navbar offset -->
+    <nav class="fixed top-0 left-0 w-full z-10 bg-white/95 shadow-md">
+      <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        height: 4rem; /* Consistent height for offset */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 9999px;
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      }
+
+      .back-button i {
+        font-size: 1rem;
+      }
+
+      .back-button:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        transform: translateX(-0.25rem);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+      }
+
+      .bg-white {
+        margin-top: 4rem; /* Offset to prevent overlap with fixed navbar */
+      }
+    </style>
+    <div
+      class="calculator-container rounded-2xl w-full max-w-6xl overflow-hidden"
+    >
+      <!-- Header -->
+      <div
+        class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold">Cash Flow Calculator</h1>
+            <p class="text-indigo-100 mt-2">
+              Analyze income, expenses, and net cash flow over time
+            </p>
+          </div>
+          <div class="bg-white/20 p-3 rounded-full">
+            <i class="fas fa-money-bill-wave text-2xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="p-6">
+        <!-- Cash Flow Type Selection -->
+        <div class="mb-6">
+          <label class="block text-gray-700 font-medium mb-2">
+            <i class="fas fa-chart-line text-blue-500 mr-2"></i>Cash Flow
+            Analysis Type
+          </label>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button
+              data-cashflow="simple"
+              class="cashflow-btn active bg-white border border-indigo-500 py-3 rounded-lg text-indigo-700 font-medium transition duration-200"
+            >
+              Simple Cash Flow
+            </button>
+            <button
+              data-cashflow="business"
+              class="cashflow-btn bg-white border border-gray-200 py-3 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition duration-200"
+            >
+              Business Cash Flow
+            </button>
+            <button
+              data-cashflow="investment"
+              class="cashflow-btn bg-white border border-gray-200 py-3 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition duration-200"
+            >
+              Investment Analysis
+            </button>
+          </div>
+        </div>
+
+        <!-- Input Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <!-- Simple Cash Flow Inputs -->
+          <div id="simpleInputs" class="space-y-6">
+            <h3 class="font-semibold text-gray-800 mb-2">Income & Expenses</h3>
+
+            <!-- Income Sources -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h4 class="font-medium text-gray-700 mb-3 flex items-center">
+                <i class="fas fa-arrow-up text-green-500 mr-2"></i> Income
+                Sources
+              </h4>
+              <div class="space-y-4">
+                <div class="input-group">
+                  <label class="block text-gray-700 text-sm mb-1" for="salary">
+                    Salary/Wages
+                  </label>
+                  <div class="flex">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                    >
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      id="salary"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="Monthly salary"
+                      value="5000"
+                      min="0"
+                      step="100"
+                    />
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <label
+                    class="block text-gray-700 text-sm mb-1"
+                    for="investmentIncome"
+                  >
+                    Investment Income
+                  </label>
+                  <div class="flex">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                    >
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      id="investmentIncome"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="Monthly investment income"
+                      value="300"
+                      min="0"
+                      step="50"
+                    />
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <label
+                    class="block text-gray-700 text-sm mb-1"
+                    for="otherIncome"
+                  >
+                    Other Income
+                  </label>
+                  <div class="flex">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                    >
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      id="otherIncome"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="Other monthly income"
+                      value="200"
+                      min="0"
+                      step="50"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Expenses -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h4 class="font-medium text-gray-700 mb-3 flex items-center">
+                <i class="fas fa-arrow-down text-red-500 mr-2"></i> Monthly
+                Expenses
+              </h4>
+              <div class="space-y-4">
+                <div class="input-group">
+                  <label class="block text-gray-700 text-sm mb-1" for="housing">
+                    Housing (Rent/Mortgage)
+                  </label>
+                  <div class="flex">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                    >
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      id="housing"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="Housing cost"
+                      value="1500"
+                      min="0"
+                      step="100"
+                    />
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <label
+                    class="block text-gray-700 text-sm mb-1"
+                    for="utilities"
+                  >
+                    Utilities
+                  </label>
+                  <div class="flex">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                    >
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      id="utilities"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="Utilities cost"
+                      value="300"
+                      min="0"
+                      step="50"
+                    />
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <label
+                    class="block text-gray-700 text-sm mb-1"
+                    for="transportation"
+                  >
+                    Transportation
+                  </label>
+                  <div class="flex">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                    >
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      id="transportation"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="Transportation cost"
+                      value="400"
+                      min="0"
+                      step="50"
+                    />
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <label class="block text-gray-700 text-sm mb-1" for="food">
+                    Food & Groceries
+                  </label>
+                  <div class="flex">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                    >
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      id="food"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="Food cost"
+                      value="600"
+                      min="0"
+                      step="50"
+                    />
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <label
+                    class="block text-gray-700 text-sm mb-1"
+                    for="otherExpenses"
+                  >
+                    Other Expenses
+                  </label>
+                  <div class="flex">
+                    <span
+                      class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500"
+                    >
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      id="otherExpenses"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="Other expenses"
+                      value="500"
+                      min="0"
+                      step="50"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Time Period -->
+            <div class="input-group">
+              <label
+                class="block text-gray-700 font-medium mb-2"
+                for="timePeriod"
+              >
+                <i class="fas fa-calendar-alt text-blue-500 mr-2"></i>Analysis
+                Period (Months)
+              </label>
+              <input
+                type="number"
+                id="timePeriod"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="Number of months"
+                value="12"
+                min="1"
+                max="60"
+              />
+            </div>
+          </div>
+
+          <!-- Visualization Area -->
+          <div class="space-y-6">
+            <div class="chart-container p-4">
+              <canvas id="cashFlowChart"></canvas>
+            </div>
+
+            <div class="chart-container p-4">
+              <canvas id="incomeExpenseChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 my-8">
+          <button
+            id="calculateBtn"
+            class="btn-primary text-white font-medium py-3 px-6 rounded-lg flex-1 flex items-center justify-center"
+          >
+            <i class="fas fa-calculator mr-2"></i> Calculate Cash Flow
+          </button>
+          <button
+            id="resetBtn"
+            class="bg-gray-200 text-gray-800 font-medium py-3 px-6 rounded-lg flex-1 flex items-center justify-center hover:bg-gray-300 transition duration-200"
+          >
+            <i class="fas fa-redo mr-2"></i> Reset
+          </button>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="space-y-4 mb-8 hidden">
+          <!-- Summary Results -->
+          <div class="result-card p-4 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-2">Cash Flow Summary</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="text-center p-3 bg-white rounded-lg">
+                <p class="text-sm text-gray-600">Total Income</p>
+                <p id="totalIncome" class="text-xl font-bold text-green-600">
+                  $0
+                </p>
+              </div>
+              <div class="text-center p-3 bg-white rounded-lg">
+                <p class="text-sm text-gray-600">Total Expenses</p>
+                <p id="totalExpenses" class="text-xl font-bold text-red-600">
+                  $0
+                </p>
+              </div>
+              <div class="text-center p-3 bg-white rounded-lg">
+                <p class="text-sm text-gray-600">Net Cash Flow</p>
+                <p id="netCashFlow" class="text-xl font-bold text-blue-600">
+                  $0
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Monthly Breakdown -->
+          <div class="explanation-card p-4 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-2">
+              Monthly Cash Flow Breakdown
+            </h3>
+            <div class="overflow-x-auto">
+              <table class="cashflow-table">
+                <thead>
+                  <tr>
+                    <th>Month</th>
+                    <th>Income</th>
+                    <th>Expenses</th>
+                    <th>Net Cash Flow</th>
+                    <th>Cumulative</th>
+                  </tr>
+                </thead>
+                <tbody id="monthlyBreakdown">
+                  <!-- Monthly data will be populated here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Analysis & Insights -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+              <h4 class="font-semibold text-gray-800 mb-2">Key Metrics</h4>
+              <div id="keyMetrics" class="space-y-2 text-sm">
+                <!-- Metrics will be populated here -->
+              </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+              <h4 class="font-semibold text-gray-800 mb-2">
+                Financial Health Analysis
+              </h4>
+              <div id="healthAnalysis" class="space-y-2 text-sm">
+                <!-- Analysis will be populated here -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cash Flow Tips -->
+        <div class="mt-6 bg-gray-50 p-4 rounded-lg">
+          <h3 class="font-semibold text-gray-800 mb-3">
+            Cash Flow Management Tips
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-white p-3 rounded-lg">
+              <h4 class="font-medium text-gray-700 mb-2 flex items-center">
+                <i class="fas fa-piggy-bank text-green-500 mr-2"></i> Increase
+                Income
+              </h4>
+              <ul class="text-sm text-gray-600 space-y-1">
+                <li>• Negotiate salary increases</li>
+                <li>• Develop side income streams</li>
+                <li>• Invest in income-generating assets</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-3 rounded-lg">
+              <h4 class="font-medium text-gray-700 mb-2 flex items-center">
+                <i class="fas fa-chart-line-down text-red-500 mr-2"></i> Reduce
+                Expenses
+              </h4>
+              <ul class="text-sm text-gray-600 space-y-1">
+                <li>• Track spending patterns</li>
+                <li>• Eliminate unnecessary subscriptions</li>
+                <li>• Shop smarter for essentials</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-3 rounded-lg">
+              <h4 class="font-medium text-gray-700 mb-2 flex items-center">
+                <i class="fas fa-shield-alt text-blue-500 mr-2"></i> Build
+                Emergency Fund
+              </h4>
+              <ul class="text-sm text-gray-600 space-y-1">
+                <li>• Save 3-6 months of expenses</li>
+                <li>• Keep funds in accessible accounts</li>
+                <li>• Automate savings contributions</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-gray-100 p-4 text-center text-gray-600 text-sm">
+        <p>
+          Cash flow is the net amount of cash and cash-equivalents moving in and
+          out of a business or personal account.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Get DOM elements
+      const calculateBtn = document.getElementById("calculateBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const resultsDiv = document.getElementById("results");
+      const monthlyBreakdown = document.getElementById("monthlyBreakdown");
+      const keyMetrics = document.getElementById("keyMetrics");
+      const healthAnalysis = document.getElementById("healthAnalysis");
+
+      // Result elements
+      const totalIncome = document.getElementById("totalIncome");
+      const totalExpenses = document.getElementById("totalExpenses");
+      const netCashFlow = document.getElementById("netCashFlow");
+
+      // Chart elements
+      const cashFlowChart = document.getElementById("cashFlowChart");
+      const incomeExpenseChart = document.getElementById("incomeExpenseChart");
+
+      // Cash flow type buttons
+      const cashflowBtns = document.querySelectorAll(".cashflow-btn");
+
+      let currentCashFlowType = "simple";
+      let charts = {};
+
+      // Switch between cash flow types
+      cashflowBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          // Reset all buttons
+          cashflowBtns.forEach((b) => {
+            b.classList.remove(
+              "active",
+              "border-indigo-500",
+              "text-indigo-700",
+              "bg-indigo-50"
+            );
+            b.classList.add("border-gray-200", "text-gray-700", "bg-white");
+          });
+
+          // Highlight selected button
+          btn.classList.add("active", "border-indigo-500", "text-white");
+          btn.classList.remove("border-gray-200", "text-gray-700", "bg-white");
+
+          currentCashFlowType = btn.dataset.cashflow;
+
+          // Recalculate if we already have results
+          if (!resultsDiv.classList.contains("hidden")) {
+            calculateCashFlow();
+          }
+        });
+      });
+
+      // Format currency
+      function formatCurrency(amount) {
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(amount);
+      }
+
+      // Calculate cash flow
+      function calculateCashFlow() {
+        // Get input values
+        const salary = parseFloat(document.getElementById("salary").value) || 0;
+        const investmentIncome =
+          parseFloat(document.getElementById("investmentIncome").value) || 0;
+        const otherIncome =
+          parseFloat(document.getElementById("otherIncome").value) || 0;
+
+        const housing =
+          parseFloat(document.getElementById("housing").value) || 0;
+        const utilities =
+          parseFloat(document.getElementById("utilities").value) || 0;
+        const transportation =
+          parseFloat(document.getElementById("transportation").value) || 0;
+        const food = parseFloat(document.getElementById("food").value) || 0;
+        const otherExpenses =
+          parseFloat(document.getElementById("otherExpenses").value) || 0;
+
+        const timePeriod =
+          parseInt(document.getElementById("timePeriod").value) || 12;
+
+        // Calculate totals
+        const monthlyIncome = salary + investmentIncome + otherIncome;
+        const monthlyExpenses =
+          housing + utilities + transportation + food + otherExpenses;
+        const monthlyNet = monthlyIncome - monthlyExpenses;
+
+        const totalMonthlyIncome = monthlyIncome * timePeriod;
+        const totalMonthlyExpenses = monthlyExpenses * timePeriod;
+        const totalNet = totalMonthlyIncome - totalMonthlyExpenses;
+
+        // Update summary
+        totalIncome.textContent = formatCurrency(totalMonthlyIncome);
+        totalExpenses.textContent = formatCurrency(totalMonthlyExpenses);
+        netCashFlow.textContent = formatCurrency(totalNet);
+
+        // Generate monthly breakdown
+        generateMonthlyBreakdown(monthlyIncome, monthlyExpenses, timePeriod);
+
+        // Generate charts
+        generateCharts(monthlyIncome, monthlyExpenses, timePeriod);
+
+        // Generate analysis
+        generateAnalysis(monthlyIncome, monthlyExpenses, monthlyNet);
+
+        // Show results
+        resultsDiv.classList.remove("hidden");
+
+        // Add glow effect
+        resultsDiv.classList.add("glow");
+        setTimeout(() => {
+          resultsDiv.classList.remove("glow");
+        }, 1000);
+      }
+
+      // Generate monthly breakdown table
+      function generateMonthlyBreakdown(income, expenses, months) {
+        monthlyBreakdown.innerHTML = "";
+        let cumulative = 0;
+
+        for (let i = 1; i <= months; i++) {
+          cumulative += income - expenses;
+
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                    <td>Month ${i}</td>
+                    <td class="positive">${formatCurrency(income)}</td>
+                    <td class="negative">${formatCurrency(expenses)}</td>
+                    <td class="${
+                      income - expenses >= 0 ? "positive" : "negative"
+                    }">
+                        ${formatCurrency(income - expenses)}
+                    </td>
+                    <td class="${cumulative >= 0 ? "positive" : "negative"}">
+                        ${formatCurrency(cumulative)}
+                    </td>
+                `;
+          monthlyBreakdown.appendChild(row);
+        }
+      }
+
+      // Generate charts
+      function generateCharts(income, expenses, months) {
+        // Destroy existing charts
+        if (charts.cashFlow) charts.cashFlow.destroy();
+        if (charts.incomeExpense) charts.incomeExpense.destroy();
+
+        // Cash Flow Over Time Chart
+        const monthlyData = [];
+        const cumulativeData = [];
+        let cumulative = 0;
+
+        for (let i = 1; i <= months; i++) {
+          cumulative += income - expenses;
+          monthlyData.push(income - expenses);
+          cumulativeData.push(cumulative);
+        }
+
+        charts.cashFlow = new Chart(cashFlowChart, {
+          type: "line",
+          data: {
+            labels: Array.from({ length: months }, (_, i) => `Month ${i + 1}`),
+            datasets: [
+              {
+                label: "Monthly Cash Flow",
+                data: monthlyData,
+                borderColor: "#3b82f6",
+                backgroundColor: "rgba(59, 130, 246, 0.1)",
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+              },
+              {
+                label: "Cumulative Cash Flow",
+                data: cumulativeData,
+                borderColor: "#10b981",
+                backgroundColor: "rgba(16, 185, 129, 0.1)",
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: "Cash Flow Over Time",
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Amount ($)",
+                },
+              },
+            },
+          },
+        });
+
+        // Income vs Expenses Chart
+        charts.incomeExpense = new Chart(incomeExpenseChart, {
+          type: "doughnut",
+          data: {
+            labels: ["Income", "Expenses"],
+            datasets: [
+              {
+                data: [income, expenses],
+                backgroundColor: ["#10b981", "#ef4444"],
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: "Income vs Expenses",
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    const label = context.label || "";
+                    const value = context.raw;
+                    const percentage = (
+                      (value / (income + expenses)) *
+                      100
+                    ).toFixed(1);
+                    return `${label}: ${formatCurrency(
+                      value
+                    )} (${percentage}%)`;
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // Generate financial analysis
+      function generateAnalysis(income, expenses, net) {
+        const savingsRate = ((net / income) * 100).toFixed(1);
+        const expenseRatio = ((expenses / income) * 100).toFixed(1);
+
+        keyMetrics.innerHTML = `
+                <div class="flex justify-between border-b pb-1">
+                    <span>Monthly Savings Rate:</span>
+                    <span class="${
+                      savingsRate >= 0 ? "positive" : "negative"
+                    }">${savingsRate}%</span>
+                </div>
+                <div class="flex justify-between border-b pb-1">
+                    <span>Expense to Income Ratio:</span>
+                    <span>${expenseRatio}%</span>
+                </div>
+                <div class="flex justify-between border-b pb-1">
+                    <span>Break-even Point:</span>
+                    <span>${
+                      income === 0 ? "N/A" : formatCurrency(expenses)
+                    }</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Monthly Safety Margin:</span>
+                    <span class="${
+                      net >= 0 ? "positive" : "negative"
+                    }">${formatCurrency(Math.abs(net))}</span>
+                </div>
+            `;
+
+        // Health analysis
+        let analysisText = "";
+        if (net > 0) {
+          if (savingsRate > 20) {
+            analysisText =
+              "Excellent financial health! You have a strong savings rate and positive cash flow.";
+          } else if (savingsRate > 10) {
+            analysisText =
+              "Good financial health. You have positive cash flow and are building savings.";
+          } else {
+            analysisText =
+              "Fair financial health. You have positive cash flow but could increase your savings rate.";
+          }
+        } else {
+          analysisText =
+            "Attention needed. You have negative cash flow. Consider reducing expenses or increasing income.";
+        }
+
+        healthAnalysis.innerHTML = `
+                <p class="text-sm text-gray-700 mb-2">${analysisText}</p>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• ${
+                      net > 0
+                        ? "Continue building emergency fund"
+                        : "Review and reduce discretionary spending"
+                    }</li>
+                    <li>• ${
+                      savingsRate > 15
+                        ? "Consider investment opportunities"
+                        : "Focus on increasing savings rate to 15-20%"
+                    }</li>
+                    <li>• Monitor cash flow monthly for adjustments</li>
+                </ul>
+            `;
+      }
+
+      // Reset function
+      function resetCalculator() {
+        // Reset input values
+        document.getElementById("salary").value = "5000";
+        document.getElementById("investmentIncome").value = "300";
+        document.getElementById("otherIncome").value = "200";
+        document.getElementById("housing").value = "1500";
+        document.getElementById("utilities").value = "300";
+        document.getElementById("transportation").value = "400";
+        document.getElementById("food").value = "600";
+        document.getElementById("otherExpenses").value = "500";
+        document.getElementById("timePeriod").value = "12";
+
+        // Reset to simple cash flow
+        cashflowBtns.forEach((btn) => {
+          btn.classList.remove(
+            "active",
+            "border-indigo-500",
+            "text-indigo-700",
+            "bg-indigo-50"
+          );
+          btn.classList.add("border-gray-200", "text-gray-700", "bg-white");
+        });
+        cashflowBtns[0].classList.add(
+          "active",
+          "border-indigo-500",
+          "text-white"
+        );
+        cashflowBtns[0].classList.remove(
+          "border-gray-200",
+          "text-gray-700",
+          "bg-white"
+        );
+        currentCashFlowType = "simple";
+
+        resultsDiv.classList.add("hidden");
+
+        // Destroy charts
+        if (charts.cashFlow) charts.cashFlow.destroy();
+        if (charts.incomeExpense) charts.incomeExpense.destroy();
+      }
+
+      // Event listeners
+      calculateBtn.addEventListener("click", calculateCashFlow);
+      resetBtn.addEventListener("click", resetCalculator);
+
+      // Add keyboard support
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          calculateCashFlow();
+        }
+        if (event.key === "Escape") {
+          resetCalculator();
+        }
+      });
+
+      // Auto-calculate when inputs change
+      document.querySelectorAll("input").forEach((element) => {
+        element.addEventListener("input", calculateCashFlow);
+      });
+
+      // Initialize
+      calculateCashFlow(); // Calculate with default values
+    </script>
+  </body>
+</html>

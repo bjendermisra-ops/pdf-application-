@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Net Worth Calculator India 2025</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .fade-in { animation: fadeIn 0.6s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .result-card { opacity: 0; transform: translateY(20px); transition: all 0.6s ease; }
+    .result-card.show { opacity: 1; transform: translateY(0); }
+    .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    .net-positive { @apply text-green-600 font-bold; }
+    .net-negative { @apply text-red-600 font-bold; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-100 min-h-screen font-sans">
+
+    <!-- Back Button -->
+<div class="fixed top-6 left-6 z-50">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <a href="/"
+     class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white
+            rounded-full shadow-md w-fit
+            bg-gradient-to-r from-blue-600 to-blue-700
+            hover:from-blue-700 hover:to-indigo-800
+            hover:-translate-x-1 hover:shadow-lg
+            transition-all duration-300 ease-in-out">
+    <i class="fas fa-arrow-left text-sm"></i>
+    <span>Back to All Tools</span>
+  </a>
+</div>
+
+
+  <div class="max-w-6xl mx-auto p-6 md:p-10">
+
+    <!-- Header -->
+    <header class="text-center mb-12">
+      <h1 class="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-700 mb-4">
+        <i class="fas fa-chart-line mr-3"></i>Net Worth Calculator
+      </h1>
+      <p class="text-xl text-gray-700 font-medium">Assets – Liabilities + 5-Year Growth Trend</p>
+      <p class="text-sm text-gray-600 mt-2">Track, Grow & Achieve Financial Freedom</p>
+    </header>
+
+    <!-- Calculator Form -->
+    <div class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-8 md:p-12 mb-10">
+      <form id="networthForm" class="space-y-10">
+
+        <!-- Assets Section -->
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl border border-green-200">
+          <h3 class="text-2xl font-bold text-green-800 mb-6 flex items-center">
+            <i class="fas fa-plus-circle mr-3"></i>Assets (What You Own)
+          </h3>
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">Cash & Bank Savings (₹)</label>
+              <input type="number" id="cash" placeholder="2,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-green-300 focus:border-green-500" />
+            </div>
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">Fixed Deposits (₹)</label>
+              <input type="number" id="fd" placeholder="5,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-green-300 focus:border-green-500" />
+            </div>
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">Stocks / Mutual Funds (₹)</label>
+              <input type="number" id="investments" placeholder="10,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-green-300 focus:border-green-500" />
+            </div>
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">Gold (Current Value ₹)</label>
+              <input type="number" id="gold" placeholder="8,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-green-300 focus:border-green-500" />
+            </div>
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">Real Estate (Market Value ₹)</label>
+              <input type="number" id="property" placeholder="50,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-green-300 focus:border-green-500" />
+            </div>
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">Vehicles (Current Value ₹)</label>
+              <input type="number" id="vehicles" placeholder="12,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-green-300 focus:border-green-500" />
+            </div>
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">PF / EPF Balance (₹)</label>
+              <input type="number" id="pf" placeholder="6,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-green-300 focus:border-green-500" />
+            </div>
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">PPF / NPS (₹)</label>
+              <input type="number" id="ppf" placeholder="3,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-green-300 focus:border-green-500" />
+            </div>
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">Other Assets (₹)</label>
+              <input type="number" id="otherAssets" placeholder="1,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-green-300 focus:border-green-500" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Liabilities Section -->
+        <div class="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-2xl border border-red-200">
+          <h3 class="text-2xl font-bold text-red-800 mb-6 flex items-center">
+            <i class="fas fa-minus-circle mr-3"></i>Liabilities (What You Owe)
+          </h3>
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">Home Loan Outstanding (₹)</label>
+              <input type="number" id="homeLoan" placeholder="25,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-300 focus:border-red-500" />
+            </div>
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">Car Loan Outstanding (₹)</label>
+              <input type="number" id="carLoan" placeholder="8,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-300 focus:border-red-500" />
+            </div>
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">Personal Loan (₹)</label>
+              <input type="number" id="personalLoan" placeholder="2,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-300 focus:border-red-500" />
+            </div>
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">Credit Card Debt (₹)</label>
+              <input type="number" id="creditCard" placeholder="50,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-300 focus:border-red-500" />
+            </div>
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">Education Loan (₹)</label>
+              <input type="number" id="eduLoan" placeholder="3,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-300 focus:border-red-500" />
+            </div>
+            <div>
+              <label class="block text-lg font-semibold text-gray-700 mb-2">Other Liabilities (₹)</label>
+              <input type="number" id="otherLiab" placeholder="1,00,000" min="0"
+                class="w-full px-5 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-300 focus:border-red-500" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Action -->
+        <div class="flex justify-center">
+          <button type="submit" class="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold text-xl py-5 px-16 rounded-xl transition-all shadow-xl">
+            <i class="fas fa-calculator mr-2"></i>Calculate & Project
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Results -->
+    <div id="resultSection" class="hidden result-card space-y-8">
+
+      <!-- Net Worth Summary -->
+      <div class="bg-gradient-to-r from-amber-500 to-orange-600 text-white p-8 rounded-3xl shadow-2xl">
+        <h3 class="text-2xl font-bold mb-6">Your Net Worth</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          <div><p class="text-sm opacity-90">Total Assets</p><p class="text-3xl font-bold" id="totalAssets">₹0</p></div>
+          <div><p class="text-sm opacity-90">Total Liabilities</p><p class="text-3xl font-bold" id="totalLiab">₹0</p></div>
+          <div><p class="text-sm opacity-90">Net Worth</p><p class="text-4xl font-bold" id="netWorth">₹0</p></div>
+        </div>
+      </div>
+
+      <!-- Breakdown -->
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl">
+          <h3 class="text-xl font-bold text-green-800 mb-4">Assets Breakdown</h3>
+          <table class="w-full text-sm">
+            <tbody id="assetsTable" class="divide-y divide-gray-200"></tbody>
+          </table>
+        </div>
+        <div class="bg-white p-8 rounded-3xl shadow-2xl">
+          <h3 class="text-xl font-bold text-red-800 mb-4">Liabilities Breakdown</h3>
+          <table class="w-full text-sm">
+            <tbody id="liabTable" class="divide-y divide-gray-200"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Line Graph: 5-Year Projection -->
+      <div class="bg-white p-8 rounded-3xl shadow-2xl">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">5-Year Net Worth Growth (Projected)</h3>
+        <p class="text-sm text-gray-600 mb-4">Assumes: 5% annual asset growth, 3% annual debt reduction</p>
+        <canvas id="trendChart"></canvas>
+      </div>
+
+      <!-- Insights -->
+      <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-8 rounded-3xl shadow-2xl">
+        <h3 class="text-xl font-bold mb-4">Financial Insights</h3>
+        <ul id="insights" class="space-y-3 text-sm"></ul>
+      </div>
+    </div>
+
+    <!-- About Net Worth -->
+    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 md:p-10 border border-amber-200 mb-10">
+      <h3 class="text-2xl font-bold text-amber-800 mb-6 flex items-center">
+        <i class="fas fa-info-circle mr-3 text-amber-600"></i>About Net Worth
+      </h3>
+      <div class="prose prose-lg text-gray-700 space-y-4">
+        <p><strong>Net Worth = Assets – Liabilities</strong> is your financial foundation.</p>
+        <div class="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl border-l-4 border-amber-500">
+          <p class="text-lg font-mono text-amber-700 text-center">
+            Grow Assets → Reduce Debt → Increase Net Worth
+          </p>
+        </div>
+        <p><strong>India 2025 Tips:</strong></p>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li>PF, PPF, NPS are tax-free assets</li>
+          <li>Gold: Use current market price (₹7,500/g)</li>
+          <li>Property: Use circle rate or market value</li>
+          <li>Debt: Pay high-interest first (Credit Card > Personal Loan)</li>
+        </ul>
+        <p class="mt-6 italic text-amber-600">
+          Used by 1M+ Indians. Inspired by Warren Buffett’s wealth formula.
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center text-gray-600 text-sm">
+      © 2025 Net Worth Calculator | <i class="fas fa-heart text-red-500"></i> Build Wealth
+    </footer>
+  </div>
+
+  <script>
+    const form = document.getElementById('networthForm');
+    const resultSection = document.getElementById('resultSection');
+    let chart = null;
+
+    const assetFields = [
+      { id: 'cash', label: 'Cash & Savings' },
+      { id: 'fd', label: 'Fixed Deposits' },
+      { id: 'investments', label: 'Stocks / MF' },
+      { id: 'gold', label: 'Gold' },
+      { id: 'property', label: 'Real Estate' },
+      { id: 'vehicles', label: 'Vehicles' },
+      { id: 'pf', label: 'PF / EPF' },
+      { id: 'ppf', label: 'PPF / NPS' },
+      { id: 'otherAssets', label: 'Other Assets' }
+    ];
+
+    const liabFields = [
+      { id: 'homeLoan', label: 'Home Loan' },
+      { id: 'carLoan', label: 'Car Loan' },
+      { id: 'personalLoan', label: 'Personal Loan' },
+      { id: 'creditCard', label: 'Credit Card' },
+      { id: 'eduLoan', label: 'Education Loan' },
+      { id: 'otherLiab', label: 'Other Debt' }
+    ];
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      let totalAssets = 0;
+      let totalLiab = 0;
+
+      // Calculate Assets
+      const assets = {};
+      assetFields.forEach(f => {
+        const val = parseFloat(document.getElementById(f.id).value) || 0;
+        assets[f.id] = val;
+        totalAssets += val;
+      });
+
+      // Calculate Liabilities
+      const liabilities = {};
+      liabFields.forEach(f => {
+        const val = parseFloat(document.getElementById(f.id).value) || 0;
+        liabilities[f.id] = val;
+        totalLiab += val;
+      });
+
+      const netWorth = totalAssets - totalLiab;
+
+      // Update Summary
+      document.getElementById('totalAssets').textContent = '₹' + totalAssets.toLocaleString('en-IN');
+      document.getElementById('totalLiab').textContent = '₹' + totalLiab.toLocaleString('en-IN');
+      const nwEl = document.getElementById('netWorth');
+      nwEl.textContent = netWorth >= 0 ? '₹' + netWorth.toLocaleString('en-IN') : '-₹' + Math.abs(netWorth).toLocaleString('en-IN');
+      nwEl.className = netWorth >= 0 ? 'text-4xl font-bold net-positive' : 'text-4xl font-bold net-negative';
+
+      // Assets Table
+      const assetsTbody = document.getElementById('assetsTable');
+      assetsTbody.innerHTML = '';
+      assetFields.forEach(f => {
+        if (assets[f.id] > 0) {
+          assetsTbody.innerHTML += `<tr><td class="py-2">${f.label}</td><td class="py-2 text-right font-medium">₹${assets[f.id].toLocaleString('en-IN')}</td></tr>`;
+        }
+      });
+
+      // Liabilities Table
+      const liabTbody = document.getElementById('liabTable');
+      liabTbody.innerHTML = '';
+      liabFields.forEach(f => {
+        if (liabilities[f.id] > 0) {
+          liabTbody.innerHTML += `<tr><td class="py-2">${f.label}</td><td class="py-2 text-right font-medium text-red-600">-₹${liabilities[f.id].toLocaleString('en-IN')}</td></tr>`;
+        }
+      });
+
+      // Line Chart: 5-Year Projection
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      if (chart) chart.destroy();
+
+      const years = ['Now', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'];
+      const netWorthData = [netWorth];
+      let currentAssets = totalAssets;
+      let currentLiab = totalLiab;
+
+      for (let i = 1; i <= 5; i++) {
+        currentAssets *= 1.05;  // 5% growth
+        currentLiab *= 0.97;    // 3% reduction
+        netWorthData.push(currentAssets - currentLiab);
+      }
+
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: years,
+          datasets: [{
+            label: 'Net Worth (₹)',
+            data: netWorthData,
+            borderColor: netWorth >= 0 ? '#10b981' : '#ef4444',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 6,
+            pointBackgroundColor: '#f59e0b'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: false }
+          },
+          plugins: {
+            tooltip: { callbacks: { label: ctx => `₹${Math.round(ctx.parsed.y).toLocaleString('en-IN')}` } }
+          }
+        }
+      });
+
+      // Insights
+      const insights = document.getElementById('insights');
+      insights.innerHTML = '';
+      const debtRatio = totalLiab / (totalAssets || 1) * 100;
+      insights.innerHTML += `<li class="flex items-start gap-3"><i class="fas fa-lightbulb mt-1"></i>Debt-to-Asset Ratio: <strong>${debtRatio.toFixed(1)}%</strong> ${debtRatio > 50 ? '(High – Reduce Debt)' : '(Healthy)'}</li>`;
+      insights.innerHTML += `<li class="flex items-start gap-3"><i class="fas fa-lightbulb mt-1"></i>Liquid Assets: ₹${(assets.cash + assets.fd).toLocaleString('en-IN')} (Emergency Fund)</li>`;
+      insights.innerHTML += `<li class="flex items-start gap-3"><i class="fas fa-chart-line mt-1"></i>Projected Net Worth in 5 Years: <strong>₹${Math.round(netWorthData[5]).toLocaleString('en-IN')}</strong></li>`;
+      if (netWorth > 0) {
+        insights.innerHTML += `<li class="flex items-start gap-3"><i class="fas fa-check mt-1"></i>Positive Net Worth – You're building wealth!</li>`;
+      } else {
+        insights.innerHTML += `<li class="flex items-start gap-3"><i class="fas fa-exclamation mt-1"></i>Negative Net Worth – Focus on debt repayment</li>`;
+      }
+
+      resultSection.classList.remove('hidden');
+      resultSection.classList.add('show');
+      resultSection.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Sample Data
+    document.getElementById('cash').value = 200000;
+    document.getElementById('fd').value = 500000;
+    document.getElementById('investments').value = 1000000;
+    document.getElementById('gold').value = 800000;
+    document.getElementById('property').value = 5000000;
+    document.getElementById('vehicles').value = 1200000;
+    document.getElementById('pf').value = 600000;
+    document.getElementById('ppf').value = 300000;
+    document.getElementById('homeLoan').value = 2500000;
+    document.getElementById('carLoan').value = 800000;
+    document.getElementById('creditCard').value = 50000;
+  </script>
+</body>
+</html>

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Bulk Rotate Images Online — Rotate Multiple Photos Instantly</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s ease;
+        }
+        .upload-area.dragover {
+            border-color: #4f46e5;
+            background-color: #eef2ff;
+        }
+        .image-card {
+            transition: all 0.2s ease;
+            animation: fadeInUp 0.25s ease-out;
+        }
+        .image-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .rotate-animation {
+            transition: transform 0.2s ease;
+        }
+        .gallery-container {
+            max-height: 600px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        .gallery-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .gallery-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .gallery-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+        }
+        .selection-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #4f46e5;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-slate-100 antialiased">
+
+    <!-- Breadcrumb -->
+    <div class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 md:py-4">
+            <div class="flex items-center gap-2 text-sm">
+                <a href="/" class="text-gray-600 hover:text-indigo-600 transition"><i class="fas fa-home"></i> Home</a>
+                <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                <span class="text-indigo-700 font-semibold">Bulk Rotate Images</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
+        <!-- Header section -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center gap-2 bg-indigo-50 px-4 py-1.5 rounded-full text-indigo-700 text-sm font-medium mb-4">
+                <i class="fas fa-undo-alt"></i> Batch processing
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-gray-800 to-indigo-700 bg-clip-text text-transparent mb-4">
+                Bulk Rotate Images Online
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Rotate one photo or dozens photos at once — clockwise or counterclockwise. 
+                <span class="text-indigo-500 font-medium">Free, instant, and 100% private.</span> 
+                Your images never leave your device.
+                <i class="fas fa-shield-alt text-green-500 ml-1"></i>
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- LEFT PANEL: Upload & controls -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Dropzone -->
+                <div id="dropzone" class="upload-area rounded-2xl p-6 text-center bg-white transition-all cursor-pointer shadow-sm hover:shadow-md">
+                    <div class="flex flex-col items-center">
+                        <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-3">
+                            <i class="fas fa-images text-2xl text-indigo-500"></i>
+                        </div>
+                        <p id="uploadStatus" class="text-gray-800 font-semibold">Drop images here</p>
+                        <p class="text-gray-400 text-xs mt-1">JPEG, PNG, WEBP · No limit</p>
+                        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple class="hidden">
+                        <button id="selectImagesBtn" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-xl transition shadow-md flex items-center gap-2 text-sm">
+                            <i class="fas fa-folder-open"></i> Select images
+                        </button>
+                        <p class="text-xs text-gray-400 mt-3"><i class="fas fa-lock"></i> 100% local processing</p>
+                    </div>
+                </div>
+
+                <!-- Rotation Controls -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-gray-800 flex items-center gap-2 mb-4">
+                        <i class="fas fa-sync-alt text-indigo-500"></i> Rotation settings
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-5">
+                        <button id="rotateLeftBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fas fa-undo-alt"></i> 90° Left
+                        </button>
+                        <button id="rotateRightBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fas fa-redo-alt"></i> 90° Right
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <button id="rotate180Btn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fas fa-rotate"></i> 180°
+                        </button>
+                        <button id="resetRotationBtn" class="bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium py-3 rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fas fa-undo"></i> Reset all
+                        </button>
+                    </div>
+                    
+                    <!-- Selection info -->
+                    <div class="bg-indigo-50 rounded-xl p-3 mb-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-indigo-800"><i class="fas fa-check-circle"></i> Selected:</span>
+                            <span id="selectedCount" class="font-bold text-indigo-900">0</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-sm text-indigo-800"><i class="fas fa-images"></i> Total images:</span>
+                            <span id="totalImagesCount" class="font-bold text-indigo-900">0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Action buttons -->
+                    <button id="applyRotationBtn" class="w-full btn-primary text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 mb-3">
+                        <i class="fas fa-magic"></i> Apply rotation to selected
+                    </button>
+                    <button id="downloadAllBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fas fa-download"></i> Download all rotated images (ZIP)
+                    </button>
+                </div>
+                
+                <!-- Tips -->
+                <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                    <p class="text-xs font-semibold text-blue-800 flex items-center gap-1"><i class="fas fa-lightbulb"></i> Pro tip</p>
+                    <p class="text-xs text-blue-700 mt-1">Select individual images by clicking on them, or use the checkboxes to rotate only specific photos. Click "Download all" to get a ZIP archive with all rotated images.</p>
+                </div>
+            </div>
+            
+            <!-- RIGHT PANEL: Gallery of images -->
+            <div class="lg:col-span-8">
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-th"></i> Image gallery
+                            <span id="galleryBadge" class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">0 images</span>
+                        </h3>
+                        <div class="flex gap-2">
+                            <button id="selectAllBtn" class="text-xs text-indigo-600 hover:text-indigo-700 font-medium">Select all</button>
+                            <span class="text-gray-300">|</span>
+                            <button id="deselectAllBtn" class="text-xs text-gray-500 hover:text-gray-700 font-medium">Deselect all</button>
+                        </div>
+                    </div>
+                    
+                    <div id="galleryContainer" class="gallery-container grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-1">
+                        <!-- Dynamic gallery items will appear here -->
+                        <div class="text-center text-gray-400 col-span-full py-12">
+                            <i class="fas fa-cloud-upload-alt text-4xl mb-2 block"></i>
+                            <p class="text-sm">No images uploaded yet</p>
+                            <p class="text-xs mt-1">Drop your images above or click "Select images"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center text-gray-400 text-xs mt-10 pb-4">
+            <i class="fas fa-sync-alt"></i> All rotations are applied locally — your original files remain untouched. Rotated images are processed in your browser.
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const selectImagesBtn = document.getElementById('selectImagesBtn');
+        const galleryContainer = document.getElementById('galleryContainer');
+        const totalImagesCountSpan = document.getElementById('totalImagesCount');
+        const selectedCountSpan = document.getElementById('selectedCount');
+        const galleryBadge = document.getElementById('galleryBadge');
+        const rotateLeftBtn = document.getElementById('rotateLeftBtn');
+        const rotateRightBtn = document.getElementById('rotateRightBtn');
+        const rotate180Btn = document.getElementById('rotate180Btn');
+        const resetRotationBtn = document.getElementById('resetRotationBtn');
+        const applyRotationBtn = document.getElementById('applyRotationBtn');
+        const downloadAllBtn = document.getElementById('downloadAllBtn');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const deselectAllBtn = document.getElementById('deselectAllBtn');
+        const uploadStatus = document.getElementById('uploadStatus');
+
+        // Data structures
+        let images = []; // array of { id, file, originalUrl, currentRotation, originalWidth, originalHeight, element, imgElement, checkbox }
+        let nextId = 0;
+        
+        // Helper: update counts
+        function updateCounts() {
+            const total = images.length;
+            const selected = images.filter(img => img.checkbox && img.checkbox.checked).length;
+            totalImagesCountSpan.innerText = total;
+            selectedCountSpan.innerText = selected;
+            galleryBadge.innerText = `${total} image${total !== 1 ? 's' : ''}`;
+            if (total === 0) {
+                uploadStatus.innerHTML = 'Drop images here';
+            } else {
+                uploadStatus.innerHTML = `${total} image${total !== 1 ? 's' : ''} loaded <i class="fas fa-check-circle text-green-500"></i>`;
+            }
+        }
+        
+        // Rotate an image element visually (canvas rotation)
+        function updateImageRotation(imgItem) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const originalImg = imgItem.imgElement;
+            
+            let width = imgItem.originalWidth;
+            let height = imgItem.originalHeight;
+            let rotatedWidth = width;
+            let rotatedHeight = height;
+            
+            // For 90° or 270° rotations, swap dimensions
+            const rotationMod = ((imgItem.currentRotation % 360) + 360) % 360;
+            if (rotationMod === 90 || rotationMod === 270) {
+                rotatedWidth = height;
+                rotatedHeight = width;
+            }
+            
+            canvas.width = rotatedWidth;
+            canvas.height = rotatedHeight;
+            
+            ctx.save();
+            ctx.translate(rotatedWidth / 2, rotatedHeight / 2);
+            ctx.rotate((rotationMod * Math.PI) / 180);
+            ctx.drawImage(originalImg, -width / 2, -height / 2, width, height);
+            ctx.restore();
+            
+            // Update the displayed image
+            const displayImg = imgItem.element.querySelector('.gallery-image');
+            if (displayImg) {
+                displayImg.src = canvas.toDataURL('image/jpeg', 0.9);
+            }
+            
+            // Store rotated blob for download
+            canvas.toBlob((blob) => {
+                imgItem.rotatedBlob = blob;
+                imgItem.rotatedUrl = URL.createObjectURL(blob);
+            }, 'image/jpeg', 0.92);
+        }
+        
+        // Apply rotation to selected images
+        function applyRotationToSelected(degreesToAdd) {
+            const selected = images.filter(img => img.checkbox && img.checkbox.checked);
+            if (selected.length === 0) {
+                alert('Please select at least one image to rotate.');
+                return;
+            }
+            
+            selected.forEach(img => {
+                img.currentRotation = (img.currentRotation + degreesToAdd) % 360;
+                updateImageRotation(img);
+            });
+            
+            updateCounts();
+        }
+        
+        // Reset rotation for selected images
+        function resetSelectedRotation() {
+            const selected = images.filter(img => img.checkbox && img.checkbox.checked);
+            if (selected.length === 0) {
+                alert('Please select images to reset rotation.');
+                return;
+            }
+            selected.forEach(img => {
+                img.currentRotation = 0;
+                updateImageRotation(img);
+            });
+            updateCounts();
+        }
+        
+        // Apply specific rotation to selected
+        rotateLeftBtn.addEventListener('click', () => applyRotationToSelected(-90));
+        rotateRightBtn.addEventListener('click', () => applyRotationToSelected(90));
+        rotate180Btn.addEventListener('click', () => applyRotationToSelected(180));
+        resetRotationBtn.addEventListener('click', () => resetSelectedRotation());
+        
+        // Apply rotation button (just triggers based on current settings? we'll make it apply left by default? better to just use specific buttons)
+        applyRotationBtn.addEventListener('click', () => {
+            if (images.length === 0) {
+                alert('No images to rotate. Please upload some images first.');
+                return;
+            }
+            const selected = images.filter(img => img.checkbox && img.checkbox.checked);
+            if (selected.length === 0) {
+                alert('Please select images from the gallery first.');
+                return;
+            }
+            alert('Use the rotation buttons above (Left/Right/180) to rotate selected images.');
+        });
+        
+        // Add new images to gallery
+        function addImages(files) {
+            const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+            if (validFiles.length === 0) {
+                alert('Please select valid image files (JPEG, PNG, WEBP).');
+                return;
+            }
+            
+            let addedCount = 0;
+            validFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const imageId = nextId++;
+                        const imageCard = document.createElement('div');
+                        imageCard.className = 'image-card relative bg-gray-50 rounded-xl p-2 border border-gray-200 cursor-pointer';
+                        imageCard.setAttribute('data-id', imageId);
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.className = 'absolute top-2 left-2 w-4 h-4 z-10 cursor-pointer rounded border-gray-300 text-indigo-600 focus:ring-indigo-500';
+                        checkbox.checked = true;
+                        
+                        const imgContainer = document.createElement('div');
+                        imgContainer.className = 'relative w-full pt-[100%] overflow-hidden rounded-lg bg-gray-100';
+                        
+                        const displayImg = document.createElement('img');
+                        displayImg.className = 'gallery-image absolute top-0 left-0 w-full h-full object-contain p-2';
+                        displayImg.src = e.target.result;
+                        
+                        imgContainer.appendChild(displayImg);
+                        
+                        const label = document.createElement('div');
+                        label.className = 'text-xs text-gray-600 truncate mt-2 text-center px-1';
+                        label.innerText = file.name.length > 25 ? file.name.slice(0, 22) + '...' : file.name;
+                        
+                        const rotationBadge = document.createElement('div');
+                        rotationBadge.className = 'text-[10px] text-gray-400 text-center mt-0.5';
+                        rotationBadge.innerText = '0°';
+                        
+                        imageCard.appendChild(checkbox);
+                        imageCard.appendChild(imgContainer);
+                        imageCard.appendChild(label);
+                        imageCard.appendChild(rotationBadge);
+                        
+                        // Store image data
+                        const imgItem = {
+                            id: imageId,
+                            file: file,
+                            originalUrl: e.target.result,
+                            currentRotation: 0,
+                            originalWidth: img.width,
+                            originalHeight: img.height,
+                            element: imageCard,
+                            imgElement: img,
+                            checkbox: checkbox,
+                            displayImg: displayImg,
+                            rotationBadge: rotationBadge,
+                            rotatedBlob: null,
+                            rotatedUrl: null
+                        };
+                        
+                        images.push(imgItem);
+                        
+                        // Add to gallery
+                        if (galleryContainer.querySelector('.col-span-full')) {
+                            galleryContainer.innerHTML = '';
+                        }
+                        galleryContainer.appendChild(imageCard);
+                        
+                        // Update rotation display
+                        function updateBadge() {
+                            rotationBadge.innerText = `${imgItem.currentRotation}°`;
+                        }
+                        
+                        // Checkbox change
+                        checkbox.addEventListener('change', (e) => {
+                            e.stopPropagation();
+                            updateCounts();
+                        });
+                        
+                        // Click on card toggles checkbox
+                        imageCard.addEventListener('click', (e) => {
+                            if (e.target !== checkbox) {
+                                checkbox.checked = !checkbox.checked;
+                                updateCounts();
+                            }
+                        });
+                        
+                        // Store reference to update function
+                        imgItem.updateBadge = updateBadge;
+                        
+                        // Initial rotation
+                        updateImageRotation(imgItem);
+                        updateBadge();
+                        updateCounts();
+                        
+                        // Override updateImageRotation to also update badge
+                        const originalUpdate = updateImageRotation;
+                        window.updateImageRotation = function(item) {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            let width = item.originalWidth;
+                            let height = item.originalHeight;
+                            let rotMod = ((item.currentRotation % 360) + 360) % 360;
+                            let rotatedWidth = (rotMod === 90 || rotMod === 270) ? height : width;
+                            let rotatedHeight = (rotMod === 90 || rotMod === 270) ? width : height;
+                            canvas.width = rotatedWidth;
+                            canvas.height = rotatedHeight;
+                            ctx.translate(rotatedWidth / 2, rotatedHeight / 2);
+                            ctx.rotate((rotMod * Math.PI) / 180);
+                            ctx.drawImage(item.imgElement, -width / 2, -height / 2, width, height);
+                            if (item.displayImg) item.displayImg.src = canvas.toDataURL('image/jpeg', 0.9);
+                            canvas.toBlob((blob) => {
+                                item.rotatedBlob = blob;
+                                if (item.rotatedUrl) URL.revokeObjectURL(item.rotatedUrl);
+                                item.rotatedUrl = URL.createObjectURL(blob);
+                            }, 'image/jpeg', 0.92);
+                            if (item.rotationBadge) item.rotationBadge.innerText = `${item.currentRotation}°`;
+                        };
+                        
+                        // Reassign for this item
+                        const updateFn = (item) => {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            let width = item.originalWidth;
+                            let height = item.originalHeight;
+                            let rotMod = ((item.currentRotation % 360) + 360) % 360;
+                            let rotatedWidth = (rotMod === 90 || rotMod === 270) ? height : width;
+                            let rotatedHeight = (rotMod === 90 || rotMod === 270) ? width : height;
+                            canvas.width = rotatedWidth;
+                            canvas.height = rotatedHeight;
+                            ctx.translate(rotatedWidth / 2, rotatedHeight / 2);
+                            ctx.rotate((rotMod * Math.PI) / 180);
+                            ctx.drawImage(item.imgElement, -width / 2, -height / 2, width, height);
+                            if (item.displayImg) item.displayImg.src = canvas.toDataURL('image/jpeg', 0.9);
+                            canvas.toBlob((blob) => {
+                                item.rotatedBlob = blob;
+                                if (item.rotatedUrl) URL.revokeObjectURL(item.rotatedUrl);
+                                item.rotatedUrl = URL.createObjectURL(blob);
+                            }, 'image/jpeg', 0.92);
+                            if (item.rotationBadge) item.rotationBadge.innerText = `${item.currentRotation}°`;
+                        };
+                        
+                        imgItem.customUpdate = () => updateFn(imgItem);
+                        imgItem.customUpdate();
+                        
+                        // Override the global function reference for this item
+                        const boundUpdate = () => updateFn(imgItem);
+                        imgItem.updateImage = boundUpdate;
+                        boundUpdate();
+                        
+                        addedCount++;
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // Select all images
+        function selectAll() {
+            images.forEach(img => {
+                if (img.checkbox) img.checkbox.checked = true;
+            });
+            updateCounts();
+        }
+        
+        // Deselect all images
+        function deselectAll() {
+            images.forEach(img => {
+                if (img.checkbox) img.checkbox.checked = false;
+            });
+            updateCounts();
+        }
+        
+        selectAllBtn.addEventListener('click', selectAll);
+        deselectAllBtn.addEventListener('click', deselectAll);
+        
+        // Download all as ZIP
+        async function downloadAllAsZip() {
+            const rotatedImages = images.filter(img => img.rotatedBlob);
+            if (rotatedImages.length === 0) {
+                alert('No rotated images to download. Please upload and rotate some images first.');
+                return;
+            }
+            
+            // Show loading indicator
+            const originalBtnText = downloadAllBtn.innerHTML;
+            downloadAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating ZIP...';
+            downloadAllBtn.disabled = true;
+            
+            try {
+                // Dynamically load JSZip
+                if (typeof JSZip === 'undefined') {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+                    await new Promise((resolve, reject) => {
+                        script.onload = resolve;
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                }
+                
+                const JSZip = window.JSZip;
+                const zip = new JSZip();
+                
+                for (let img of rotatedImages) {
+                    if (img.rotatedBlob) {
+                        const originalName = img.file.name;
+                        const nameParts = originalName.split('.');
+                        const ext = nameParts.pop();
+                        const baseName = nameParts.join('.');
+                        const newName = `${baseName}_rotated_${img.currentRotation}deg.${ext}`;
+                        zip.file(newName, img.rotatedBlob);
+                    }
+                }
+                
+                const content = await zip.generateAsync({ type: 'blob' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = `rotated_images_${Date.now()}.zip`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+            } catch (err) {
+                console.error('ZIP error:', err);
+                alert('Failed to create ZIP. Please try again.');
+            } finally {
+                downloadAllBtn.innerHTML = originalBtnText;
+                downloadAllBtn.disabled = false;
+            }
+        }
+        
+        downloadAllBtn.addEventListener('click', downloadAllAsZip);
+        
+        // Clear gallery (utility)
+        function clearGallery() {
+            images.forEach(img => {
+                if (img.rotatedUrl) URL.revokeObjectURL(img.rotatedUrl);
+            });
+            images = [];
+            galleryContainer.innerHTML = '<div class="text-center text-gray-400 col-span-full py-12"><i class="fas fa-cloud-upload-alt text-4xl mb-2 block"></i><p class="text-sm">No images uploaded yet</p><p class="text-xs mt-1">Drop your images above or click "Select images"</p></div>';
+            updateCounts();
+        }
+        
+        // File selection handler
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files && files.length > 0) {
+                addImages(files);
+            }
+            fileInput.value = '';
+        }
+        
+        // Event listeners
+        fileInput.addEventListener('change', handleFileSelect);
+        selectImagesBtn.addEventListener('click', () => fileInput.click());
+        
+        // Drag & drop
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files && files.length > 0) {
+                addImages(files);
+            }
+        });
+        dropzone.addEventListener('click', (e) => {
+            if (e.target === selectImagesBtn || selectImagesBtn.contains(e.target)) return;
+            fileInput.click();
+        });
+        
+        // Initialize empty gallery
+        updateCounts();
+    </script>
+</body>
+</html>

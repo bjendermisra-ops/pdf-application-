@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Credit Utilization Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      .calculator-container {
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        background: white;
+      }
+
+      .input-group {
+        transition: all 0.2s ease;
+      }
+
+      .input-group:focus-within {
+        transform: translateY(-2px);
+      }
+
+      .btn-primary {
+        background: linear-gradient(to right, #667eea, #764ba2);
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(to right, #5a6fd8, #6a4190);
+        transform: translateY(-2px);
+      }
+
+      .result-card {
+        background: linear-gradient(to right, #ecfdf5, #d1fae5);
+        border-left: 4px solid #10b981;
+      }
+
+      .explanation-card {
+        background: linear-gradient(to right, #eff6ff, #dbeafe);
+        border-left: 4px solid #3b82f6;
+      }
+
+      .glow {
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .chart-container {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+      }
+
+      .formula-box {
+        background: #f1f5f9;
+        border-left: 4px solid #3b82f6;
+        padding: 12px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+      }
+
+      .error-message {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+      }
+
+      .account-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+      }
+    </style>
+  </head>
+  <body
+    class="flex flex-col min-h-screen items-center justify-center p-4 pt-20"
+  >
+    <!-- Adjusted padding-top to account for fixed navbar height -->
+    <nav class="fixed top-0 left-0 right-0 z-10">
+      <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+    <style>
+      nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(
+          135deg,
+          #667eea,
+          #764ba2
+        ); /* Updated to match calculator's gradient */
+        border-radius: 9999px;
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3); /* Adjusted shadow to match theme */
+      }
+
+      .back-button i {
+        font-size: 1rem;
+      }
+
+      .back-button:hover {
+        background: linear-gradient(
+          135deg,
+          #5a6fd8,
+          #6a4190
+        ); /* Updated hover to match calculator's button hover */
+        transform: translateX(-0.25rem);
+        box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+      }
+    </style>
+    <div
+      class="calculator-container rounded-2xl w-full max-w-4xl overflow-hidden"
+      role="main"
+    >
+      <!-- Header -->
+      <div
+        class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold">Credit Utilization Calculator</h1>
+            <p class="text-indigo-100 mt-2">
+              Calculate your credit utilization ratio for multiple accounts with
+              visualizations and advice
+            </p>
+          </div>
+          <div class="bg-white/20 p-3 rounded-full">
+            <i class="fas fa-credit-card text-2xl" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="p-6">
+        <!-- Accounts Section -->
+        <div class="mb-6">
+          <h2 class="font-semibold text-gray-800 mb-4">Credit Accounts</h2>
+          <div id="accountsContainer" class="space-y-4">
+            <!-- Initial Account -->
+            <div
+              class="account-card flex flex-col md:flex-row gap-4"
+              data-index="0"
+            >
+              <div class="flex-1">
+                <label
+                  class="block text-gray-700 font-medium mb-2"
+                  for="accountName0"
+                >
+                  <i
+                    class="fas fa-tag text-blue-500 mr-2"
+                    aria-hidden="true"
+                  ></i
+                  >Account Name (Optional)
+                </label>
+                <input
+                  type="text"
+                  id="accountName0"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="e.g., Visa Card"
+                  value=""
+                />
+              </div>
+              <div class="flex-1">
+                <label
+                  class="block text-gray-700 font-medium mb-2"
+                  for="balance0"
+                >
+                  <i
+                    class="fas fa-dollar-sign text-green-500 mr-2"
+                    aria-hidden="true"
+                  ></i
+                  >Current Balance
+                </label>
+                <input
+                  type="number"
+                  id="balance0"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Balance"
+                  value="0"
+                  min="0"
+                  step="0.01"
+                  aria-describedby="balance0Error"
+                />
+                <p id="balance0Error" class="error-message hidden"></p>
+              </div>
+              <div class="flex-1">
+                <label
+                  class="block text-gray-700 font-medium mb-2"
+                  for="limit0"
+                >
+                  <i
+                    class="fas fa-chart-line text-purple-500 mr-2"
+                    aria-hidden="true"
+                  ></i
+                  >Credit Limit
+                </label>
+                <input
+                  type="number"
+                  id="limit0"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Credit Limit"
+                  value="1000"
+                  min="0"
+                  step="0.01"
+                  aria-describedby="limit0Error"
+                />
+                <p id="limit0Error" class="error-message hidden"></p>
+              </div>
+              <button
+                class="removeAccount mt-6 md:mt-0 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200"
+                aria-label="Remove account"
+              >
+                <i class="fas fa-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <button
+            id="addAccountBtn"
+            class="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
+          >
+            <i class="fas fa-plus mr-2" aria-hidden="true"></i> Add Another
+            Account
+          </button>
+        </div>
+
+        <!-- Visualization and Buttons -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div class="chart-container p-4 flex items-center justify-center">
+            <canvas
+              id="utilizationChart"
+              role="img"
+              aria-label="Credit utilization chart"
+            ></canvas>
+          </div>
+          <div class="flex flex-col gap-4">
+            <button
+              id="calculateBtn"
+              class="btn-primary text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center"
+              aria-label="Calculate utilization"
+            >
+              <i class="fas fa-calculator mr-2" aria-hidden="true"></i>
+              Calculate Utilization
+            </button>
+            <button
+              id="resetBtn"
+              class="bg-gray-200 text-gray-800 font-medium py-3 px-6 rounded-lg flex items-center justify-center hover:bg-gray-300 transition duration-200"
+              aria-label="Reset calculator"
+            >
+              <i class="fas fa-redo mr-2" aria-hidden="true"></i> Reset
+            </button>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div
+          id="results"
+          class="space-y-4 mb-8 hidden"
+          role="region"
+          aria-live="polite"
+        >
+          <div class="result-card p-4 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-2">Overall Results</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="text-center p-3 bg-white rounded-lg">
+                <p class="text-sm text-gray-600">Total Balance</p>
+                <p id="totalBalance" class="text-xl font-bold text-indigo-600">
+                  $0.00
+                </p>
+              </div>
+              <div class="text-center p-3 bg-white rounded-lg">
+                <p class="text-sm text-gray-600">Total Credit Limit</p>
+                <p id="totalLimit" class="text-xl font-bold text-blue-600">
+                  $0.00
+                </p>
+              </div>
+              <div class="text-center p-3 bg-white rounded-lg">
+                <p class="text-sm text-gray-600">Overall Utilization</p>
+                <p
+                  id="overallUtilization"
+                  class="text-xl font-bold text-green-600"
+                >
+                  0%
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div id="adviceCard" class="explanation-card p-4 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-2">
+              Credit Score Advice
+            </h3>
+            <p id="adviceText" class="text-sm text-gray-700"></p>
+          </div>
+
+          <div class="result-card p-4 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-2">
+              Individual Account Utilizations
+            </h3>
+            <div id="individualResults" class="space-y-4"></div>
+          </div>
+
+          <div class="explanation-card p-4 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-2">Calculation Steps</h3>
+            <div id="stepList" class="space-y-3"></div>
+          </div>
+        </div>
+
+        <!-- Reference -->
+        <div class="mt-6 bg-gray-50 p-4 rounded-lg">
+          <h3 class="font-semibold text-gray-800 mb-3">
+            Credit Utilization Tips
+          </h3>
+          <ul class="list-disc pl-5 space-y-2 text-sm text-gray-600">
+            <li>Keep utilization under 30% for optimal credit score.</li>
+            <li>Pay down balances to lower utilization.</li>
+            <li>Request credit limit increases (but don't spend more).</li>
+            <li>
+              Utilization is calculated as (Total Balances / Total Limits) ×
+              100%.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-gray-100 p-4 text-center text-gray-600 text-sm">
+        <p>
+          Credit utilization is a key factor in your credit score, typically
+          accounting for 30% of FICO scores.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      const addAccountBtn = document.getElementById("addAccountBtn");
+      const accountsContainer = document.getElementById("accountsContainer");
+      const calculateBtn = document.getElementById("calculateBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const resultsDiv = document.getElementById("results");
+      const totalBalanceEl = document.getElementById("totalBalance");
+      const totalLimitEl = document.getElementById("totalLimit");
+      const overallUtilizationEl =
+        document.getElementById("overallUtilization");
+      const adviceTextEl = document.getElementById("adviceText");
+      const individualResults = document.getElementById("individualResults");
+      const stepList = document.getElementById("stepList");
+      const utilizationChart = document.getElementById("utilizationChart");
+      let accountIndex = 1;
+      let chart;
+
+      // Add new account
+      addAccountBtn.addEventListener("click", () => {
+        const accountCard = document.createElement("div");
+        accountCard.className = "account-card flex flex-col md:flex-row gap-4";
+        accountCard.dataset.index = accountIndex;
+        accountCard.innerHTML = `
+                <div class="flex-1">
+                    <label class="block text-gray-700 font-medium mb-2" for="accountName${accountIndex}">
+                        <i class="fas fa-tag text-blue-500 mr-2" aria-hidden="true"></i>Account Name (Optional)
+                    </label>
+                    <input type="text" id="accountName${accountIndex}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="e.g., Mastercard" value="">
+                </div>
+                <div class="flex-1">
+                    <label class="block text-gray-700 font-medium mb-2" for="balance${accountIndex}">
+                        <i class="fas fa-dollar-sign text-green-500 mr-2" aria-hidden="true"></i>Current Balance
+                    </label>
+                    <input type="number" id="balance${accountIndex}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Balance" value="0" min="0" step="0.01" aria-describedby="balance${accountIndex}Error">
+                    <p id="balance${accountIndex}Error" class="error-message hidden"></p>
+                </div>
+                <div class="flex-1">
+                    <label class="block text-gray-700 font-medium mb-2" for="limit${accountIndex}">
+                        <i class="fas fa-chart-line text-purple-500 mr-2" aria-hidden="true"></i>Credit Limit
+                    </label>
+                    <input type="number" id="limit${accountIndex}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Credit Limit" value="1000" min="0" step="0.01" aria-describedby="limit${accountIndex}Error">
+                    <p id="limit${accountIndex}Error" class="error-message hidden"></p>
+                </div>
+                <button class="removeAccount mt-6 md:mt-0 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200" aria-label="Remove account">
+                    <i class="fas fa-trash" aria-hidden="true"></i>
+                </button>
+            `;
+        accountsContainer.appendChild(accountCard);
+        accountIndex++;
+      });
+
+      // Remove account
+      accountsContainer.addEventListener("click", (e) => {
+        if (e.target.closest(".removeAccount")) {
+          const accountCard = e.target.closest(".account-card");
+          if (accountsContainer.children.length > 1) {
+            accountCard.remove();
+          }
+        }
+      });
+
+      // Clear errors
+      function clearErrors() {
+        document.querySelectorAll(".error-message").forEach((el) => {
+          el.textContent = "";
+          el.classList.add("hidden");
+        });
+      }
+
+      // Show error
+      function showError(inputId, message) {
+        const errorEl = document.getElementById(`${inputId}Error`);
+        if (errorEl) {
+          errorEl.textContent = message;
+          errorEl.classList.remove("hidden");
+        }
+        return false;
+      }
+
+      // Get all accounts data
+      function getAccounts() {
+        const accounts = [];
+        document.querySelectorAll(".account-card").forEach((card, index) => {
+          const name =
+            document.getElementById(`accountName${card.dataset.index}`).value ||
+            `Account ${index + 1}`;
+          const balance =
+            parseFloat(
+              document.getElementById(`balance${card.dataset.index}`).value
+            ) || 0;
+          const limit =
+            parseFloat(
+              document.getElementById(`limit${card.dataset.index}`).value
+            ) || 0;
+          accounts.push({ name, balance, limit });
+        });
+        return accounts;
+      }
+
+      // Create utilization chart
+      function createUtilizationChart(utilization) {
+        if (chart) chart.destroy();
+        const remaining = 100 - utilization;
+        chart = new Chart(utilizationChart, {
+          type: "doughnut",
+          data: {
+            labels: ["Utilization", "Available"],
+            datasets: [
+              {
+                data: [utilization, remaining],
+                backgroundColor:
+                  utilization > 30
+                    ? ["#ef4444", "#10b981"]
+                    : ["#10b981", "#d1d5db"],
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: "Overall Credit Utilization",
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    return `${context.label}: ${context.raw.toFixed(2)}%`;
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // Generate advice
+      function getAdvice(utilization) {
+        if (utilization === 0)
+          return "Your utilization is 0%. Consider using your credit responsibly to build history.";
+        if (utilization < 10)
+          return "Excellent! Your utilization is very low, which is great for your credit score.";
+        if (utilization < 30)
+          return "Good job! Keeping utilization under 30% is recommended for optimal credit health.";
+        if (utilization < 50)
+          return "Warning: Your utilization is moderate. Try to pay down balances to below 30%.";
+        return "High utilization! This may negatively impact your credit score. Prioritize paying down debt.";
+      }
+
+      // Generate steps
+      function generateSteps(accounts, totalBalance, totalLimit, overallUtil) {
+        const steps = [];
+        steps.push(
+          `<div class="font-medium text-indigo-700 mb-1">Calculation Steps:</div>`
+        );
+        accounts.forEach((acc) => {
+          const util =
+            acc.limit > 0
+              ? ((acc.balance / acc.limit) * 100).toFixed(2)
+              : "N/A";
+          steps.push(
+            `${acc.name}: Balance $${acc.balance.toFixed(
+              2
+            )}, Limit $${acc.limit.toFixed(2)}, Utilization ${util}%`
+          );
+        });
+        steps.push(`Total Balance: $${totalBalance.toFixed(2)}`);
+        steps.push(`Total Limit: $${totalLimit.toFixed(2)}`);
+        steps.push(
+          `Overall Utilization = (Total Balance / Total Limit) × 100% = ${overallUtil.toFixed(
+            2
+          )}%`
+        );
+        return steps;
+      }
+
+      // Calculate
+      function calculate() {
+        clearErrors();
+        const accounts = getAccounts();
+        let totalBalance = 0;
+        let totalLimit = 0;
+        let valid = true;
+
+        accounts.forEach((acc, index) => {
+          const origIndex =
+            document.querySelectorAll(".account-card")[index].dataset.index;
+          if (acc.balance < 0) {
+            valid = showError(
+              `balance${origIndex}`,
+              "Balance cannot be negative."
+            );
+          }
+          if (acc.limit <= 0) {
+            valid = showError(
+              `limit${origIndex}`,
+              "Credit limit must be positive."
+            );
+          }
+          if (acc.balance > acc.limit) {
+            valid = showError(
+              `balance${origIndex}`,
+              "Balance cannot exceed limit."
+            );
+          }
+          totalBalance += acc.balance;
+          totalLimit += acc.limit;
+        });
+
+        if (!valid) return;
+
+        if (totalLimit === 0) {
+          showError(
+            "limit0",
+            "At least one positive credit limit is required."
+          );
+          return;
+        }
+
+        const overallUtil = (totalBalance / totalLimit) * 100;
+
+        totalBalanceEl.textContent = `$${totalBalance.toFixed(2)}`;
+        totalLimitEl.textContent = `$${totalLimit.toFixed(2)}`;
+        overallUtilizationEl.textContent = `${overallUtil.toFixed(2)}%`;
+        adviceTextEl.textContent = getAdvice(overallUtil);
+
+        individualResults.innerHTML = "";
+        accounts.forEach((acc) => {
+          const util =
+            acc.limit > 0 ? ((acc.balance / acc.limit) * 100).toFixed(2) : 0;
+          const color = util > 30 ? "text-red-600" : "text-green-600";
+          const div = document.createElement("div");
+          div.className = "p-3 bg-white rounded-lg";
+          div.innerHTML = `
+                    <p class="font-medium">${acc.name}</p>
+                    <p class="text-sm text-gray-600">Balance: $${acc.balance.toFixed(
+                      2
+                    )} / Limit: $${acc.limit.toFixed(2)}</p>
+                    <p class="text-lg ${color}">Utilization: ${util}%</p>
+                `;
+          individualResults.appendChild(div);
+        });
+
+        const steps = generateSteps(
+          accounts,
+          totalBalance,
+          totalLimit,
+          overallUtil
+        );
+        stepList.innerHTML = "";
+        steps.forEach((step) => {
+          const p = document.createElement("p");
+          p.className = "text-sm text-gray-700";
+          p.innerHTML = step;
+          stepList.appendChild(p);
+        });
+
+        createUtilizationChart(overallUtil);
+
+        resultsDiv.classList.remove("hidden");
+        resultsDiv.classList.add("glow");
+        setTimeout(() => resultsDiv.classList.remove("glow"), 1000);
+      }
+
+      // Reset
+      function resetCalculator() {
+        accountsContainer.innerHTML = `
+                <div class="account-card flex flex-col md:flex-row gap-4" data-index="0">
+                    <div class="flex-1">
+                        <label class="block text-gray-700 font-medium mb-2" for="accountName0">
+                            <i class="fas fa-tag text-blue-500 mr-2" aria-hidden="true"></i>Account Name (Optional)
+                        </label>
+                        <input type="text" id="accountName0" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="e.g., Visa Card" value="">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-gray-700 font-medium mb-2" for="balance0">
+                            <i class="fas fa-dollar-sign text-green-500 mr-2" aria-hidden="true"></i>Current Balance
+                        </label>
+                        <input type="number" id="balance0" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Balance" value="0" min="0" step="0.01" aria-describedby="balance0Error">
+                        <p id="balance0Error" class="error-message hidden"></p>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-gray-700 font-medium mb-2" for="limit0">
+                            <i class="fas fa-chart-line text-purple-500 mr-2" aria-hidden="true"></i>Credit Limit
+                        </label>
+                        <input type="number" id="limit0" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Credit Limit" value="1000" min="0" step="0.01" aria-describedby="limit0Error">
+                        <p id="limit0Error" class="error-message hidden"></p>
+                    </div>
+                    <button class="removeAccount mt-6 md:mt-0 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200" aria-label="Remove account">
+                        <i class="fas fa-trash" aria-hidden="true"></i>
+                    </button>
+                </div>
+            `;
+        accountIndex = 1;
+        clearErrors();
+        resultsDiv.classList.add("hidden");
+        if (chart) chart.destroy();
+        chart = null;
+      }
+
+      // Event listeners
+      calculateBtn.addEventListener("click", calculate);
+      resetBtn.addEventListener("click", resetCalculator);
+
+      // Auto-calculate on input change with debounce
+      function debounce(func, wait) {
+        let timeout;
+        return function (...args) {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+      }
+
+      accountsContainer.addEventListener("input", debounce(calculate, 300));
+
+      // Initial calculation
+      calculate();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mean, Median, Mode, Range Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .btn-primary {
+        background-color: #3b82f6;
+        color: white;
+        transition: all 0.2s;
+      }
+
+      .btn-primary:hover {
+        background-color: #2563eb;
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        background-color: #6b7280;
+        color: white;
+        transition: all 0.2s;
+      }
+
+      .btn-secondary:hover {
+        background-color: #4b5563;
+        transform: translateY(-1px);
+      }
+
+      .result-row {
+        border-bottom: 1px solid #e5e7eb;
+        transition: background-color 0.2s;
+      }
+
+      .result-row:hover {
+        background-color: #f9fafb;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 200px;
+        width: 100%;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav>
+      <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 9999px;
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      }
+
+      .back-button i {
+        font-size: 1rem;
+      }
+
+      .back-button:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        transform: translateX(-0.25rem);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+      }
+    </style>
+    <div
+      class="bg-white mx-auto rounded-lg shadow-xl max-w-2xl w-full p-6 mt-10"
+    >
+      <h1 class="text-2xl font-bold text-gray-800 mb-4">
+        Mean, Median, Mode, Range Calculator
+      </h1>
+
+      <div id="input-section">
+        <div class="mb-6">
+          <p class="text-gray-600 mb-4">
+            Please provide numbers separated by comma to calculate.
+          </p>
+
+          <div class="mb-4">
+            <textarea
+              id="number-input"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-24"
+            >
+10, 2, 38, 23, 38, 23, 21</textarea
+            >
+          </div>
+
+          <div class="flex space-x-4">
+            <button
+              id="calculate-btn"
+              class="btn-primary px-4 py-2 rounded-md font-medium"
+            >
+              Calculate
+            </button>
+            <button
+              id="clear-btn"
+              class="btn-secondary px-4 py-2 rounded-md font-medium"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="result-section" class="hidden">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Result</h2>
+
+        <div class="overflow-x-auto mb-6">
+          <table class="w-full border-collapse">
+            <tbody>
+              <tr class="result-row">
+                <td class="py-3 pr-4 font-medium">Mean (Average)</td>
+                <td class="py-3 px-4" id="mean-result">22.142857142857</td>
+              </tr>
+              <tr class="result-row">
+                <td class="py-3 pr-4 font-medium">Median</td>
+                <td class="py-3 px-4" id="median-result">23</td>
+              </tr>
+              <tr class="result-row">
+                <td class="py-3 pr-4 font-medium">Range</td>
+                <td class="py-3 px-4" id="range-result">36</td>
+              </tr>
+              <tr class="result-row">
+                <td class="py-3 pr-4 font-medium">Mode</td>
+                <td class="py-3 px-4" id="mode-result">
+                  38, 23, each appeared 2 times
+                </td>
+              </tr>
+              <tr class="result-row">
+                <td class="py-3 pr-4 font-medium">Geometric Mean</td>
+                <td class="py-3 px-4" id="geometric-mean-result">
+                  16.412764443111
+                </td>
+              </tr>
+              <tr class="result-row">
+                <td class="py-3 pr-4 font-medium">Largest</td>
+                <td class="py-3 px-4" id="largest-result">38</td>
+              </tr>
+              <tr class="result-row">
+                <td class="py-3 pr-4 font-medium">Smallest</td>
+                <td class="py-3 px-4" id="smallest-result">2</td>
+              </tr>
+              <tr class="result-row">
+                <td class="py-3 pr-4 font-medium">Sum</td>
+                <td class="py-3 px-4" id="sum-result">155</td>
+              </tr>
+              <tr class="result-row">
+                <td class="py-3 pr-4 font-medium">Count</td>
+                <td class="py-3 px-4" id="count-result">7</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mb-6">
+          <p class="font-medium text-gray-700 mb-2">Sorted Data Set:</p>
+          <p class="bg-gray-100 p-3 rounded-md" id="sorted-data-result">
+            2, 10, 21, 23, 23, 38, 38
+          </p>
+        </div>
+
+        <div class="mb-6">
+          <h3 class="font-medium text-gray-700 mb-2">
+            Column Chart of the Values
+          </h3>
+          <div class="chart-container">
+            <canvas id="data-chart"></canvas>
+          </div>
+        </div>
+
+        <div class="flex space-x-4">
+          <button
+            id="back-btn"
+            class="btn-primary px-4 py-2 rounded-md font-medium"
+          >
+            Calculate Again
+          </button>
+          <button
+            id="result-clear-btn"
+            class="btn-secondary px-4 py-2 rounded-md font-medium"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const inputSection = document.getElementById("input-section");
+        const resultSection = document.getElementById("result-section");
+        const calculateBtn = document.getElementById("calculate-btn");
+        const clearBtn = document.getElementById("clear-btn");
+        const backBtn = document.getElementById("back-btn");
+        const resultClearBtn = document.getElementById("result-clear-btn");
+        const numberInput = document.getElementById("number-input");
+
+        let dataChart = null;
+
+        // Calculate button click handler
+        calculateBtn.addEventListener("click", function () {
+          // Get input values
+          const inputText = numberInput.value.trim();
+
+          if (!inputText) {
+            alert("Please enter some numbers");
+            return;
+          }
+
+          // Parse numbers from input
+          let numbers;
+          try {
+            numbers = inputText
+              .split(",")
+              .map((item) => item.trim())
+              .filter((item) => item !== "")
+              .map((item) => parseFloat(item));
+
+            if (numbers.some(isNaN)) {
+              throw new Error("Invalid number format");
+            }
+
+            if (numbers.length === 0) {
+              throw new Error("No valid numbers provided");
+            }
+          } catch (error) {
+            alert("Please enter valid numbers separated by commas");
+            return;
+          }
+
+          // Calculate statistics
+          const results = calculateStatistics(numbers);
+
+          // Update result display
+          document.getElementById("mean-result").textContent =
+            results.mean.toFixed(12);
+          document.getElementById("median-result").textContent = results.median;
+          document.getElementById("range-result").textContent = results.range;
+          document.getElementById("mode-result").textContent = results.modeText;
+          document.getElementById("geometric-mean-result").textContent =
+            results.geometricMean.toFixed(12);
+          document.getElementById("largest-result").textContent =
+            results.largest;
+          document.getElementById("smallest-result").textContent =
+            results.smallest;
+          document.getElementById("sum-result").textContent = results.sum;
+          document.getElementById("count-result").textContent = results.count;
+          document.getElementById("sorted-data-result").textContent =
+            results.sortedData.join(", ");
+
+          // Update chart
+          updateChart(results.sortedData);
+
+          // Show results
+          inputSection.classList.add("hidden");
+          resultSection.classList.remove("hidden");
+        });
+
+        // Clear button click handler
+        clearBtn.addEventListener("click", function () {
+          numberInput.value = "";
+        });
+
+        // Back button click handler
+        backBtn.addEventListener("click", function () {
+          inputSection.classList.remove("hidden");
+          resultSection.classList.add("hidden");
+        });
+
+        // Result clear button click handler
+        resultClearBtn.addEventListener("click", function () {
+          numberInput.value = "";
+          inputSection.classList.remove("hidden");
+          resultSection.classList.add("hidden");
+        });
+
+        // Calculate all statistics
+        function calculateStatistics(numbers) {
+          // Sort numbers
+          const sortedData = [...numbers].sort((a, b) => a - b);
+          const count = sortedData.length;
+
+          // Calculate mean (average)
+          const sum = sortedData.reduce((acc, val) => acc + val, 0);
+          const mean = sum / count;
+
+          // Calculate median
+          let median;
+          if (count % 2 === 0) {
+            median = (sortedData[count / 2 - 1] + sortedData[count / 2]) / 2;
+          } else {
+            median = sortedData[Math.floor(count / 2)];
+          }
+
+          // Calculate range
+          const range = sortedData[count - 1] - sortedData[0];
+
+          // Calculate mode
+          const frequencyMap = {};
+          sortedData.forEach((num) => {
+            frequencyMap[num] = (frequencyMap[num] || 0) + 1;
+          });
+
+          let maxFrequency = 0;
+          let modes = [];
+          for (const num in frequencyMap) {
+            if (frequencyMap[num] > maxFrequency) {
+              maxFrequency = frequencyMap[num];
+              modes = [num];
+            } else if (frequencyMap[num] === maxFrequency) {
+              modes.push(num);
+            }
+          }
+
+          let modeText;
+          if (modes.length === sortedData.length) {
+            modeText = "No mode (all values are unique)";
+          } else {
+            modeText = modes.join(", ");
+            if (maxFrequency > 1) {
+              modeText += `, each appeared ${maxFrequency} times`;
+            }
+          }
+
+          // Calculate geometric mean
+          const product = sortedData.reduce((acc, val) => acc * val, 1);
+          const geometricMean = Math.pow(product, 1 / count);
+
+          return {
+            mean,
+            median,
+            range,
+            modeText,
+            geometricMean,
+            largest: sortedData[count - 1],
+            smallest: sortedData[0],
+            sum,
+            count,
+            sortedData,
+          };
+        }
+
+        // Update the chart with data
+        function updateChart(data) {
+          const ctx = document.getElementById("data-chart").getContext("2d");
+
+          // Destroy previous chart if it exists
+          if (dataChart) {
+            dataChart.destroy();
+          }
+
+          // Create new chart
+          dataChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: data.map((_, index) => index + 1),
+              datasets: [
+                {
+                  label: "Values",
+                  data: data,
+                  backgroundColor: "#3b82f6",
+                  borderColor: "#2563eb",
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 10,
+                  },
+                },
+              },
+              plugins: {
+                legend: {
+                  display: false,
+                },
+              },
+            },
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

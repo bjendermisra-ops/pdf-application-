@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PNG to JPG Converter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+  <style>
+    .drop-zone-highlight {
+      border-color: #3b82f6;
+      background-color: #f0f9ff;
+    }
+
+    .step-number {
+      background-color: #3b82f6;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+
+<?php include 'includes/navbar.html'; ?>
+<nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+<div class="w-full max-w-2xl bg-blue-100 rounded-lg shadow-sm p-8 mx-auto mt-12 mb-12">
+  <h1 class="text-2xl font-bold text-center text-gray-800 mb-2">
+    PNG to JPG Converter
+  </h1>
+  <p class="text-center text-gray-600 mb-6">
+    Convert PNG images to JPG quickly and free
+  </p>
+
+  <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center mb-8 transition-colors duration-200"
+    id="dropZone">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-gray-400 mb-3" fill="none" viewBox="0 0 24 24"
+      stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+    <p class="text-gray-600 mb-1">Drag & drop your PNG file here</p>
+    <p class="text-sm text-gray-500 mb-3">or</p>
+    <label for="fileInput"
+      class="inline-block px-4 py-2 bg-blue-600 text-white rounded-md cursor-pointer hover:bg-blue-700 transition text-sm">
+      Select File
+    </label>
+    <input type="file" id="fileInput" accept=".png" class="hidden" />
+  </div>
+
+  <div class="bg-gray-50 p-4 rounded-lg mb-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-3">How to use:</h2>
+
+    <div class="flex items-start mb-3">
+      <span class="step-number">1</span>
+      <p class="text-gray-700">Select a PNG image to upload</p>
+    </div>
+
+    <div class="flex items-start mb-3">
+      <span class="step-number">2</span>
+      <p class="text-gray-700">Preview your image before conversion</p>
+    </div>
+
+    <div class="flex items-start">
+      <span class="step-number">3</span>
+      <p class="text-gray-700">Download your converted JPG file</p>
+    </div>
+  </div>
+
+  <div id="previewContainer" class="hidden mb-6">
+    <div class="flex justify-between items-center mb-3">
+      <h2 class="text-lg font-semibold text-gray-800">Preview</h2>
+      <button id="resetBtn" class="text-sm text-blue-600 hover:text-blue-800">
+        Select different file
+      </button>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-4 mb-4">
+      <div class="flex-1">
+        <div class="border rounded-md p-2 bg-white">
+          <img id="originalPreview" class="max-h-48 w-full object-contain mx-auto" src="" alt="Original PNG preview" />
+        </div>
+        <p id="originalInfo" class="text-xs text-gray-500 mt-1 text-center"></p>
+      </div>
+      <div class="flex-1">
+        <div class="border rounded-md p-2 bg-white">
+          <img id="convertedPreview" class="max-h-48 w-full object-contain mx-auto" src=""
+            alt="Converted JPG preview" />
+        </div>
+        <p id="convertedInfo" class="text-xs text-gray-500 mt-1 text-center"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-center">
+    <button id="downloadBtn" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition hidden">
+      Download JPG
+    </button>
+  </div>
+</div>
+
+<?php include 'includes/footer.html'; ?>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("fileInput");
+    const dropZone = document.getElementById("dropZone");
+    const originalPreview = document.getElementById("originalPreview");
+    const convertedPreview = document.getElementById("convertedPreview");
+    const previewContainer = document.getElementById("previewContainer");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const originalInfo = document.getElementById("originalInfo");
+    const convertedInfo = document.getElementById("convertedInfo");
+
+    let convertedUrl = null;
+    let currentFile = null;
+
+    // Handle file selection
+    fileInput.addEventListener("change", handleFileSelect);
+
+    // Drag and drop events
+    ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ["dragenter", "dragover"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ["dragleave", "drop"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+      dropZone.classList.add("drop-zone-highlight");
+    }
+
+    function unhighlight() {
+      dropZone.classList.remove("drop-zone-highlight");
+    }
+
+    dropZone.addEventListener("drop", handleDrop, false);
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+
+      if (files.length) {
+        fileInput.files = files;
+        handleFileSelect({ target: fileInput });
+      }
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      currentFile = file;
+
+      if (!file) return;
+
+      if (!file.name.match(/\.png$/i)) {
+        alert("Please select a PNG file.");
+        return;
+      }
+
+      // Display original file info
+      originalInfo.textContent = `${file.name} (${formatFileSize(
+        file.size
+      )})`;
+
+      // Read and display original image
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        originalPreview.src = e.target.result;
+
+        // Create canvas for conversion
+        const img = new Image();
+        img.onload = function () {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+
+          // Draw white background for transparent PNGs
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+
+          // Convert to JPG
+          canvas.toBlob(
+            function (blob) {
+              // Revoke previous URL if exists
+              if (convertedUrl) {
+                URL.revokeObjectURL(convertedUrl);
+              }
+
+              // Create new URL for the converted image
+              convertedUrl = URL.createObjectURL(blob);
+              convertedPreview.src = convertedUrl;
+
+              // Display converted file info
+              convertedInfo.textContent = `${file.name.replace(
+                /\.png$/i,
+                ".jpg"
+              )} (${formatFileSize(blob.size)})`;
+
+              // Show preview and buttons
+              previewContainer.classList.remove("hidden");
+              downloadBtn.classList.remove("hidden");
+
+              // Set up download
+              downloadBtn.onclick = function () {
+                const a = document.createElement("a");
+                a.href = convertedUrl;
+                a.download = file.name.replace(/\.png$/i, ".jpg");
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                  document.body.removeChild(a);
+                }, 100);
+              };
+
+              // Set up reset
+              resetBtn.onclick = resetConverter;
+            },
+            "image/jpeg",
+            0.92
+          ); // 92% quality
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetConverter() {
+      // Revoke object URLs
+      if (convertedUrl) {
+        URL.revokeObjectURL(convertedUrl);
+        convertedUrl = null;
+      }
+
+      // Reset previews
+      originalPreview.src = "";
+      convertedPreview.src = "";
+
+      // Reset file input
+      fileInput.value = "";
+      currentFile = null;
+
+      // Hide elements
+      previewContainer.classList.add("hidden");
+      downloadBtn.classList.add("hidden");
+
+      // Clear info texts
+      originalInfo.textContent = "";
+      convertedInfo.textContent = "";
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return "0 Bytes";
+      const k = 1024;
+      const sizes = ["Bytes", "KB", "MB", "GB"];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return (
+        parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+      );
+    }
+
+    // Clean up object URLs when leaving the page
+    window.addEventListener("beforeunload", function () {
+      if (convertedUrl) {
+        URL.revokeObjectURL(convertedUrl);
+      }
+    });
+  });
+</script>
+</body>
+
+</html>

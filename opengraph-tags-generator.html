@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced OpenGraph Meta Tags Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#1e40af',
+                        accent: '#10b981',
+                        dark: '#1f2937'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .tab-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .code-output {
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            background-color: #1e293b;
+            color: #e2e8f0;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .preview-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .preview-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Advanced OpenGraph Meta Tags Generator</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Generate OpenGraph meta tags for your website to improve social media sharing and engagement.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Input Section -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">OpenGraph Information</h2>
+                    <div class="flex border-b border-gray-200 mb-4">
+                        <button class="tab-btn px-4 py-2 font-medium text-gray-600 hover:text-primary active" data-tab="basic">Basic Tags</button>
+                        <button class="tab-btn px-4 py-2 font-medium text-gray-600 hover:text-primary" data-tab="advanced">Advanced Tags</button>
+                        <button class="tab-btn px-4 py-2 font-medium text-gray-600 hover:text-primary" data-tab="twitter">Twitter Cards</button>
+                    </div>
+                </div>
+
+                <div class="p-6">
+                    <!-- Basic Tags Tab -->
+                    <div id="basic-tab" class="tab-content active">
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Page Title</label>
+                            <input type="text" id="og-title" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g., Easy Smart Calculator" value="Easy Smart Calculator">
+                            <p class="text-xs text-gray-500 mt-1">The title of your page as it should appear when shared.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea id="og-description" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" rows="3" placeholder="A brief description of your page">Easy Smart Calculator offers free online calculators for math, finance, health, and daily life. Simple, accurate, and user-friendly tools.</textarea>
+                            <p class="text-xs text-gray-500 mt-1">A one to two sentence description of your page.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">URL</label>
+                            <input type="url" id="og-url" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="https://example.com" value="https://easysmartcalculator.com/">
+                            <p class="text-xs text-gray-500 mt-1">The canonical URL of your page.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                            <input type="url" id="og-image" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="https://example.com/image.jpg" value="https://easysmartcalculator.com/images/og-image.jpg">
+                            <p class="text-xs text-gray-500 mt-1">An image URL which should represent your page. Recommended size: 1200x630px.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Site Name</label>
+                            <input type="text" id="og-site-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g., Easy Smart Calculator" value="Easy Smart Calculator">
+                            <p class="text-xs text-gray-500 mt-1">The name of your website.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                            <select id="og-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="website">Website</option>
+                                <option value="article">Article</option>
+                                <option value="book">Book</option>
+                                <option value="profile">Profile</option>
+                                <option value="music.song">Music Song</option>
+                                <option value="music.album">Music Album</option>
+                                <option value="music.playlist">Music Playlist</option>
+                                <option value="video.movie">Video Movie</option>
+                                <option value="video.episode">Video Episode</option>
+                                <option value="video.tv_show">TV Show</option>
+                                <option value="video.other">Video Other</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">The type of your content.</p>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Tags Tab -->
+                    <div id="advanced-tab" class="tab-content">
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Locale</label>
+                            <select id="og-locale" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="en_US">English (US)</option>
+                                <option value="en_GB">English (UK)</option>
+                                <option value="es_ES">Spanish</option>
+                                <option value="fr_FR">French</option>
+                                <option value="de_DE">German</option>
+                                <option value="it_IT">Italian</option>
+                                <option value="ja_JP">Japanese</option>
+                                <option value="ko_KR">Korean</option>
+                                <option value="pt_BR">Portuguese (Brazil)</option>
+                                <option value="ru_RU">Russian</option>
+                                <option value="zh_CN">Chinese (Simplified)</option>
+                                <option value="zh_TW">Chinese (Traditional)</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">The locale of your content.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Image Width</label>
+                            <input type="number" id="og-image-width" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="1200" value="1200">
+                            <p class="text-xs text-gray-500 mt-1">Width of your image in pixels.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Image Height</label>
+                            <input type="number" id="og-image-height" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="630" value="630">
+                            <p class="text-xs text-gray-500 mt-1">Height of your image in pixels.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Image Alt Text</label>
+                            <input type="text" id="og-image-alt" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Description of the image" value="Easy Smart Calculator - Online Tools">
+                            <p class="text-xs text-gray-500 mt-1">A description of what is in the image.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Author</label>
+                            <input type="text" id="og-author" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Author name" value="">
+                            <p class="text-xs text-gray-500 mt-1">The author of the content (for articles).</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Published Time</label>
+                            <input type="datetime-local" id="og-published-time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <p class="text-xs text-gray-500 mt-1">When the content was first published.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Modified Time</label>
+                            <input type="datetime-local" id="og-modified-time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <p class="text-xs text-gray-500 mt-1">When the content was last modified.</p>
+                        </div>
+                    </div>
+
+                    <!-- Twitter Cards Tab -->
+                    <div id="twitter-tab" class="tab-content">
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Twitter Card Type</label>
+                            <select id="twitter-card" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="summary">Summary</option>
+                                <option value="summary_large_image">Summary Large Image</option>
+                                <option value="app">App</option>
+                                <option value="player">Player</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">The type of Twitter Card to display.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Twitter Site</label>
+                            <input type="text" id="twitter-site" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="@username" value="@EasySmartCalc">
+                            <p class="text-xs text-gray-500 mt-1">The Twitter @username of your site.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Twitter Creator</label>
+                            <input type="text" id="twitter-creator" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="@username" value="@EasySmartCalc">
+                            <p class="text-xs text-gray-500 mt-1">The Twitter @username of the content creator.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Twitter Title</label>
+                            <input type="text" id="twitter-title" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Twitter-specific title" value="Easy Smart Calculator">
+                            <p class="text-xs text-gray-500 mt-1">Title for Twitter (if different from OG title).</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Twitter Description</label>
+                            <textarea id="twitter-description" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" rows="3" placeholder="Twitter-specific description">Easy Smart Calculator offers free online calculators for math, finance, health, and daily life. Simple, accurate, and user-friendly tools.</textarea>
+                            <p class="text-xs text-gray-500 mt-1">Description for Twitter (if different from OG description).</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Twitter Image</label>
+                            <input type="url" id="twitter-image" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="https://example.com/twitter-image.jpg" value="https://easysmartcalculator.com/images/twitter-image.jpg">
+                            <p class="text-xs text-gray-500 mt-1">Image for Twitter Cards. Recommended size: 1200x628px.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="space-y-8">
+                <!-- Generated Code -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Generated OpenGraph Meta Tags</h2>
+                        <p class="text-gray-600">Copy and paste this code into the &lt;head&gt; section of your webpage.</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="code-output p-4 rounded-lg overflow-x-auto max-h-80 overflow-y-auto">
+                            <pre id="og-output">&lt;meta property="og:title" content="Easy Smart Calculator"&gt;
+&lt;meta property="og:description" content="Easy Smart Calculator offers free online calculators for math, finance, health, and daily life. Simple, accurate, and user-friendly tools."&gt;
+&lt;meta property="og:type" content="website"&gt;
+&lt;meta property="og:url" content="https://easysmartcalculator.com/"&gt;
+&lt;meta property="og:image" content="https://easysmartcalculator.com/images/og-image.jpg"&gt;
+&lt;meta property="og:site_name" content="Easy Smart Calculator"&gt;</pre>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <button id="copy-btn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors flex items-center">
+                                <i class="fas fa-copy mr-2"></i> Copy to Clipboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Section -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Social Media Preview</h2>
+                        <p class="text-gray-600">See how your content will look when shared on social media.</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="preview-card max-w-md mx-auto bg-white border border-gray-200 rounded-xl overflow-hidden">
+                            <div class="h-48 bg-gray-200 overflow-hidden">
+                                <img id="preview-image" src="https://easysmartcalculator.com/images/og-image.jpg" alt="Preview" class="w-full h-full object-cover">
+                            </div>
+                            <div class="p-4">
+                                <div class="text-xs text-gray-500 uppercase mb-1" id="preview-site">easysmartcalculator.com</div>
+                                <h3 class="font-bold text-lg text-gray-900 mb-1" id="preview-title">Easy Smart Calculator</h3>
+                                <p class="text-gray-700 text-sm" id="preview-description">Easy Smart Calculator offers free online calculators for math, finance, health, and daily life. Simple, accurate, and user-friendly tools.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Implementation Guide -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Implementation Guide</h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="prose max-w-none">
+                            <h3 class="text-lg font-medium text-gray-800 mb-2">How to Use OpenGraph Meta Tags</h3>
+                            <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                                <li>Copy the generated meta tags above</li>
+                                <li>Paste them into the &lt;head&gt; section of your HTML page</li>
+                                <li>Test your tags using Facebook's <a href="https://developers.facebook.com/tools/debug/" class="text-primary hover:underline">Sharing Debugger</a></li>
+                                <li>Test Twitter Cards using Twitter's <a href="https://cards-dev.twitter.com/validator" class="text-primary hover:underline">Card Validator</a></li>
+                            </ol>
+                            
+                            <h3 class="text-lg font-medium text-gray-800 mt-4 mb-2">Benefits of OpenGraph Tags</h3>
+                            <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                                <li>Control how your content appears when shared on social media</li>
+                                <li>Increase click-through rates with compelling previews</li>
+                                <li>Improve brand consistency across platforms</li>
+                                <li>Enhance SEO and social media engagement</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and tabs
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(tab => tab.classList.remove('active'));
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Show corresponding tab
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        // Form input listeners
+        const formInputs = document.querySelectorAll('input, textarea, select');
+        formInputs.forEach(input => {
+            input.addEventListener('input', updateOutput);
+            input.addEventListener('change', updateOutput);
+        });
+
+        // Copy to clipboard functionality
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const output = document.getElementById('og-output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                const copyBtn = document.getElementById('copy-btn');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Copied!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+
+        // Function to update output based on form inputs
+        function updateOutput() {
+            let output = '';
+            
+            // Basic OpenGraph tags
+            const title = document.getElementById('og-title').value;
+            const description = document.getElementById('og-description').value;
+            const url = document.getElementById('og-url').value;
+            const image = document.getElementById('og-image').value;
+            const siteName = document.getElementById('og-site-name').value;
+            const type = document.getElementById('og-type').value;
+            
+            if (title) output += `<meta property="og:title" content="${title}">\n`;
+            if (description) output += `<meta property="og:description" content="${description}">\n`;
+            if (type) output += `<meta property="og:type" content="${type}">\n`;
+            if (url) output += `<meta property="og:url" content="${url}">\n`;
+            if (image) output += `<meta property="og:image" content="${image}">\n`;
+            if (siteName) output += `<meta property="og:site_name" content="${siteName}">\n`;
+            
+            // Advanced OpenGraph tags
+            const locale = document.getElementById('og-locale').value;
+            const imageWidth = document.getElementById('og-image-width').value;
+            const imageHeight = document.getElementById('og-image-height').value;
+            const imageAlt = document.getElementById('og-image-alt').value;
+            const author = document.getElementById('og-author').value;
+            const publishedTime = document.getElementById('og-published-time').value;
+            const modifiedTime = document.getElementById('og-modified-time').value;
+            
+            if (locale) output += `<meta property="og:locale" content="${locale}">\n`;
+            if (imageWidth) output += `<meta property="og:image:width" content="${imageWidth}">\n`;
+            if (imageHeight) output += `<meta property="og:image:height" content="${imageHeight}">\n`;
+            if (imageAlt) output += `<meta property="og:image:alt" content="${imageAlt}">\n`;
+            if (author) output += `<meta property="article:author" content="${author}">\n`;
+            if (publishedTime) output += `<meta property="article:published_time" content="${publishedTime}">\n`;
+            if (modifiedTime) output += `<meta property="article:modified_time" content="${modifiedTime}">\n`;
+            
+            // Twitter Card tags
+            const twitterCard = document.getElementById('twitter-card').value;
+            const twitterSite = document.getElementById('twitter-site').value;
+            const twitterCreator = document.getElementById('twitter-creator').value;
+            const twitterTitle = document.getElementById('twitter-title').value;
+            const twitterDescription = document.getElementById('twitter-description').value;
+            const twitterImage = document.getElementById('twitter-image').value;
+            
+            if (twitterCard) output += `<meta name="twitter:card" content="${twitterCard}">\n`;
+            if (twitterSite) output += `<meta name="twitter:site" content="${twitterSite}">\n`;
+            if (twitterCreator) output += `<meta name="twitter:creator" content="${twitterCreator}">\n`;
+            if (twitterTitle) output += `<meta name="twitter:title" content="${twitterTitle}">\n`;
+            if (twitterDescription) output += `<meta name="twitter:description" content="${twitterDescription}">\n`;
+            if (twitterImage) output += `<meta name="twitter:image" content="${twitterImage}">\n`;
+            
+            // Update the output
+            document.getElementById('og-output').textContent = output;
+            
+            // Update the preview
+            document.getElementById('preview-title').textContent = title || 'Your Page Title';
+            document.getElementById('preview-description').textContent = description || 'Your page description';
+            document.getElementById('preview-image').src = image || 'https://via.placeholder.com/600x315?text=No+Image';
+            
+            // Extract domain from URL for preview
+            if (url) {
+                try {
+                    const domain = new URL(url).hostname;
+                    document.getElementById('preview-site').textContent = domain;
+                } catch (e) {
+                    document.getElementById('preview-site').textContent = 'yourwebsite.com';
+                }
+            } else {
+                document.getElementById('preview-site').textContent = 'yourwebsite.com';
+            }
+        }
+
+        // Initialize with default values
+        updateOutput();
+    </script>
+</body>
+</html>

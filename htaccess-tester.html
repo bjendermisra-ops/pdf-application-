@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dentsu - SEO Tools</title>
+    <meta
+      name="description"
+      content="Professional SEO tools and utilities for technical SEO analysis, crawling, rendering, and optimization."
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="canonical" href="https://seo.vibeloopdaily.com/" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <!-- Required -->
+    <meta property="og:title" content="Your Page Title Here" />
+    <meta
+      property="og:description"
+      content="A short description of the page content."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://seo.vibeloopdaily.com/" />
+    <meta
+      property="og:image"
+      content="https://seo.vibeloopdaily.com/path-to-your-image.jpg"
+    />
+
+    <!-- Optional but good to include -->
+    <meta property="og:site_name" content="Vibeloop Daily SEO" />
+    <meta property="og:locale" content="en_US" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Vibeloop Daily SEO",
+        "url": "https://seo.vibeloopdaily.com/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://seo.vibeloopdaily.com/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
+    <style>
+      .sidebar-transition {
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .tool-card {
+        transition: all 0.3s ease;
+      }
+
+      .tool-card:hover {
+        transform: translateY(-4px);
+      }
+
+      .modal-backdrop {
+        backdrop-filter: blur(8px);
+      }
+
+      @media (max-width: 1023px) {
+        .sidebar-closed {
+          transform: translateX(-100%);
+        }
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen bg-slate-900 text-white">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8 max-w-7xl text-white">
+      <div class="bg-slate-800 rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold text-white mb-2">.htaccess Tester</h1>
+        <p class="text-gray-200 mb-4">
+          Test your .htaccess rewrite rules for HTTP redirects (server-side).
+          This tool is leveraging the API developed by the madewithlove team;
+          their original tool can be found at:
+          <a
+            href="https://htaccess.madewithlove.com"
+            class="text-indigo-400 hover:underline"
+            target="_blank"
+            >htaccess.madewithlove.com</a
+          >.
+        </p>
+
+        <div class="border-t border-gray-200 pt-6 mt-4">
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-white mb-2"
+              >.htaccess Rules</label
+            >
+            <div class="flex space-x-2 mb-2">
+              <button
+                id="basic-btn"
+                class="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700"
+              >
+                Basic
+              </button>
+              <button
+                id="advanced-btn"
+                class="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300"
+              >
+                Advanced
+              </button>
+            </div>
+
+            <div id="basic-rules" class="mb-4">
+              <select
+                id="rule-preset"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-slate-800 text-white"
+              >
+                <option value="">Select a common rule...</option>
+                <option value="redirect-www">Redirect www to non-www</option>
+                <option value="redirect-nonwww">Redirect non-www to www</option>
+                <option value="redirect-https">Redirect HTTP to HTTPS</option>
+                <option value="remove-index">Remove index.php from URL</option>
+                <option value="redirect-subdomain">
+                  Redirect to subdomain
+                </option>
+              </select>
+            </div>
+
+            <div id="advanced-rules" class="hidden">
+              <textarea
+                id="custom-rules"
+                rows="6"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm bg-slate-800 text-white"
+                placeholder="Write your custom .htaccess rules here"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label
+              for="test-url"
+              class="block text-sm font-medium text-white mb-1"
+              >URL</label
+            >
+            <input
+              type="text"
+              id="test-url"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-slate-800 text-white"
+              placeholder="Fill in the URL that you're applying the rules to"
+            />
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label
+                for="referrer"
+                class="block text-sm font-medium text-white mb-1"
+                >HTTP REFERRER (optional)</label
+              >
+              <input
+                type="text"
+                id="referrer"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-slate-800 text-white"
+                placeholder="Referrer URL"
+              />
+            </div>
+
+            <div>
+              <label
+                for="server-name"
+                class="block text-sm font-medium text-white mb-1"
+                >SERVER_NAME (Optional)</label
+              >
+              <input
+                type="text"
+                id="server-name"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-slate-800 text-white"
+                placeholder="The Server Name configured for the virtual host"
+              />
+            </div>
+          </div>
+
+          <button
+            id="test-button"
+            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            TEST
+          </button>
+        </div>
+
+        <div id="results" class="mt-8 hidden">
+          <h2 class="text-xl font-semibold text-white mb-4">Test Results</h2>
+          <div class="bg-gray-50 p-4 rounded-md text-gray-900">
+            <div id="result-content">
+              <div id="loading" class="hidden animate-pulse text-gray-700">
+                Testing rewrite rules...
+              </div>
+              <div id="result-data" class="hidden"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const basicBtn = document.getElementById("basic-btn");
+        const advancedBtn = document.getElementById("advanced-btn");
+        const basicRules = document.getElementById("basic-rules");
+        const advancedRules = document.getElementById("advanced-rules");
+        const rulePreset = document.getElementById("rule-preset");
+        const customRules = document.getElementById("custom-rules");
+        const testButton = document.getElementById("test-button");
+        const resultsDiv = document.getElementById("results");
+        const loadingDiv = document.getElementById("loading");
+        const resultData = document.getElementById("result-data");
+
+        // Toggle between basic and advanced modes
+        basicBtn.addEventListener("click", function () {
+          basicBtn.classList.remove("bg-gray-200", "text-gray-700");
+          basicBtn.classList.add("bg-indigo-600", "text-white");
+          advancedBtn.classList.remove("bg-indigo-600", "text-white");
+          advancedBtn.classList.add("bg-gray-200", "text-gray-700");
+          basicRules.classList.remove("hidden");
+          advancedRules.classList.add("hidden");
+        });
+
+        advancedBtn.addEventListener("click", function () {
+          advancedBtn.classList.remove("bg-gray-200", "text-gray-700");
+          advancedBtn.classList.add("bg-indigo-600", "text-white");
+          basicBtn.classList.remove("bg-indigo-600", "text-white");
+          basicBtn.classList.add("bg-gray-200", "text-gray-700");
+          advancedRules.classList.remove("hidden");
+          basicRules.classList.add("hidden");
+        });
+
+        // Populate custom rules when preset is selected
+        rulePreset.addEventListener("change", function () {
+          if (!this.value) return;
+
+          let rules = "";
+          switch (this.value) {
+            case "redirect-www":
+              rules = `RewriteEngine On\nRewriteCond %{HTTP_HOST} ^www\\.(.+)$ [NC]\nRewriteRule ^(.*)$ https://%1/$1 [R=301,L]`;
+              break;
+            case "redirect-nonwww":
+              rules = `RewriteEngine On\nRewriteCond %{HTTP_HOST} !^www\\. [NC]\nRewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]`;
+              break;
+            case "redirect-https":
+              rules = `RewriteEngine On\nRewriteCond %{HTTPS} off\nRewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]`;
+              break;
+            case "remove-index":
+              rules = `RewriteEngine On\nRewriteCond %{THE_REQUEST} ^.*/index\\.php \nRewriteRule ^(.*)index\\.php$ /$1 [R=301,L]`;
+              break;
+            case "redirect-subdomain":
+              rules = `RewriteEngine On\nRewriteCond %{HTTP_HOST} ^example\\.com$\nRewriteRule ^(.*)$ https://subdomain.example.com/$1 [R=301,L]`;
+              break;
+          }
+
+          // Switch to advanced mode with the rules
+          advancedBtn.click();
+          customRules.value = rules;
+        });
+
+        // Test button click handler
+        testButton.addEventListener("click", function () {
+          const testUrl = document.getElementById("test-url").value.trim();
+          const referrer = document.getElementById("referrer").value.trim();
+          const serverName = document
+            .getElementById("server-name")
+            .value.trim();
+
+          // Get rules based on current mode
+          let rules = "";
+          if (!advancedRules.classList.contains("hidden")) {
+            rules = customRules.value.trim();
+          } else if (rulePreset.value) {
+            // If in basic mode with a preset selected, use those rules
+            rules = customRules.value.trim(); // Already populated from preset
+          }
+
+          if (!rules) {
+            alert("Please enter or select .htaccess rules to test");
+            return;
+          }
+
+          if (!testUrl) {
+            alert("Please enter a URL to test");
+            return;
+          }
+
+          // Show loading state
+          testButton.disabled = true;
+          testButton.innerHTML = "Testing...";
+          resultsDiv.classList.remove("hidden");
+          loadingDiv.classList.remove("hidden");
+          resultData.classList.add("hidden");
+
+          // Simulate API call (in a real app, you would call the madewithlove API here)
+          simulateTest(rules, testUrl, referrer, serverName);
+        });
+
+        function simulateTest(rules, testUrl, referrer, serverName) {
+          // Simulate network delay
+          setTimeout(() => {
+            // Generate fake results for demonstration
+            const isRedirect = Math.random() > 0.3;
+            const statusCode = isRedirect
+              ? Math.random() > 0.5
+                ? 301
+                : 302
+              : 200;
+            const redirectUrl = isRedirect
+              ? testUrl
+                  .replace("http://", "https://")
+                  .replace("example.com", "www.example.com")
+              : "";
+
+            let resultHtml = `
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-800 mb-2">Test Parameters</h3>
+                            <div class="bg-gray-100 p-3 rounded">
+                                <pre class="text-sm overflow-x-auto"><code class="language-apache">${
+                                  hljs.highlight(rules, { language: "apache" })
+                                    .value
+                                }</code></pre>
+                            </div>
+                            <ul class="mt-3 text-sm space-y-1">
+                                <li><strong>Test URL:</strong> ${testUrl}</li>
+                                ${
+                                  referrer
+                                    ? `<li><strong>Referrer:</strong> ${referrer}</li>`
+                                    : ""
+                                }
+                                ${
+                                  serverName
+                                    ? `<li><strong>Server Name:</strong> ${serverName}</li>`
+                                    : ""
+                                }
+                            </ul>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-800 mb-2">Result</h3>
+                            <div class="p-3 rounded ${
+                              isRedirect ? "bg-blue-50" : "bg-gray-50"
+                            }">
+                                <p class="${
+                                  isRedirect ? "text-blue-600" : "text-gray-600"
+                                } font-medium">
+                                    ${
+                                      isRedirect
+                                        ? `HTTP ${statusCode} Redirect to: ${redirectUrl}`
+                                        : "No redirect - HTTP 200 OK"
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-medium text-gray-800 mb-2">Debug Information</h3>
+                            <div class="bg-gray-100 p-3 rounded text-sm">
+                                <p class="mb-2"><strong>Matched Rule:</strong></p>
+                                <pre class="bg-white p-2 rounded overflow-x-auto"><code>RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]</code></pre>
+                                <p class="mt-3"><strong>Server Variables:</strong></p>
+                                <ul class="list-disc pl-5 mt-1">
+                                    <li>REQUEST_URI = ${
+                                      testUrl.split("/").slice(3).join("/") ||
+                                      "/"
+                                    }</li>
+                                    <li>HTTP_HOST = ${
+                                      testUrl.split("/")[2] || "example.com"
+                                    }</li>
+                                    ${
+                                      referrer
+                                        ? `<li>HTTP_REFERER = ${referrer}</li>`
+                                        : ""
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+
+            loadingDiv.classList.add("hidden");
+            resultData.innerHTML = resultHtml;
+            resultData.classList.remove("hidden");
+            testButton.disabled = false;
+            testButton.innerHTML = "TEST";
+
+            // Apply syntax highlighting
+            document.querySelectorAll("pre code").forEach((block) => {
+              hljs.highlightElement(block);
+            });
+          }, 1500);
+        }
+      });
+    </script>
+  </body>
+</html>

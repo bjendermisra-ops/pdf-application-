@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Signing Tool</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- PDF.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+    <!-- PDFLib CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <!-- jQuery UI CDN -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background: #fff;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+      .drop-zone {
+        border: 2px dashed #93c5fd;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        background: #eef2ff;
+        transition: all 0.3s ease;
+      }
+      .drop-zone.dragover {
+        border-color: #2563eb;
+        background: #eff6ff;
+      }
+      .pdf-container {
+        position: relative;
+        background: white;
+        border-radius: 4px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .toolbar {
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 1rem;
+        border-radius: 4px 4px 0 0;
+      }
+      .signature-pad {
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        background: white;
+        cursor: crosshair;
+        transition: border-color 0.3s;
+      }
+      .signature-pad.active {
+        border-color: #2563eb;
+      }
+      .signature {
+        position: absolute;
+        cursor: move;
+        border: 1px dashed #2563eb;
+      }
+      .loading {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-3xl font-bold text-center text-gray-800 mt-10 mb-4">
+        PDF Signing Tool
+      </h1>
+      <h3 class="text-xl text-center text-gray-600 mb-10">
+        This PDF Signing Tool allows you to securely add digital or
+        handwritten<br />
+        signatures to any PDF document.
+      </h3>
+
+      <!-- Drop Zone -->
+      <div
+        class="drop-zone max-w-3xl mx-auto"
+        id="dropZone"
+        style="min-height: 300px"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-12 w-12 mx-auto text-gray-500 mb-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+          />
+        </svg>
+        <p class="text-gray-600">Drag & Drop PDF here</p>
+        <input type="file" id="pdfInput" accept=".pdf" class="hidden" />
+        <button
+          class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+          Browse Files
+        </button>
+        <p class="mt-4 text-gray-500 text-base">
+          All processing happens locally in your browser.
+        </p>
+      </div>
+
+      <!-- PDF Viewer and Tools -->
+      <div class="pdf-container mt-4 hidden max-w-3xl mx-auto" id="pdfViewer">
+        <div class="toolbar">
+          <button
+            id="signBtn"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          >
+            Add Signature
+          </button>
+          <button
+            id="downloadBtn"
+            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition ml-2"
+          >
+            Download Signed PDF
+          </button>
+          <span class="ml-4 text-gray-600"
+            >Page: <span id="pageNum">1</span>/<span id="pageCount"
+              >1</span
+            ></span
+          >
+          <button
+            id="prevPage"
+            class="ml-4 px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+          >
+            Prev
+          </button>
+          <button
+            id="nextPage"
+            class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+          >
+            Next
+          </button>
+        </div>
+        <div class="relative">
+          <canvas id="pdfCanvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Signature Modal -->
+      <div
+        id="signatureModal"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center"
+      >
+        <div class="bg-white p-6 rounded-lg shadow-xl w-96">
+          <h2 class="text-xl font-semibold mb-4">Add Signature</h2>
+          <select
+            id="signatureType"
+            class="w-full mb-4 px-3 py-2 border rounded"
+          >
+            <option value="draw">Draw Signature</option>
+            <option value="image">Upload Image</option>
+            <option value="text">Add Text</option>
+          </select>
+
+          <!-- Draw Signature -->
+          <div id="drawSection" class="mb-4">
+            <canvas
+              id="signaturePad"
+              class="signature-pad w-full"
+              height="150"
+            ></canvas>
+          </div>
+
+          <!-- Upload Image -->
+          <div id="imageSection" class="mb-4 hidden">
+            <input
+              type="file"
+              id="signatureImage"
+              accept="image/png,image/jpeg"
+              class="w-full mb-2"
+            />
+            <p class="text-sm text-gray-500">Supported formats: PNG, JPG</p>
+          </div>
+
+          <!-- Add Text -->
+          <div id="textSection" class="mb-4 hidden">
+            <input
+              type="text"
+              id="signatureText"
+              placeholder="Enter your name or text"
+              class="w-full px-3 py-2 border rounded"
+            />
+            <select
+              id="textFontSize"
+              class="w-full mt-2 px-3 py-2 border rounded"
+            >
+              <option value="20">20px</option>
+              <option value="30" selected>30px</option>
+              <option value="40">40px</option>
+            </select>
+          </div>
+
+          <div class="mt-4 flex justify-end gap-2">
+            <button
+              id="clearSig"
+              class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            >
+              Clear
+            </button>
+            <button
+              id="saveSig"
+              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Indicator -->
+      <div class="loading" id="loading">Processing...</div>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        // Initialize PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+          "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js";
+
+        let pdfDoc = null;
+        let pageNum = 1;
+        let scale = 1.5;
+        let signatures = [];
+        let uploadedFile = null;
+
+        // Show/hide loading indicator
+        function toggleLoading(show) {
+          $("#loading").toggle(show);
+        }
+
+        // Setup drag and drop
+        const $dropZone = $("#dropZone");
+        const $input = $("#pdfInput");
+
+        $dropZone.on({
+          dragover: function (e) {
+            e.preventDefault();
+            $(this).addClass("dragover");
+          },
+          dragleave: function () {
+            $(this).removeClass("dragover");
+          },
+          drop: function (e) {
+            e.preventDefault();
+            $(this).removeClass("dragover");
+            const files = e.originalEvent.dataTransfer.files;
+            if (files.length) {
+              $input[0].files = files;
+              $input.trigger("change");
+            }
+          },
+        });
+
+        $("#dropZone button").on("click", () => $input.click());
+
+        $input.on("change", function (e) {
+          const file = this.files[0];
+          if (file && file.type.match("pdf")) {
+            uploadedFile = file;
+            $dropZone.hide();
+            $("#pdfViewer").removeClass("hidden");
+            loadPDF(file);
+          } else {
+            alert("Please select a valid PDF file.");
+          }
+        });
+
+        async function loadPDF(file) {
+          toggleLoading(true);
+          try {
+            const arrayBuffer = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = () => reject(new Error("Failed to read file."));
+              reader.readAsArrayBuffer(file);
+            });
+            pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            $("#pageCount").text(pdfDoc.numPages);
+            pageNum = 1;
+            $("#pageNum").text(pageNum);
+            await renderPage(pageNum);
+          } catch (error) {
+            console.error("Error loading PDF:", error);
+            let message = "Failed to load PDF. Please try another file.";
+            if (error.message.includes("Invalid PDF")) {
+              message = "The PDF file is corrupted or invalid.";
+            } else if (error.message.includes("read file")) {
+              message =
+                "Unable to read the PDF file. Please ensure it is accessible.";
+            }
+            alert(message);
+            resetApp();
+          } finally {
+            toggleLoading(false);
+          }
+        }
+
+        async function renderPage(num) {
+          try {
+            const page = await pdfDoc.getPage(num);
+            const viewport = page.getViewport({ scale });
+            const canvas = $("#pdfCanvas")[0];
+            const context = canvas.getContext("2d");
+
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = {
+              canvasContext: context,
+              viewport: viewport,
+            };
+            await page.render(renderContext).promise;
+
+            $(".signature").remove();
+            signatures.filter((s) => s.page === num).forEach(renderSignature);
+          } catch (error) {
+            console.error("Error rendering page:", error);
+            alert("Failed to render page.");
+          }
+        }
+
+        function renderSignature(signature) {
+          let $sig;
+          if (signature.type === "draw" || signature.type === "image") {
+            $sig = $(
+              `<img class="signature" data-id="${signature.id}" src="${signature.image}">`
+            );
+          } else if (signature.type === "text") {
+            $sig = $(
+              `<div class="signature" data-id="${signature.id}" style="font-size: ${signature.fontSize}px;">${signature.text}</div>`
+            );
+          }
+          $sig.css({
+            left: signature.x,
+            top: signature.y,
+            width: signature.type === "text" ? "auto" : "200px",
+          });
+          $("#pdfViewer").append($sig);
+
+          $sig.draggable({
+            containment: "#pdfCanvas",
+            stop: function (event, ui) {
+              const index = signatures.findIndex((s) => s.id === signature.id);
+              signatures[index].x = ui.position.left;
+              signatures[index].y = ui.position.top;
+            },
+          });
+        }
+
+        // Signature Pad Setup
+        const signaturePad = $("#signaturePad")[0];
+        const sigContext = signaturePad.getContext("2d");
+        let drawing = false;
+
+        function initializeSignaturePad() {
+          const ratio = window.devicePixelRatio || 1;
+          signaturePad.width = signaturePad.offsetWidth * ratio;
+          signaturePad.height = 150 * ratio;
+          sigContext.scale(ratio, ratio);
+          sigContext.lineWidth = 2;
+          sigContext.strokeStyle = "#000";
+          sigContext.lineCap = "round";
+          sigContext.lineJoin = "round";
+        }
+
+        $(window).on("resize", initializeSignaturePad);
+
+        signaturePad.addEventListener("mousedown", (e) => {
+          drawing = true;
+          $("#signaturePad").addClass("active");
+          const rect = signaturePad.getBoundingClientRect();
+          sigContext.beginPath();
+          sigContext.moveTo(
+            (e.clientX - rect.left) * (signaturePad.width / rect.width),
+            (e.clientY - rect.top) * (signaturePad.height / rect.height)
+          );
+        });
+
+        signaturePad.addEventListener("mousemove", (e) => {
+          if (drawing) {
+            const rect = signaturePad.getBoundingClientRect();
+            sigContext.lineTo(
+              (e.clientX - rect.left) * (signaturePad.width / rect.width),
+              (e.clientY - rect.top) * (signaturePad.height / rect.height)
+            );
+            sigContext.stroke();
+          }
+        });
+
+        signaturePad.addEventListener("mouseup", () => {
+          drawing = false;
+          $("#signaturePad").removeClass("active");
+        });
+
+        signaturePad.addEventListener("mouseleave", () => {
+          drawing = false;
+          $("#signaturePad").removeClass("active");
+        });
+
+        // Touch support
+        signaturePad.addEventListener("touchstart", (e) => {
+          e.preventDefault();
+          drawing = true;
+          $("#signaturePad").addClass("active");
+          const rect = signaturePad.getBoundingClientRect();
+          const touch = e.touches[0];
+          sigContext.beginPath();
+          sigContext.moveTo(
+            (touch.clientX - rect.left) * (signaturePad.width / rect.width),
+            (touch.clientY - rect.top) * (signaturePad.height / rect.height)
+          );
+        });
+
+        signaturePad.addEventListener("touchmove", (e) => {
+          e.preventDefault();
+          if (drawing) {
+            const rect = signaturePad.getBoundingClientRect();
+            const touch = e.touches[0];
+            sigContext.lineTo(
+              (touch.clientX - rect.left) * (signaturePad.width / rect.width),
+              (touch.clientY - rect.top) * (signaturePad.height / rect.height)
+            );
+            sigContext.stroke();
+          }
+        });
+
+        signaturePad.addEventListener("touchend", () => {
+          drawing = false;
+          $("#signaturePad").removeClass("active");
+        });
+
+        $("#clearSig").on("click", () => {
+          sigContext.clearRect(0, 0, signaturePad.width, signaturePad.height);
+          initializeSignaturePad();
+        });
+
+        // Signature Type Switch
+        $("#signatureType").on("change", function () {
+          const type = $(this).val();
+          $("#drawSection, #imageSection, #textSection").addClass("hidden");
+          $(`#${type}Section`).removeClass("hidden");
+          if (type === "draw") {
+            setTimeout(initializeSignaturePad, 0); // Ensure canvas is ready
+          }
+        });
+
+        $("#signBtn").on("click", () => {
+          $("#signatureModal").removeClass("hidden");
+          $("#signatureType").trigger("change");
+        });
+
+        $("#saveSig").on("click", async () => {
+          const type = $("#signatureType").val();
+          const id = Date.now();
+          let signature;
+
+          try {
+            if (type === "draw") {
+              const imageData = signaturePad.toDataURL("image/png");
+              const blankCanvas = document.createElement("canvas");
+              blankCanvas.width = signaturePad.width;
+              blankCanvas.height = signaturePad.height;
+              if (imageData === blankCanvas.toDataURL()) {
+                alert("Please draw a signature.");
+                return;
+              }
+              signature = {
+                id,
+                type: "draw",
+                page: pageNum,
+                x: 50,
+                y: 50,
+                image: imageData,
+              };
+              sigContext.clearRect(
+                0,
+                0,
+                signaturePad.width,
+                signaturePad.height
+              );
+              initializeSignaturePad();
+            } else if (type === "image") {
+              const file = $("#signatureImage")[0].files[0];
+              if (!file || !file.type.match("image/(png|jpeg)")) {
+                alert("Please upload a PNG or JPG image.");
+                return;
+              }
+              const imageUrl = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(file);
+              });
+              signature = {
+                id,
+                type: "image",
+                page: pageNum,
+                x: 50,
+                y: 50,
+                image: imageUrl,
+                fileType: file.type,
+              };
+              $("#signatureImage").val("");
+            } else if (type === "text") {
+              const text = $("#signatureText").val().trim();
+              const fontSize = parseInt($("#textFontSize").val());
+              if (!text) {
+                alert("Please enter text for the signature.");
+                return;
+              }
+              signature = {
+                id,
+                type: "text",
+                page: pageNum,
+                x: 50,
+                y: 50,
+                text,
+                fontSize,
+              };
+              $("#signatureText").val("");
+            }
+
+            signatures.push(signature);
+            renderSignature(signature);
+            $("#signatureModal").addClass("hidden");
+          } catch (error) {
+            console.error("Error saving signature:", error);
+            alert("Failed to save signature.");
+          }
+        });
+
+        $("#prevPage").on("click", function () {
+          if (pageNum > 1) {
+            pageNum--;
+            $("#pageNum").text(pageNum);
+            renderPage(pageNum);
+          }
+        });
+
+        $("#nextPage").on("click", function () {
+          if (pageNum < pdfDoc.numPages) {
+            pageNum++;
+            $("#pageNum").text(pageNum);
+            renderPage(pageNum);
+          }
+        });
+
+        $("#downloadBtn").on("click", async function () {
+          if (!pdfDoc || !uploadedFile) {
+            alert("No PDF loaded.");
+            return;
+          }
+
+          toggleLoading(true);
+          try {
+            const pdfBytes = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsArrayBuffer(uploadedFile);
+            });
+            const pdfDocNew = await PDFLib.PDFDocument.load(pdfBytes);
+
+            for (const sig of signatures) {
+              const page = pdfDocNew.getPage(sig.page - 1);
+              const pageHeight = page.getHeight();
+
+              if (sig.type === "draw" || sig.type === "image") {
+                const response = await fetch(sig.image);
+                const arrayBuffer = await response.arrayBuffer();
+                let embeddedImage;
+
+                if (sig.type === "image" && sig.fileType === "image/jpeg") {
+                  embeddedImage = await pdfDocNew.embedJpg(arrayBuffer);
+                } else {
+                  embeddedImage = await pdfDocNew.embedPng(arrayBuffer);
+                }
+
+                const dims = embeddedImage.scale(0.5);
+                page.drawImage(embeddedImage, {
+                  x: sig.x / scale,
+                  y: pageHeight - sig.y / scale - dims.height / scale,
+                  width: dims.width / scale,
+                  height: dims.height / scale,
+                });
+              } else if (sig.type === "text") {
+                const font = await pdfDocNew.embedFont(
+                  PDFLib.StandardFonts.Helvetica
+                );
+                page.drawText(sig.text, {
+                  x: sig.x / scale,
+                  y: pageHeight - sig.y / scale,
+                  size: sig.fontSize / scale,
+                  font: font,
+                  color: PDFLib.rgb(0, 0, 0),
+                });
+              }
+            }
+
+            const pdfBytesNew = await pdfDocNew.save();
+            const blob = new Blob([pdfBytesNew], { type: "application/pdf" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "signed.pdf";
+            link.click();
+            URL.revokeObjectURL(link.href);
+          } catch (error) {
+            console.error("Error generating PDF:", error);
+            alert("Failed to generate signed PDF. Please try again.");
+          } finally {
+            toggleLoading(false);
+          }
+        });
+
+        // Reset app state
+        function resetApp() {
+          pdfDoc = null;
+          pageNum = 1;
+          signatures = [];
+          uploadedFile = null;
+          $(".signature").remove();
+          $("#pdfViewer").addClass("hidden");
+          $dropZone.show();
+          $input.val("");
+          $("#pageNum").text("1");
+          $("#pageCount").text("1");
+          sigContext.clearRect(0, 0, signaturePad.width, signaturePad.height);
+          initializeSignaturePad();
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meta Tag Generator | SEO Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .copy-btn.copied {
+        background-color: #16a34a;
+        border-color: #16a34a;
+      }
+    </style>
+  </head>
+  <body class="bg-white text-black min-h-screen">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+      <header class="mb-10 text-center">
+        <h1 class="text-4xl font-bold text-black mb-2">Meta Tag Generator</h1>
+        <p class="text-gray-700 max-w-2xl mx-auto">
+          Generate essential meta tags for better SEO and social sharing
+        </p>
+      </header>
+
+      <main class="max-w-3xl mx-auto">
+        <!-- Input Form -->
+        <div class="bg-white rounded-xl p-6 shadow-lg mb-8">
+          <h2 class="text-xl font-semibold mb-6 text-black">
+            Meta Tag Configuration
+          </h2>
+
+          <div class="space-y-5">
+            <!-- Site Title -->
+            <div>
+              <label
+                for="siteTitle"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Site Title (max 60 chars)</label
+              >
+              <input
+                type="text"
+                id="siteTitle"
+                placeholder="Your Website Title"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <div class="flex justify-between mt-1">
+                <span id="titleError" class="text-xs text-red-600 hidden"
+                  >Title must be within 60 Characters</span
+                >
+                <span id="titleCount" class="text-xs text-gray-500"
+                  >Characters left: 60</span
+                >
+              </div>
+            </div>
+
+            <!-- Site Description -->
+            <div>
+              <label
+                for="siteDescription"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Site Description (max 150 chars)</label
+              >
+              <textarea
+                id="siteDescription"
+                rows="3"
+                placeholder="Brief description of your website"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></textarea>
+              <div class="flex justify-between mt-1">
+                <span id="descError" class="text-xs text-red-600 hidden"
+                  >Description must be within 150 Characters</span
+                >
+                <span id="descCount" class="text-xs text-gray-500"
+                  >Characters left: 150</span
+                >
+              </div>
+            </div>
+
+            <!-- Robots Index -->
+            <div>
+              <label class="block text-sm font-medium text-blue-800 mb-2"
+                >Allow robots to index your website?</label
+              >
+              <div class="flex gap-4">
+                <label class="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="robotsIndex"
+                    value="index"
+                    checked
+                    class="text-blue-500 bg-white border-gray-300 focus:ring-blue-500"
+                  />
+                  <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="robotsIndex"
+                    value="noindex"
+                    class="text-blue-500 bg-white border-gray-300 focus:ring-blue-500"
+                  />
+                  <span class="ml-2">No</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Content Type -->
+            <div>
+              <label
+                for="contentType"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >What type of content will your site display?</label
+              >
+              <select
+                id="contentType"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="UTF-8" selected>UTF-8 (Standard)</option>
+                <option value="ISO-8859-1">ISO-8859-1 (Latin)</option>
+                <option value="windows-1252">Windows-1252 (Western)</option>
+              </select>
+            </div>
+
+            <!-- Revisit After -->
+            <div>
+              <label
+                for="revisitAfter"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Search engines should revisit this page after</label
+              >
+              <select
+                id="revisitAfter"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="" selected disabled>Select Days</option>
+                <option value="1">1 day</option>
+                <option value="3">3 days</option>
+                <option value="7">7 days</option>
+                <option value="14">14 days</option>
+                <option value="30">30 days</option>
+                <option value="90">90 days</option>
+              </select>
+            </div>
+
+            <!-- Site Keywords -->
+            <div>
+              <label
+                for="siteKeywords"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Site Keywords (Separate with commas)</label
+              >
+              <input
+                type="text"
+                id="siteKeywords"
+                placeholder="keyword1, keyword2, keyword3"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <!-- Robots Follow -->
+            <div>
+              <label class="block text-sm font-medium text-blue-800 mb-2"
+                >Allow robots to follow all links?</label
+              >
+              <div class="flex gap-4">
+                <label class="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="robotsFollow"
+                    value="follow"
+                    checked
+                    class="text-blue-500 bg-white border-gray-300 focus:ring-blue-500"
+                  />
+                  <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="robotsFollow"
+                    value="nofollow"
+                    class="text-blue-500 bg-white border-gray-300 focus:ring-blue-500"
+                  />
+                  <span class="ml-2">No</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Language -->
+            <div>
+              <label
+                for="siteLanguage"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >What is your site's primary language?</label
+              >
+              <select
+                id="siteLanguage"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="" selected disabled>No Language Tag</option>
+                <option value="en">English (en)</option>
+                <option value="es">Spanish (es)</option>
+                <option value="fr">French (fr)</option>
+                <option value="de">German (de)</option>
+                <option value="it">Italian (it)</option>
+                <option value="pt">Portuguese (pt)</option>
+                <option value="ru">Russian (ru)</option>
+                <option value="zh">Chinese (zh)</option>
+                <option value="ja">Japanese (ja)</option>
+                <option value="ar">Arabic (ar)</option>
+              </select>
+            </div>
+
+            <!-- Author -->
+            <div>
+              <label
+                for="siteAuthor"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Author</label
+              >
+              <input
+                type="text"
+                id="siteAuthor"
+                placeholder="Your Name or Company"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <button
+              id="generateBtn"
+              class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium text-white transition-colors flex items-center justify-center gap-2"
+            >
+              <i class="fas fa-code"></i> Generate Meta Tags
+            </button>
+          </div>
+        </div>
+
+        <!-- Output Section -->
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-black">
+              Generated Meta Tags
+            </h2>
+            <button
+              id="copyBtn"
+              class="copy-btn px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm flex items-center gap-2"
+            >
+              <i class="fas fa-copy"></i> Copy
+            </button>
+          </div>
+          <div
+            id="metaTagsOutput"
+            class="bg-gray-50 rounded-lg p-4 font-mono text-sm text-gray-800 overflow-x-auto min-h-40"
+          >
+            <p class="text-gray-500">
+              Fill the form and generate your meta tags
+            </p>
+          </div>
+          <div class="mt-4 text-sm text-gray-500">
+            <p>
+              Add these meta tags to your HTML
+              <code class="bg-gray-100 px-2 py-1 rounded">head</code> section.
+            </p>
+          </div>
+        </div>
+      </main>
+
+      <footer class="mt-16 text-center text-gray-500 text-sm">
+        <p>Meta Tag Generator © 2023 | SEO Tool</p>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // DOM Elements
+        const siteTitle = document.getElementById("siteTitle");
+        const siteDescription = document.getElementById("siteDescription");
+        const contentType = document.getElementById("contentType");
+        const revisitAfter = document.getElementById("revisitAfter");
+        const siteKeywords = document.getElementById("siteKeywords");
+        const siteLanguage = document.getElementById("siteLanguage");
+        const siteAuthor = document.getElementById("siteAuthor");
+        const generateBtn = document.getElementById("generateBtn");
+        const copyBtn = document.getElementById("copyBtn");
+        const metaTagsOutput = document.getElementById("metaTagsOutput");
+        const titleCount = document.getElementById("titleCount");
+        const descCount = document.getElementById("descCount");
+        const titleError = document.getElementById("titleError");
+        const descError = document.getElementById("descError");
+
+        // Character counters
+        siteTitle.addEventListener("input", function () {
+          const remaining = 60 - this.value.length;
+          titleCount.textContent = `Characters left: ${remaining}`;
+
+          if (remaining < 0) {
+            titleError.classList.remove("hidden");
+            titleCount.classList.add("text-red-600");
+          } else {
+            titleError.classList.add("hidden");
+            titleCount.classList.remove("text-red-600");
+          }
+        });
+
+        siteDescription.addEventListener("input", function () {
+          const remaining = 150 - this.value.length;
+          descCount.textContent = `Characters left: ${remaining}`;
+
+          if (remaining < 0) {
+            descError.classList.remove("hidden");
+            descCount.classList.add("text-red-600");
+          } else {
+            descError.classList.add("hidden");
+            descCount.classList.remove("text-red-600");
+          }
+        });
+
+        // Generate meta tags
+        generateBtn.addEventListener("click", function () {
+          // Validate title and description length
+          if (siteTitle.value.length > 60) {
+            alert("Title must be 60 characters or less");
+            return;
+          }
+
+          if (siteDescription.value.length > 150) {
+            alert("Description must be 150 characters or less");
+            return;
+          }
+
+          // Get current values
+          const robotsIndexValue = document.querySelector(
+            'input[name="robotsIndex"]:checked'
+          ).value;
+          const robotsFollowValue = document.querySelector(
+            'input[name="robotsFollow"]:checked'
+          ).value;
+
+          // Generate meta tags
+          let metaTags = "<!-- Basic Meta Tags -->\n";
+          metaTags += `<meta charset="${contentType.value}">\n`;
+
+          if (siteTitle.value) {
+            metaTags += `<meta name="title" content="${escapeHtml(
+              siteTitle.value
+            )}">\n`;
+            metaTags += `<meta property="og:title" content="${escapeHtml(
+              siteTitle.value
+            )}">\n`;
+            metaTags += `<meta name="twitter:title" content="${escapeHtml(
+              siteTitle.value
+            )}">\n`;
+          }
+
+          if (siteDescription.value) {
+            metaTags += `<meta name="description" content="${escapeHtml(
+              siteDescription.value
+            )}">\n`;
+            metaTags += `<meta property="og:description" content="${escapeHtml(
+              siteDescription.value
+            )}">\n`;
+            metaTags += `<meta name="twitter:description" content="${escapeHtml(
+              siteDescription.value
+            )}">\n`;
+          }
+
+          metaTags += `<meta name="robots" content="${robotsIndexValue}, ${robotsFollowValue}">\n`;
+
+          if (revisitAfter.value) {
+            metaTags += `<meta name="revisit-after" content="${revisitAfter.value} days">\n`;
+          }
+
+          if (siteKeywords.value) {
+            metaTags += `<meta name="keywords" content="${escapeHtml(
+              siteKeywords.value
+            )}">\n`;
+          }
+
+          if (siteLanguage.value) {
+            metaTags += `<meta http-equiv="content-language" content="${siteLanguage.value}">\n`;
+          }
+
+          if (siteAuthor.value) {
+            metaTags += `<meta name="author" content="${escapeHtml(
+              siteAuthor.value
+            )}">\n`;
+          }
+
+          // Viewport tag (always included)
+          metaTags += `<meta name="viewport" content="width=device-width, initial-scale=1.0">\n`;
+
+          // Open Graph/Twitter Card tags
+          metaTags += "\n<!-- Open Graph / Facebook -->\n";
+          metaTags += `<meta property="og:type" content="website">\n`;
+
+          metaTags += "\n<!-- Twitter -->\n";
+          metaTags += `<meta property="twitter:card" content="summary_large_image">\n`;
+
+          // Display the meta tags
+          metaTagsOutput.innerHTML = metaTags
+            .split("\n")
+            .map((line) => `<div class="whitespace-pre">${line}</div>`)
+            .join("");
+        });
+
+        // Copy to clipboard
+        copyBtn.addEventListener("click", function () {
+          if (metaTagsOutput.textContent.includes("<!-- Basic Meta Tags -->")) {
+            navigator.clipboard
+              .writeText(metaTagsOutput.textContent)
+              .then(() => {
+                const original = this.innerHTML;
+                this.classList.add("copied");
+                this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                  this.classList.remove("copied");
+                  this.innerHTML = original;
+                }, 2000);
+              })
+              .catch((err) => {
+                console.error("Failed to copy: ", err);
+                alert("Failed to copy text. Please try again.");
+              });
+          } else {
+            alert("Please generate meta tags first");
+          }
+        });
+
+        // Helper function to escape HTML
+        function escapeHtml(unsafe) {
+          return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        }
+      });
+    </script>
+  </body>
+</html>

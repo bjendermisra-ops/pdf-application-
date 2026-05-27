@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blur Background Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      .dropzone {
+        border: 2px dashed #ccc;
+        transition: all 0.3s ease;
+      }
+
+      .dropzone.active {
+        border-color: #4f46e5;
+        background-color: #f0f0ff;
+      }
+
+      #resultCanvas {
+        display: none;
+        max-width: 100%;
+      }
+
+      #previewImage {
+        max-width: 100%;
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-50 min-h-screen">
+    <?php include 'includes/navbar.html'; ?>
+    <nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="container mx-auto px-4 py-8">
+      <h1 class="text-3xl font-bold text-center text-indigo-700 mb-2">
+        Blur Background
+      </h1>
+      <p class="text-center text-gray-600 mb-8">
+        Upload an image to automatically blur the background
+      </p>
+
+      <div
+        class="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6"
+      >
+        <div id="uploadSection">
+          <div
+            id="dropzone"
+            class="dropzone rounded-lg p-8 text-center cursor-pointer mb-6"
+          >
+            <input type="file" id="fileInput" class="hidden" accept="image/*" />
+            <div class="flex flex-col items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-12 w-12 text-indigo-500 mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
+              </svg>
+              <h3 class="text-lg font-medium text-gray-700 mb-1">
+                Upload from PC or Mobile
+              </h3>
+              <p class="text-gray-500 text-sm mb-4">or Drag files here</p>
+              <button
+                id="uploadBtn"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition"
+              >
+                Select Image
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="processingSection" class="hidden">
+          <div class="flex flex-col items-center p-8">
+            <div
+              class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mb-4"
+            ></div>
+            <p class="text-gray-700">Processing image...</p>
+          </div>
+        </div>
+
+        <div id="resultSection" class="hidden">
+          <div class="mb-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-medium text-gray-700">Result</h3>
+              <div class="flex space-x-2">
+                <button
+                  id="downloadBtn"
+                  class="bg-indigo-600 text-white px-3 py-1 rounded-md text-sm hover:bg-indigo-700 transition"
+                >
+                  Download
+                </button>
+                <button
+                  id="newImageBtn"
+                  class="bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm hover:bg-gray-300 transition"
+                >
+                  New Image
+                </button>
+              </div>
+            </div>
+
+            <div class="relative">
+              <img id="previewImage" class="rounded-lg" alt="Preview" />
+              <canvas id="resultCanvas" class="rounded-lg"></canvas>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label
+              for="blurAmount"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Blur Intensity</label
+            >
+            <input
+              type="range"
+              id="blurAmount"
+              min="1"
+              max="20"
+              value="10"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            />
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+              <span>Low</span>
+              <span>High</span>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label
+              for="foregroundSize"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Foreground Size</label
+            >
+            <input
+              type="range"
+              id="foregroundSize"
+              min="10"
+              max="90"
+              value="50"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            />
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+              <span>Small</span>
+              <span>Large</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <?php include 'includes/footer.html'; ?>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const fileInput = document.getElementById("fileInput");
+        const uploadBtn = document.getElementById("uploadBtn");
+        const dropzone = document.getElementById("dropzone");
+        const uploadSection = document.getElementById("uploadSection");
+        const processingSection = document.getElementById("processingSection");
+        const resultSection = document.getElementById("resultSection");
+        const previewImage = document.getElementById("previewImage");
+        const resultCanvas = document.getElementById("resultCanvas");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const newImageBtn = document.getElementById("newImageBtn");
+        const blurAmount = document.getElementById("blurAmount");
+        const foregroundSize = document.getElementById("foregroundSize");
+
+        let originalImage = null;
+        let ctx = resultCanvas.getContext("2d");
+
+        // Handle file selection via button
+        uploadBtn.addEventListener("click", () => fileInput.click());
+
+        // Handle file selection via input
+        fileInput.addEventListener("change", handleFileSelect);
+
+        // Handle drag and drop
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+          dropzone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        ["dragenter", "dragover"].forEach((eventName) => {
+          dropzone.addEventListener(eventName, highlight, false);
+        });
+
+        ["dragleave", "drop"].forEach((eventName) => {
+          dropzone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+          dropzone.classList.add("active");
+        }
+
+        function unhighlight() {
+          dropzone.classList.remove("active");
+        }
+
+        dropzone.addEventListener("drop", handleDrop, false);
+
+        function handleDrop(e) {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+
+          if (files.length) {
+            fileInput.files = files;
+            handleFileSelect({ target: fileInput });
+          }
+        }
+
+        function handleFileSelect(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+
+          if (!file.type.match("image.*")) {
+            alert("Please select an image file.");
+            return;
+          }
+
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            originalImage = new Image();
+            originalImage.onload = function () {
+              processImage();
+            };
+            originalImage.src = e.target.result;
+            previewImage.src = e.target.result;
+          };
+
+          uploadSection.classList.add("hidden");
+          processingSection.classList.remove("hidden");
+
+          reader.readAsDataURL(file);
+        }
+
+        function processImage() {
+          // Set canvas dimensions
+          const maxWidth = 800;
+          const ratio = Math.min(maxWidth / originalImage.width, 1);
+          resultCanvas.width = originalImage.width * ratio;
+          resultCanvas.height = originalImage.height * ratio;
+
+          // Draw the blurred background
+          applyBlurEffect();
+
+          // Show result
+          processingSection.classList.add("hidden");
+          resultSection.classList.remove("hidden");
+          resultCanvas.style.display = "block";
+          previewImage.style.display = "none";
+        }
+
+        function applyBlurEffect() {
+          if (!originalImage) return;
+
+          const blurValue = parseInt(blurAmount.value);
+          const sizeValue = parseInt(foregroundSize.value) / 100;
+
+          // Clear canvas
+          ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+
+          // First draw the blurred version
+          ctx.filter = `blur(${blurValue}px)`;
+          ctx.drawImage(
+            originalImage,
+            0,
+            0,
+            resultCanvas.width,
+            resultCanvas.height
+          );
+          ctx.filter = "none";
+
+          // Calculate the centered foreground area
+          const centerX = resultCanvas.width / 2;
+          const centerY = resultCanvas.height / 2;
+          const radius =
+            (Math.min(resultCanvas.width, resultCanvas.height) * sizeValue) / 2;
+
+          // Save the context state
+          ctx.save();
+
+          // Create a clipping path for the foreground
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+
+          // Draw the sharp foreground
+          ctx.drawImage(
+            originalImage,
+            0,
+            0,
+            resultCanvas.width,
+            resultCanvas.height
+          );
+
+          // Restore the context state
+          ctx.restore();
+        }
+
+        // Update blur effect when sliders change
+        blurAmount.addEventListener("input", applyBlurEffect);
+        foregroundSize.addEventListener("input", applyBlurEffect);
+
+        // Download the result
+        downloadBtn.addEventListener("click", function () {
+          const link = document.createElement("a");
+          link.download = "blurred-background.png";
+          link.href = resultCanvas.toDataURL("image/png");
+          link.click();
+        });
+
+        // Start over with a new image
+        newImageBtn.addEventListener("click", function () {
+          resultSection.classList.add("hidden");
+          uploadSection.classList.remove("hidden");
+          fileInput.value = "";
+          resultCanvas.style.display = "none";
+          previewImage.style.display = "none";
+          originalImage = null;
+        });
+      });
+    </script>
+  </body>
+</html>

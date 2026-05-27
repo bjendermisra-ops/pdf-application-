@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gratuity Calculator — Pro (₹ INR)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    .back-wrapper {
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .back-wrapper.hidden {
+      transform: translateX(-150%);
+      opacity: 0;
+    }
+    .info-tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    .info-tooltip .tooltip-text {
+      visibility: hidden;
+      width: 320px;
+      background-color: #1f2937;
+      color: #fff;
+      text-align: left;
+      border-radius: 8px;
+      padding: 12px;
+      position: absolute;
+      z-index: 1000;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -160px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 13px;
+      line-height: 1.5;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .info-tooltip .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #1f2937 transparent transparent transparent;
+    }
+    .info-tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 min-h-screen p-6">
+
+  <!-- Back Button -->
+  <div class="fixed top-6 left-6 z-50 back-wrapper">
+    <a href="/" 
+       class="flex items-center gap-2.5 px-5 py-2.5 text-sm font-semibold text-white
+              bg-blue-600
+              rounded-full shadow-lg
+              hover:bg-blue-700
+              hover:shadow-xl hover:-translate-x-1
+              transition-all duration-300 ease-in-out">
+      <i class="fas fa-arrow-left text-base"></i>
+      <span>Back to All Tools</span>
+    </a>
+  </div>
+
+  <!-- Centered Title -->
+  <div class="max-w-6xl mx-auto text-center mb-10">
+    <h1 class="text-4xl font-bold text-slate-800">Gratuity Calculator</h1>
+    <p class="mt-3 text-lg text-slate-600">Calculate your gratuity + tax + take-home. Live updates as you type!</p>
+  </div>
+
+  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+    <!-- Left: Controls (3 cols) -->
+    <div class="lg:col-span-4 space-y-6">
+      
+      <!-- Scenario A -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 border border-orange-100">
+        <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-orange-800">
+          <span class="w-2 h-6 bg-orange-500 rounded"></span>
+          Scenario A
+        </h3>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 flex items-center gap-2">
+              Last Basic Salary
+              <div class="info-tooltip">
+                <i class="fas fa-info-circle text-orange-500 text-xs"></i>
+                <span class="tooltip-text">Last drawn Basic Salary (not total CTC)</span>
+              </div>
+            </label>
+            <input id="basicA" type="number" value="75000" class="w-full p-3 border-2 border-orange-200 rounded-xl focus:ring-4 focus:ring-orange-200 live-updating" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 flex items-center gap-2">
+              Years of Service
+              <div class="info-tooltip">
+                <i class="fas fa-info-circle text-orange-500 text-xs"></i>
+                <span class="tooltip-text">Complete years (partial year = 0). Min 5 years for eligibility.</span>
+              </div>
+            </label>
+            <input id="yearsA" type="number" value="10" class="w-full p-3 border-2 border-orange-200 rounded-xl focus:ring-4 focus:ring-orange-200 live-updating" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 flex items-center gap-2">
+              Days in Last Year
+              <div class="info-tooltip">
+                <i class="fas fa-info-circle text-orange-500 text-xs"></i>
+                <span class="tooltip-text">Days worked in final year (max 240 for partial year calculation)</span>
+              </div>
+            </label>
+            <input id="daysA" type="number" max="240" value="240" class="w-full p-3 border-2 border-orange-200 rounded-xl focus:ring-4 focus:ring-orange-200 live-updating" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 border border-slate-100">
+        <h3 class="font-bold text-lg mb-4 text-slate-800">Common Settings</h3>
+        
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Tax Regime</label>
+            <select id="taxRegime" class="w-full p-3 border rounded-xl live-updating">
+              <option value="old">Old Regime</option>
+              <option value="new">New Regime</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Age at Exit</label>
+            <input id="age" type="number" value="40" class="w-full p-3 border rounded-xl live-updating" />
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <button id="exportCSV" class="w-full p-3 bg-green-600 text-white rounded-xl shadow-lg hover:bg-green-700 transition font-medium">
+            <i class="fas fa-file-csv mr-2"></i>Export CSV
+          </button>
+          <button id="exportPDF" class="w-full p-3 bg-orange-600 text-white rounded-xl shadow-lg hover:bg-orange-700 transition font-medium">
+            <i class="fas fa-file-pdf mr-2"></i>Export PDF
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Right: Results (9 cols) -->
+    <div class="lg:col-span-8 space-y-8">
+
+      <!-- Scenario B -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 border border-red-100">
+        <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-red-800">
+          <span class="w-2 h-6 bg-red-500 rounded"></span>
+          Scenario B
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Last Basic Salary</label>
+            <input id="basicB" type="number" value="100000" class="w-full p-3 border-2 border-red-200 rounded-xl focus:ring-4 focus:ring-red-200 live-updating" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Years of Service</label>
+            <input id="yearsB" type="number" value="15" class="w-full p-3 border-2 border-red-200 rounded-xl focus:ring-4 focus:ring-red-200 live-updating" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Days in Last Year</label>
+            <input id="daysB" type="number" max="240" value="240" class="w-full p-3 border-2 border-red-200 rounded-xl focus:ring-4 focus:ring-red-200 live-updating" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Circular Summary Cards - Vertical Stack -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- Card 1: Scenario A -->
+        <div class="flex flex-col items-center text-center">
+          <div class="relative w-40 h-40 rounded-full bg-gradient-to-br from-orange-500 to-red-600 shadow-2xl p-1">
+            <div class="w-full h-full rounded-full bg-white flex flex-col justify-center items-center p-3">
+              <p class="text-xs font-bold text-orange-700">Scenario A</p>
+              <p id="gratuityA" class="text-lg font-extrabold text-slate-900 leading-tight">₹10,41,667</p>
+              <p class="text-xs text-green-700 font-semibold mt-1">Take-home</p>
+              <p id="takehomeA" class="text-sm font-bold text-green-700 leading-none">₹9,91,667</p>
+            </div>
+          </div>
+          <p class="mt-3 text-sm font-medium text-slate-600">Gross + Net</p>
+        </div>
+
+        <!-- Card 2: Scenario B -->
+        <div class="flex flex-col items-center text-center">
+          <div class="relative w-40 h-40 rounded-full bg-gradient-to-br from-red-500 to-orange-600 shadow-2xl p-1">
+            <div class="w-full h-full rounded-full bg-white flex flex-col justify-center items-center p-3">
+              <p class="text-xs font-bold text-red-700">Scenario B</p>
+              <p id="gratuityB" class="text-lg font-extrabold text-slate-900 leading-tight">₹25,00,000</p>
+              <p class="text-xs text-green-700 font-semibold mt-1">Take-home</p>
+              <p id="takehomeB" class="text-sm font-bold text-green-700 leading-none">₹23,75,000</p>
+            </div>
+          </div>
+          <p class="mt-3 text-sm font-medium text-slate-600">Gross + Net</p>
+        </div>
+
+        <!-- Card 3: Tax A -->
+        <div class="flex flex-col items-center text-center">
+          <div class="relative w-40 h-40 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-2xl p-1">
+            <div class="w-full h-full rounded-full bg-white flex flex-col justify-center items-center p-3">
+              <p class="text-xs font-bold text-emerald-700">Tax (A)</p>
+              <p id="taxA" class="text-lg font-extrabold text-red-600 leading-tight">₹50,000</p>
+              <p class="text-xs text-slate-600 mt-1">Rate</p>
+              <p id="taxRateA" class="text-sm font-bold text-slate-800">4.8%</p>
+            </div>
+          </div>
+          <p class="mt-3 text-sm font-medium text-slate-600">Tax Impact</p>
+        </div>
+
+        <!-- Card 4: Tax B -->
+        <div class="flex flex-col items-center text-center">
+          <div class="relative w-40 h-40 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 shadow-2xl p-1">
+            <div class="w-full h-full rounded-full bg-white flex flex-col justify-center items-center p-3">
+              <p class="text-xs font-bold text-indigo-700">Tax (B)</p>
+              <p id="taxB" class="text-lg font-extrabold text-red-600 leading-tight">₹1,25,000</p>
+              <p class="text-xs text-slate-600 mt-1">Rate</p>
+              <p id="taxRateB" class="text-sm font-bold text-slate-800">5.0%</p>
+            </div>
+          </div>
+          <p class="mt-3 text-sm font-medium text-slate-600">Tax Impact</p>
+        </div>
+
+      </div>
+
+      <!-- Charts -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-2xl shadow-xl">
+          <h3 class="font-semibold mb-4">Gratuity Comparison</h3>
+          <canvas id="compareChart"></canvas>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-xl">
+          <h3 class="font-semibold mb-4">Breakdown (Scenario A)</h3>
+          <canvas id="breakdownChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Detailed Table -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 overflow-auto">
+        <h3 class="font-bold text-xl mb-6">Detailed Calculation</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gradient-to-r from-orange-50 to-red-50">
+              <tr class="text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                <th class="p-4">Item</th>
+                <th class="p-4 text-right">Scenario A</th>
+                <th class="p-4 text-right">Scenario B</th>
+              </tr>
+            </thead>
+            <tbody id="detailTable" class="divide-y divide-slate-200">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Back button
+    const backWrapper = document.querySelector('.back-wrapper');
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const current = window.scrollY;
+      if (current > lastScroll && current > 80) backWrapper.classList.add('hidden');
+      else backWrapper.classList.remove('hidden');
+      lastScroll = current;
+    });
+
+    // Debounce
+    function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func(...args), wait);
+      };
+    }
+
+    // Charts
+    const ctx1 = document.getElementById('compareChart').getContext('2d');
+    const compareChart = new Chart(ctx1, {
+      type: 'bar',
+      options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+
+    const ctx2 = document.getElementById('breakdownChart').getContext('2d');
+    const breakdownChart = new Chart(ctx2, {
+      type: 'doughnut',
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // INR Format
+    function fmtINR(val) {
+      return '₹' + Number(val).toLocaleString('en-IN');
+    }
+
+    // LIVE Calculate
+    const calculate = debounce(function() {
+      const basicA = parseFloat(document.getElementById('basicA').value) || 0;
+      const yearsA = parseFloat(document.getElementById('yearsA').value) || 0;
+      const daysA = parseFloat(document.getElementById('daysA').value) || 0;
+      
+      const basicB = parseFloat(document.getElementById('basicB').value) || 0;
+      const yearsB = parseFloat(document.getElementById('yearsB').value) || 0;
+      const daysB = parseFloat(document.getElementById('daysB').value) || 0;
+      
+      const taxRegime = document.getElementById('taxRegime').value;
+      const age = parseInt(document.getElementById('age').value) || 40;
+
+      // Calculate Gratuity
+      function calcGratuity(basic, years, days) {
+        if (years < 5) return { gross: 0, exempt: 0 };
+        
+        const fullYears = Math.floor(years);
+        const partial = Math.min(days / 240, 1);
+        const totalYears = fullYears + partial;
+        
+        const gratuity = (basic / 26) * 15 * totalYears;
+        const exempt = Math.min(gratuity, 2000000);
+        
+        return { gross: gratuity, exempt, taxable: gratuity - exempt };
+      }
+
+      const gratA = calcGratuity(basicA, yearsA, daysA);
+      const gratB = calcGratuity(basicB, yearsB, daysB);
+
+      // Tax Calculation
+      function calcTax(taxable, regime, age) {
+        if (regime === 'new') {
+          const slabs = [0, 300000, 700000, 1000000, 1200000, 1500000];
+          const rates = [0, 0.05, 0.10, 0.15, 0.20, 0.30];
+          let tax = 0;
+          for (let i = 1; i < slabs.length; i++) {
+            const slab = Math.min(taxable, slabs[i]) - slabs[i-1];
+            if (slab > 0) tax += slab * rates[i];
+          }
+          return Math.round(tax);
+        } else {
+          // Old regime (simplified)
+          return Math.round(taxable * 0.1);
+        }
+      }
+
+      const taxA = calcTax(gratA.taxable, taxRegime, age);
+      const taxB = calcTax(gratB.taxable, taxRegime, age);
+
+      // Update UI
+      document.getElementById('gratuityA').textContent = fmtINR(gratA.gross);
+      document.getElementById('takehomeA').textContent = `Take-home: ${fmtINR(gratA.gross - taxA)}`;
+      document.getElementById('gratuityB').textContent = fmtINR(gratB.gross);
+      document.getElementById('takehomeB').textContent = `Take-home: ${fmtINR(gratB.gross - taxB)}`;
+      
+      document.getElementById('taxA').textContent = fmtINR(taxA);
+      document.getElementById('taxB').textContent = fmtINR(taxB);
+      document.getElementById('taxRateA').textContent = `${((taxA/gratA.gross)*100).toFixed(1)}%`;
+      document.getElementById('taxRateB').textContent = `${((taxB/gratB.gross)*100).toFixed(1)}%`;
+
+      // Charts
+      compareChart.data = {
+        labels: ['Gross Gratuity', 'Tax', 'Take-home'],
+        datasets: [
+          { label: 'Scenario A', data: [gratA.gross, taxA, gratA.gross - taxA], backgroundColor: '#f97316' },
+          { label: 'Scenario B', data: [gratB.gross, taxB, gratB.gross - taxB], backgroundColor: '#dc2626' }
+        ]
+      };
+      compareChart.update('none');
+
+      breakdownChart.data = {
+        labels: ['Tax-free', 'Taxable', 'Tax Paid'],
+        datasets: [{ data: [gratA.exempt, gratA.taxable, taxA], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'] }]
+      };
+      breakdownChart.update('none');
+
+      // Table
+      const tbody = document.getElementById('detailTable');
+      tbody.innerHTML = `
+        <tr class="hover:bg-orange-50">
+          <td class="p-4 font-medium">Last Basic Salary</td>
+          <td class="p-4 text-right font-mono">${fmtINR(basicA)}</td>
+          <td class="p-4 text-right font-mono">${fmtINR(basicB)}</td>
+        </tr>
+        <tr class="hover:bg-orange-50">
+          <td class="p-4 font-medium">Years of Service</td>
+          <td class="p-4 text-right font-mono">${yearsA} yrs</td>
+          <td class="p-4 text-right font-mono">${yearsB} yrs</td>
+        </tr>
+        <tr class="hover:bg-orange-50 bg-orange-50">
+          <td class="p-4 font-bold text-lg">Gross Gratuity</td>
+          <td class="p-4 text-right text-2xl font-bold text-orange-600">${fmtINR(gratA.gross)}</td>
+          <td class="p-4 text-right text-2xl font-bold text-red-600">${fmtINR(gratB.gross)}</td>
+        </tr>
+        <tr class="hover:bg-orange-50">
+          <td class="p-4">Tax-free Limit</td>
+          <td class="p-4 text-right text-green-600 font-bold">${fmtINR(gratA.exempt)}</td>
+          <td class="p-4 text-right text-green-600 font-bold">${fmtINR(gratB.exempt)}</td>
+        </tr>
+        <tr class="hover:bg-orange-50">
+          <td class="p-4">Taxable Amount</td>
+          <td class="p-4 text-right text-amber-600">${fmtINR(gratA.taxable)}</td>
+          <td class="p-4 text-right text-amber-600">${fmtINR(gratB.taxable)}</td>
+        </tr>
+        <tr class="hover:bg-orange-50 bg-red-50">
+          <td class="p-4 font-bold text-lg">Tax Payable</td>
+          <td class="p-4 text-right text-2xl font-bold text-red-500">${fmtINR(taxA)}</td>
+          <td class="p-4 text-right text-2xl font-bold text-red-500">${fmtINR(taxB)}</td>
+        </tr>
+        <tr class="hover:bg-orange-50 bg-green-50">
+          <td class="p-4 font-bold text-xl">Final Take-home</td>
+          <td class="p-4 text-right text-3xl font-bold text-green-600">${fmtINR(gratA.gross - taxA)}</td>
+          <td class="p-4 text-right text-3xl font-bold text-emerald-600">${fmtINR(gratB.gross - taxB)}</td>
+        </tr>
+      `;
+
+      window.__gratuityData = { gratA, gratB, taxA, taxB, basicA, basicB, yearsA, yearsB };
+    }, 150);
+
+    // LIVE Events
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calculate);
+    });
+
+    // Exports
+    document.getElementById('exportCSV').onclick = () => {
+      if (!window.__gratuityData) return alert('Calculating...');
+      const d = window.__gratuityData;
+      const csv = `Item,Scenario A,Scenario B\nGross Gratuity,${d.gratA.gross},${d.gratB.gross}\nTax,${d.taxA},${d.taxB}\nTake-home,${d.gratA.gross-d.taxA},${d.gratB.gross-d.taxB}`;
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'gratuity_calculation.csv'; a.click();
+    };
+
+    document.getElementById('exportPDF').onclick = () => {
+      if (!window.__gratuityData) return alert('Calculating...');
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const d = window.__gratuityData;
+      
+      doc.setFontSize(20); doc.text('Gratuity Calculator Report', 20, 20);
+      doc.setFontSize(12);
+      doc.text(`Scenario A: ${fmtINR(d.gratA.gross)} | Take-home: ${fmtINR(d.gratA.gross-d.taxA)}`, 20, 40);
+      doc.text(`Scenario B: ${fmtINR(d.gratB.gross)} | Take-home: ${fmtINR(d.gratB.gross-d.taxB)}`, 20, 50);
+      doc.save('gratuity_report.pdf');
+    };
+
+    // Initial
+    calculate();
+  </script>
+</body>
+</html>

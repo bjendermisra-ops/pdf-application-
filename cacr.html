@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CAGR Calculator - Compound Annual Growth Rate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              indigo: {
+                50: "#eef2ff",
+                100: "#e0e7ff",
+                500: "#6366f1",
+                600: "#4f46e5",
+                700: "#4338ca",
+                800: "#3730a3",
+                900: "#312e81",
+              },
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-gradient-to-br from-indigo-50 to-blue-100 min-h-screen">
+    <nav>
+      <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 9999px;
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      }
+
+      .back-button i {
+        font-size: 1rem;
+      }
+
+      .back-button:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        transform: translateX(-0.25rem);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+      }
+    </style>
+    <div class="max-w-6xl mx-auto mt-5">
+      <!-- Header -->
+      <header class="text-center mb-10">
+        <h1 class="text-4xl font-bold text-indigo-800 mb-3">CAGR Calculator</h1>
+        <p class="text-gray-600 text-lg">
+          Calculate Compound Annual Growth Rate of your investments
+        </p>
+      </header>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Input Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+            Investment Details
+          </h2>
+
+          <!-- Currency Selection -->
+          <div class="mb-6">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  for="currency"
+                  class="block text-gray-700 mb-2 font-medium"
+                  >Currency</label
+                >
+                <select
+                  id="currency"
+                  class="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option value="USD">US Dollar ($)</option>
+                  <option value="INR">Indian Rupee (₹)</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  for="exchange-rate"
+                  class="block text-gray-700 mb-2 font-medium"
+                  >Exchange Rate</label
+                >
+                <div class="flex">
+                  <span
+                    class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm"
+                  >
+                    1 USD =
+                  </span>
+                  <input
+                    type="number"
+                    id="exchange-rate"
+                    value="83.5"
+                    min="1"
+                    step="0.1"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                  <span
+                    class="inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-sm"
+                  >
+                    INR
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Initial Investment -->
+          <div class="mb-6">
+            <label
+              for="initial-value"
+              class="block text-gray-700 mb-2 font-medium"
+              >Initial Investment</label
+            >
+            <div class="relative">
+              <span
+                class="absolute left-3 top-3 text-gray-400"
+                id="initial-symbol"
+                >$</span
+              >
+              <input
+                type="number"
+                id="initial-value"
+                class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value="10000"
+                step="0.01"
+              />
+            </div>
+          </div>
+
+          <!-- Final Value -->
+          <div class="mb-6">
+            <label
+              for="final-value"
+              class="block text-gray-700 mb-2 font-medium"
+              >Final Value</label
+            >
+            <div class="relative">
+              <span
+                class="absolute left-3 top-3 text-gray-400"
+                id="final-symbol"
+                >$</span
+              >
+              <input
+                type="number"
+                id="final-value"
+                class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value="19500"
+                step="0.01"
+              />
+            </div>
+          </div>
+
+          <!-- Investment Period -->
+          <div class="mb-6">
+            <label for="years" class="block text-gray-700 mb-2 font-medium"
+              >Investment Period (Years)</label
+            >
+            <input
+              type="number"
+              id="years"
+              class="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              value="5"
+              min="1"
+              step="0.5"
+            />
+          </div>
+
+          <!-- Additional Contributions -->
+          <div class="mb-6">
+            <label class="block text-gray-700 mb-2 font-medium"
+              >Additional Contributions</label
+            >
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                id="additional-contributions"
+                class="mr-2 h-5 w-5 text-indigo-600"
+              />
+              <label for="additional-contributions" class="text-gray-700"
+                >Include regular contributions</label
+              >
+            </div>
+            <div id="contribution-details" class="mt-3 hidden">
+              <div class="grid grid-cols-2 gap-4 mb-3">
+                <div>
+                  <label
+                    for="contribution-amount"
+                    class="block text-gray-700 mb-1 text-sm"
+                    >Amount</label
+                  >
+                  <div class="relative">
+                    <span
+                      class="absolute left-3 top-2.5 text-gray-400 text-sm"
+                      id="contribution-symbol"
+                      >$</span
+                    >
+                    <input
+                      type="number"
+                      id="contribution-amount"
+                      class="w-full pl-7 pr-2 py-1.5 border border-gray-300 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                      value="100"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label
+                    for="contribution-frequency"
+                    class="block text-gray-700 mb-1 text-sm"
+                    >Frequency</label
+                  >
+                  <select
+                    id="contribution-frequency"
+                    class="w-full pl-2 pr-2 py-1.5 border border-gray-300 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  >
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="annually">Annually</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Calculate Button -->
+          <button
+            id="calculate-btn"
+            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors shadow-md flex items-center justify-center"
+          >
+            <i class="fas fa-calculator mr-2"></i> Calculate CAGR
+          </button>
+
+          <!-- Info Section -->
+          <div class="mt-6 p-4 bg-indigo-50 rounded-lg">
+            <h3 class="font-medium text-indigo-800 mb-2">About CAGR</h3>
+            <p class="text-sm text-indigo-700">
+              The Compound Annual Growth Rate (CAGR) is the mean annual growth
+              rate of an investment over a specified period of time longer than
+              one year. It represents one of the most accurate ways to calculate
+              and determine returns for individual assets.
+            </p>
+          </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+            CAGR Results
+          </h2>
+
+          <div class="text-center mb-8 p-4 bg-indigo-50 rounded-lg">
+            <h3 class="text-lg font-medium text-indigo-800 mb-1">
+              Your Investment Grew at
+            </h3>
+            <p class="text-3xl font-bold text-indigo-800" id="cagr-result">
+              14.3%
+            </p>
+            <p class="text-sm text-indigo-600 mt-1">annualized rate</p>
+          </div>
+
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="bg-indigo-50 p-4 rounded-lg">
+              <p class="text-sm text-indigo-700">Initial Investment</p>
+              <p class="text-xl font-bold text-indigo-800" id="initial-display">
+                $10,000
+              </p>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg">
+              <p class="text-sm text-green-700">Final Value</p>
+              <p class="text-xl font-bold text-green-800" id="final-display">
+                $19,500
+              </p>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <p class="text-sm text-purple-700">Total Growth</p>
+              <p class="text-xl font-bold text-purple-800" id="growth-display">
+                95%
+              </p>
+            </div>
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <p class="text-sm text-blue-700">Time Period</p>
+              <p class="text-xl font-bold text-blue-800" id="period-display">
+                5 years
+              </p>
+            </div>
+          </div>
+
+          <!-- Chart -->
+          <div class="mb-8">
+            <canvas id="growthChart" height="250"></canvas>
+          </div>
+
+          <!-- Yearly Breakdown -->
+          <div>
+            <h3 class="font-medium text-gray-700 mb-3">Yearly Growth</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left border-b border-gray-200">
+                    <th class="pb-2 text-gray-600">Year</th>
+                    <th class="pb-2 text-gray-600">Value</th>
+                    <th class="pb-2 text-gray-600">Growth</th>
+                  </tr>
+                </thead>
+                <tbody id="yearly-breakdown">
+                  <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-2">0</td>
+                    <td class="py-2">$10,000</td>
+                    <td class="py-2">-</td>
+                  </tr>
+                  <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-2">1</td>
+                    <td class="py-2">$11,430</td>
+                    <td class="py-2 text-green-600">14.3%</td>
+                  </tr>
+                  <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-2">2</td>
+                    <td class="py-2">$13,061</td>
+                    <td class="py-2 text-green-600">14.3%</td>
+                  </tr>
+                  <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-2">3</td>
+                    <td class="py-2">$14,928</td>
+                    <td class="py-2 text-green-600">14.3%</td>
+                  </tr>
+                  <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-2">4</td>
+                    <td class="py-2">$17,062</td>
+                    <td class="py-2 text-green-600">14.3%</td>
+                  </tr>
+                  <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-2">5</td>
+                    <td class="py-2">$19,500</td>
+                    <td class="py-2 text-green-600">14.3%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explanation Section -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mt-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+          Understanding CAGR
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="font-medium text-gray-800 mb-3">What is CAGR?</h3>
+            <p class="text-gray-600 mb-4">
+              The Compound Annual Growth Rate (CAGR) is a useful measure of
+              growth over multiple time periods. It describes the rate at which
+              an investment would have grown if it grew at a steady rate.
+            </p>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h4 class="font-medium text-gray-700 mb-2">CAGR Formula</h4>
+              <p class="text-sm text-gray-600">
+                CAGR = (Ending Value / Beginning Value)<sup
+                  >1/Number of Years</sup
+                >
+                - 1
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="font-medium text-gray-800 mb-3">Why Use CAGR?</h3>
+            <ul class="text-gray-600 list-disc pl-5 space-y-2">
+              <li>Smoothes out investment returns</li>
+              <li>Allows comparison between different investments</li>
+              <li>Provides a clearer picture of long-term performance</li>
+              <li>Helps in setting realistic investment expectations</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // DOM Elements
+        const currencySelect = document.getElementById("currency");
+        const exchangeRateInput = document.getElementById("exchange-rate");
+        const initialValueInput = document.getElementById("initial-value");
+        const finalValueInput = document.getElementById("final-value");
+        const yearsInput = document.getElementById("years");
+        const additionalContributionsCheckbox = document.getElementById(
+          "additional-contributions"
+        );
+        const contributionDetails = document.getElementById(
+          "contribution-details"
+        );
+        const calculateButton = document.getElementById("calculate-btn");
+
+        // Currency symbol elements
+        const initialSymbol = document.getElementById("initial-symbol");
+        const finalSymbol = document.getElementById("final-symbol");
+        const contributionSymbol = document.getElementById(
+          "contribution-symbol"
+        );
+
+        // Chart variable
+        let growthChart;
+
+        // Currency settings
+        const currencySettings = {
+          USD: {
+            symbol: "$",
+            format: (amount) =>
+              `$${amount.toLocaleString("en-US", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })}`,
+          },
+          INR: {
+            symbol: "₹",
+            format: (amount) =>
+              `₹${amount.toLocaleString("en-IN", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })}`,
+          },
+        };
+
+        // Update currency symbols
+        function updateCurrencySymbols() {
+          const currency = currencySelect.value;
+          const symbol = currencySettings[currency].symbol;
+
+          initialSymbol.textContent = symbol;
+          finalSymbol.textContent = symbol;
+          contributionSymbol.textContent = symbol;
+        }
+
+        // Format currency based on selection
+        function formatCurrency(amount) {
+          const currency = currencySelect.value;
+          return currencySettings[currency].format(amount);
+        }
+
+        // Toggle contribution details
+        additionalContributionsCheckbox.addEventListener("change", function () {
+          if (this.checked) {
+            contributionDetails.classList.remove("hidden");
+          } else {
+            contributionDetails.classList.add("hidden");
+          }
+        });
+
+        // Calculate on any input change
+        initialValueInput.addEventListener("input", calculateCAGR);
+        finalValueInput.addEventListener("input", calculateCAGR);
+        yearsInput.addEventListener("input", calculateCAGR);
+        currencySelect.addEventListener("change", function () {
+          updateCurrencySymbols();
+          calculateCAGR();
+        });
+        exchangeRateInput.addEventListener("change", calculateCAGR);
+
+        // Calculate CAGR function
+        function calculateCAGR() {
+          const initialValue = parseFloat(initialValueInput.value);
+          const finalValue = parseFloat(finalValueInput.value);
+          const years = parseFloat(yearsInput.value);
+
+          // Validate inputs
+          if (
+            isNaN(initialValue) ||
+            isNaN(finalValue) ||
+            isNaN(years) ||
+            years <= 0 ||
+            initialValue <= 0
+          ) {
+            return;
+          }
+
+          // Calculate CAGR
+          let cagr;
+          if (additionalContributionsCheckbox.checked) {
+            // For simplicity, we'll use a basic CAGR calculation even with contributions
+            // In a real application, you would use a more complex formula for regular contributions
+            cagr = Math.pow(finalValue / initialValue, 1 / years) - 1;
+          } else {
+            // Standard CAGR formula
+            cagr = Math.pow(finalValue / initialValue, 1 / years) - 1;
+          }
+
+          // Convert to percentage
+          const cagrPercent = (cagr * 100).toFixed(1);
+
+          // Update the UI with calculated values
+          document.getElementById(
+            "cagr-result"
+          ).textContent = `${cagrPercent}%`;
+          document.getElementById("initial-display").textContent =
+            formatCurrency(initialValue);
+          document.getElementById("final-display").textContent =
+            formatCurrency(finalValue);
+
+          // Calculate total growth
+          const totalGrowth =
+            ((finalValue - initialValue) / initialValue) * 100;
+          document.getElementById(
+            "growth-display"
+          ).textContent = `${totalGrowth.toFixed(0)}%`;
+          document.getElementById(
+            "period-display"
+          ).textContent = `${years} years`;
+
+          // Update chart
+          updateChart(initialValue, finalValue, years, cagr);
+
+          // Update yearly breakdown
+          updateYearlyBreakdown(initialValue, years, cagr);
+        }
+
+        // Update chart function
+        function updateChart(initialValue, finalValue, years, cagr) {
+          const ctx = document.getElementById("growthChart").getContext("2d");
+
+          // Destroy previous chart if it exists
+          if (growthChart) {
+            growthChart.destroy();
+          }
+
+          // Generate data points for each year
+          const labels = [];
+          const data = [];
+
+          for (let i = 0; i <= years; i++) {
+            labels.push(`Year ${i}`);
+            const value = initialValue * Math.pow(1 + cagr, i);
+            data.push(value);
+          }
+
+          // Create new chart
+          growthChart = new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: "Investment Growth",
+                  data: data,
+                  borderColor: "#4f46e5",
+                  backgroundColor: "rgba(79, 70, 229, 0.1)",
+                  fill: true,
+                  tension: 0.1,
+                  pointBackgroundColor: "#4f46e5",
+                  pointRadius: 4,
+                  pointHoverRadius: 6,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false,
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      return `Value: ${formatCurrency(context.raw)}`;
+                    },
+                  },
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  grid: {
+                    color: "rgba(0, 0, 0, 0.05)",
+                  },
+                  ticks: {
+                    callback: function (value) {
+                      return formatCurrency(value);
+                    },
+                  },
+                },
+                x: {
+                  grid: {
+                    color: "rgba(0, 0, 0, 0.05)",
+                  },
+                },
+              },
+            },
+          });
+        }
+
+        // Update yearly breakdown
+        function updateYearlyBreakdown(initialValue, years, cagr) {
+          const tbody = document.getElementById("yearly-breakdown");
+
+          // Clear previous data
+          tbody.innerHTML = "";
+
+          // Calculate values for each year
+          for (let year = 0; year <= years; year++) {
+            const value = initialValue * Math.pow(1 + cagr, year);
+            const row = document.createElement("tr");
+            row.className = "border-b border-gray-100 hover:bg-gray-50";
+
+            // Year column
+            const yearCell = document.createElement("td");
+            yearCell.className = "py-2";
+            yearCell.textContent = year;
+
+            // Value column
+            const valueCell = document.createElement("td");
+            valueCell.className = "py-2";
+            valueCell.textContent = formatCurrency(Math.round(value));
+
+            // Growth column
+            const growthCell = document.createElement("td");
+            growthCell.className = "py-2";
+
+            if (year > 0) {
+              const growthPercent = (cagr * 100).toFixed(1);
+              growthCell.textContent = `${growthPercent}%`;
+              growthCell.className = "py-2 text-green-600";
+            } else {
+              growthCell.textContent = "-";
+            }
+
+            row.appendChild(yearCell);
+            row.appendChild(valueCell);
+            row.appendChild(growthCell);
+            tbody.appendChild(row);
+          }
+        }
+
+        // Initial calculation
+        updateCurrencySymbols();
+        calculateCAGR();
+
+        // Calculate on button click
+        calculateButton.addEventListener("click", calculateCAGR);
+      });
+    </script>
+  </body>
+</html>

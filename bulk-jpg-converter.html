@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Bulk Image to JPG Converter — Convert PNG, WEBP to JPG Instantly</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- JSZip from reliable CDN - loaded upfront -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- FileSaver.js for better download handling -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s ease;
+        }
+        .upload-area.dragover {
+            border-color: #4f46e5;
+            background-color: #eef2ff;
+        }
+        .image-card {
+            transition: all 0.2s ease;
+            animation: fadeInUp 0.25s ease-out;
+        }
+        .image-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .gallery-container {
+            max-height: 550px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        .gallery-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .gallery-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .gallery-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .quality-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            outline: none;
+        }
+        .quality-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(79,70,229,0.3);
+        }
+        .convert-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: #10b981;
+            color: white;
+            border-radius: 20px;
+            padding: 2px 8px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+        .original-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: #6b7280;
+            color: white;
+            border-radius: 20px;
+            padding: 2px 8px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-slate-100 antialiased">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="bg-white rounded-2xl p-8 text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <p id="loadingText" class="text-gray-700 font-medium">Processing images...</p>
+            <p class="text-xs text-gray-400 mt-2">Please wait, this may take a moment</p>
+        </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 md:py-4">
+            <div class="flex items-center gap-2 text-sm">
+                <a href="/" class="text-gray-600 hover:text-indigo-600 transition"><i class="fas fa-home"></i> Home</a>
+                <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                <span class="text-indigo-700 font-semibold">Convert Image to JPG</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
+        <!-- Header section -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center gap-2 bg-indigo-50 px-4 py-1.5 rounded-full text-indigo-700 text-sm font-medium mb-4">
+                <i class="fas fa-file-image"></i> Batch conversion
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-gray-800 to-indigo-700 bg-clip-text text-transparent mb-4">
+                Convert Image to JPG in Bulk
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Convert dozens of PNG, WebP, or JPEG images to JPG instantly — 
+                <span class="text-indigo-500 font-medium">free, no uploads, no account needed.</span>
+                <i class="fas fa-shield-alt text-green-500 ml-1"></i>
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- LEFT PANEL: Upload & controls -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Dropzone -->
+                <div id="dropzone" class="upload-area rounded-2xl p-6 text-center bg-white transition-all cursor-pointer shadow-sm hover:shadow-md">
+                    <div class="flex flex-col items-center">
+                        <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-3">
+                            <i class="fas fa-file-image text-2xl text-indigo-500"></i>
+                        </div>
+                        <p id="uploadStatus" class="text-gray-800 font-semibold">Drop images here</p>
+                        <p class="text-gray-400 text-xs mt-1">PNG, WEBP, JPEG · No limit</p>
+                        <div class="flex flex-wrap gap-2 justify-center my-3">
+                            <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fas fa-file-image"></i> PNG</span>
+                            <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fab fa-chrome"></i> WEBP</span>
+                            <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fas fa-camera"></i> JPEG</span>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple class="hidden">
+                        <button id="selectImagesBtn" class="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-xl transition shadow-md flex items-center gap-2 text-sm">
+                            <i class="fas fa-folder-open"></i> Select images
+                        </button>
+                        <p class="text-xs text-gray-400 mt-3"><i class="fas fa-lock"></i> 100% local conversion — your images never leave your device</p>
+                    </div>
+                </div>
+
+                <!-- Conversion Settings -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-gray-800 flex items-center gap-2 mb-4">
+                        <i class="fas fa-sliders-h text-indigo-500"></i> JPG Settings
+                    </h3>
+                    
+                    <!-- Quality Slider -->
+                    <div class="mb-5">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm text-gray-700 font-medium">JPEG Quality</label>
+                            <span id="qualityValue" class="text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-full text-sm">85%</span>
+                        </div>
+                        <input type="range" id="qualitySlider" class="quality-slider" min="30" max="100" value="85">
+                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                            <span>Smaller file</span>
+                            <span>Better quality</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Background Color for Transparency -->
+                    <div class="mb-5 pb-4 border-b border-gray-100">
+                        <label class="block text-gray-700 font-medium text-sm mb-2">Background color (for transparent PNGs)</label>
+                        <div class="flex gap-3 items-center">
+                            <button id="bgWhite" class="bg-option w-8 h-8 rounded-full border-2 border-indigo-500 shadow" style="background: #ffffff;"></button>
+                            <button id="bgBlack" class="bg-option w-8 h-8 rounded-full border-2 border-gray-300" style="background: #000000;"></button>
+                            <div class="flex items-center gap-2 ml-1">
+                                <label class="text-xs text-gray-500">Custom:</label>
+                                <input type="color" id="customBgColor" value="#FFFFFF" class="w-8 h-8 rounded border cursor-pointer">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Selection info -->
+                    <div class="bg-indigo-50 rounded-xl p-3 mb-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-indigo-800"><i class="fas fa-check-circle"></i> Selected:</span>
+                            <span id="selectedCount" class="font-bold text-indigo-900">0</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-sm text-indigo-800"><i class="fas fa-images"></i> Total images:</span>
+                            <span id="totalImagesCount" class="font-bold text-indigo-900">0</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-sm text-indigo-800"><i class="fas fa-chart-line"></i> Est. savings:</span>
+                            <span id="savingsEstimate" class="font-bold text-indigo-900">0%</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Action buttons -->
+                    <button id="convertSelectedBtn" class="w-full btn-primary text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 mb-3">
+                        <i class="fas fa-sync-alt"></i> Convert selected to JPG
+                    </button>
+                    <button id="convertAllBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 mb-3">
+                        <i class="fas fa-layer-group"></i> Convert ALL to JPG
+                    </button>
+                    <button id="downloadAllBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fas fa-download"></i> Download all as JPG (ZIP)
+                    </button>
+                </div>
+                
+                <!-- Tips -->
+                <div class="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                    <p class="text-xs font-semibold text-amber-800 flex items-center gap-1"><i class="fas fa-lightbulb"></i> Why convert to JPG?</p>
+                    <p class="text-xs text-amber-700 mt-1">JPG files are smaller and universally supported. Perfect for web uploads, email attachments, and social media.</p>
+                </div>
+            </div>
+            
+            <!-- RIGHT PANEL: Gallery of images -->
+            <div class="lg:col-span-8">
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-th"></i> Image gallery
+                            <span id="galleryBadge" class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">0 images</span>
+                        </h3>
+                        <div class="flex gap-2">
+                            <button id="selectAllBtn" class="text-xs text-indigo-600 hover:text-indigo-700 font-medium">Select all</button>
+                            <span class="text-gray-300">|</span>
+                            <button id="deselectAllBtn" class="text-xs text-gray-500 hover:text-gray-700 font-medium">Deselect all</button>
+                            <span class="text-gray-300">|</span>
+                            <button id="clearAllBtn" class="text-xs text-red-500 hover:text-red-700 font-medium">Clear all</button>
+                        </div>
+                    </div>
+                    
+                    <div id="galleryContainer" class="gallery-container grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-1">
+                        <div class="text-center text-gray-400 col-span-full py-12">
+                            <i class="fas fa-cloud-upload-alt text-4xl mb-2 block"></i>
+                            <p class="text-sm">No images uploaded yet</p>
+                            <p class="text-xs mt-1">Drop PNG, WEBP, or JPEG images above</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center text-gray-400 text-xs mt-10 pb-4">
+            <i class="fas fa-file-image"></i> All conversions happen locally in your browser — your images are never uploaded.
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const selectImagesBtn = document.getElementById('selectImagesBtn');
+        const galleryContainer = document.getElementById('galleryContainer');
+        const totalImagesCountSpan = document.getElementById('totalImagesCount');
+        const selectedCountSpan = document.getElementById('selectedCount');
+        const galleryBadge = document.getElementById('galleryBadge');
+        const savingsEstimate = document.getElementById('savingsEstimate');
+        const convertSelectedBtn = document.getElementById('convertSelectedBtn');
+        const convertAllBtn = document.getElementById('convertAllBtn');
+        const downloadAllBtn = document.getElementById('downloadAllBtn');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const deselectAllBtn = document.getElementById('deselectAllBtn');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const qualitySlider = document.getElementById('qualitySlider');
+        const qualityValue = document.getElementById('qualityValue');
+        const bgWhite = document.getElementById('bgWhite');
+        const bgBlack = document.getElementById('bgBlack');
+        const customBgColor = document.getElementById('customBgColor');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingText = document.getElementById('loadingText');
+
+        let images = [];
+        let nextId = 0;
+        let currentBgColor = '#FFFFFF';
+
+        function showLoading(message) {
+            loadingText.innerText = message;
+            loadingOverlay.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+        }
+
+        qualitySlider.addEventListener('input', (e) => {
+            qualityValue.innerText = e.target.value + '%';
+        });
+
+        function setBgColor(color) {
+            currentBgColor = color;
+            [bgWhite, bgBlack].forEach(btn => {
+                btn.classList.remove('border-indigo-500', 'border-2');
+                btn.classList.add('border-gray-300');
+            });
+        }
+
+        bgWhite.addEventListener('click', () => {
+            setBgColor('#FFFFFF');
+            bgWhite.classList.add('border-indigo-500', 'border-2');
+            customBgColor.value = '#FFFFFF';
+        });
+        bgBlack.addEventListener('click', () => {
+            setBgColor('#000000');
+            bgBlack.classList.add('border-indigo-500', 'border-2');
+            customBgColor.value = '#000000';
+        });
+        customBgColor.addEventListener('input', (e) => {
+            setBgColor(e.target.value);
+            [bgWhite, bgBlack].forEach(btn => {
+                btn.classList.remove('border-indigo-500', 'border-2');
+                btn.classList.add('border-gray-300');
+            });
+        });
+        bgWhite.classList.add('border-indigo-500', 'border-2');
+
+        async function convertToJPG(imgItem) {
+            const quality = parseInt(qualitySlider.value) / 100;
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = imgItem.originalWidth;
+                canvas.height = imgItem.originalHeight;
+                const ctx = canvas.getContext('2d');
+                
+                ctx.fillStyle = currentBgColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(imgItem.originalImgElement, 0, 0, canvas.width, canvas.height);
+                
+                canvas.toBlob((blob) => {
+                    resolve(blob);
+                }, 'image/jpeg', quality);
+            });
+        }
+
+        async function updateImageToJPG(imgItem) {
+            const jpgBlob = await convertToJPG(imgItem);
+            const url = URL.createObjectURL(jpgBlob);
+            
+            if (imgItem.currentDisplayUrl && imgItem.currentDisplayUrl !== imgItem.originalUrl) {
+                URL.revokeObjectURL(imgItem.currentDisplayUrl);
+            }
+            
+            imgItem.isJpg = true;
+            imgItem.currentDisplayUrl = url;
+            imgItem.currentJpgBlob = jpgBlob;
+            
+            const displayImg = imgItem.element.querySelector('.gallery-image');
+            if (displayImg) displayImg.src = url;
+            
+            const convertBadge = imgItem.element.querySelector('.convert-badge');
+            if (convertBadge) {
+                convertBadge.innerText = 'JPG ✓';
+                convertBadge.style.background = '#10b981';
+            }
+            
+            const sizeInfo = imgItem.element.querySelector('.size-info');
+            if (sizeInfo) {
+                const newSizeKB = (jpgBlob.size / 1024).toFixed(1);
+                const oldSizeKB = (imgItem.originalFileSize / 1024).toFixed(1);
+                const saved = ((imgItem.originalFileSize - jpgBlob.size) / imgItem.originalFileSize * 100).toFixed(0);
+                sizeInfo.innerText = `${oldSizeKB}KB → ${newSizeKB}KB (${saved}% saved)`;
+            }
+            
+            updateSavingsEstimate();
+        }
+
+        async function convertSelected() {
+            const selected = images.filter(img => img.checkbox && img.checkbox.checked);
+            if (selected.length === 0) {
+                alert('Please select at least one image to convert.');
+                return;
+            }
+            
+            showLoading(`Converting ${selected.length} image(s) to JPG...`);
+            for (let i = 0; i < selected.length; i++) {
+                loadingText.innerText = `Converting ${i+1}/${selected.length}: ${selected[i].file.name}`;
+                if (!selected[i].isJpg) {
+                    await updateImageToJPG(selected[i]);
+                }
+                await new Promise(r => setTimeout(r, 10));
+            }
+            hideLoading();
+            updateCounts();
+        }
+
+        async function convertAll() {
+            if (images.length === 0) {
+                alert('No images to convert. Please upload some images first.');
+                return;
+            }
+            
+            showLoading(`Converting ${images.length} image(s) to JPG...`);
+            for (let i = 0; i < images.length; i++) {
+                loadingText.innerText = `Converting ${i+1}/${images.length}: ${images[i].file.name}`;
+                if (!images[i].isJpg) {
+                    await updateImageToJPG(images[i]);
+                }
+                await new Promise(r => setTimeout(r, 10));
+            }
+            hideLoading();
+            updateCounts();
+        }
+
+        function updateSavingsEstimate() {
+            const convertedImages = images.filter(img => img.isJpg && img.currentJpgBlob);
+            if (convertedImages.length === 0) {
+                savingsEstimate.innerText = '0%';
+                return;
+            }
+            
+            let totalOriginal = 0, totalNew = 0;
+            convertedImages.forEach(img => {
+                totalOriginal += img.originalFileSize;
+                totalNew += img.currentJpgBlob.size;
+            });
+            const savedPercent = ((totalOriginal - totalNew) / totalOriginal * 100).toFixed(0);
+            savingsEstimate.innerText = `${savedPercent}%`;
+        }
+
+        function updateCounts() {
+            const total = images.length;
+            const selected = images.filter(img => img.checkbox && img.checkbox.checked).length;
+            totalImagesCountSpan.innerText = total;
+            selectedCountSpan.innerText = selected;
+            galleryBadge.innerText = `${total} image${total !== 1 ? 's' : ''}`;
+            if (total === 0) {
+                uploadStatus.innerHTML = 'Drop images here';
+                savingsEstimate.innerText = '0%';
+            } else {
+                const convertedCount = images.filter(img => img.isJpg).length;
+                uploadStatus.innerHTML = `${total} image${total !== 1 ? 's' : ''} loaded (${convertedCount} converted)`;
+                updateSavingsEstimate();
+            }
+        }
+
+        async function downloadAllAsZip() {
+            const imagesToDownload = images.filter(img => img.isJpg && img.currentJpgBlob);
+            
+            if (imagesToDownload.length === 0) {
+                alert('No converted JPG images to download. Please convert some images first.');
+                return;
+            }
+            
+            showLoading(`Creating ZIP with ${imagesToDownload.length} image(s)...`);
+            
+            try {
+                const zip = new JSZip();
+                
+                for (let img of imagesToDownload) {
+                    const originalName = img.file.name;
+                    const nameParts = originalName.split('.');
+                    nameParts.pop();
+                    const baseName = nameParts.join('.') || 'image';
+                    const newName = `${baseName}.jpg`;
+                    zip.file(newName, img.currentJpgBlob);
+                }
+                
+                const content = await zip.generateAsync({ type: 'blob' });
+                saveAs(content, `jpg_converted_${Date.now()}.zip`);
+                hideLoading();
+            } catch (err) {
+                console.error('ZIP error:', err);
+                hideLoading();
+                alert('Failed to create ZIP. Please try again with fewer images or try downloading individually.');
+            }
+        }
+
+        function addImages(files) {
+            const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+            if (validFiles.length === 0) {
+                alert('Please select valid image files.');
+                return;
+            }
+            
+            validFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const imageId = nextId++;
+                        const imageCard = document.createElement('div');
+                        imageCard.className = 'image-card relative bg-gray-50 rounded-xl p-2 border border-gray-200';
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.className = 'absolute top-2 left-2 w-4 h-4 z-10 cursor-pointer rounded border-gray-300 text-indigo-600';
+                        checkbox.checked = true;
+                        
+                        const imgContainer = document.createElement('div');
+                        imgContainer.className = 'relative w-full pt-[100%] overflow-hidden rounded-lg bg-gray-100';
+                        
+                        const displayImg = document.createElement('img');
+                        displayImg.className = 'gallery-image absolute top-0 left-0 w-full h-full object-contain p-2';
+                        displayImg.src = e.target.result;
+                        imgContainer.appendChild(displayImg);
+                        
+                        const label = document.createElement('div');
+                        label.className = 'text-xs text-gray-600 truncate mt-2 text-center px-1';
+                        label.innerText = file.name.length > 20 ? file.name.slice(0, 17) + '...' : file.name;
+                        
+                        const formatBadge = document.createElement('div');
+                        formatBadge.className = 'original-badge';
+                        formatBadge.innerText = file.type.split('/')[1].toUpperCase();
+                        
+                        const convertBadge = document.createElement('div');
+                        convertBadge.className = 'convert-badge';
+                        convertBadge.innerText = 'Pending';
+                        convertBadge.style.background = '#f59e0b';
+                        
+                        const sizeInfo = document.createElement('div');
+                        sizeInfo.className = 'size-info text-[10px] text-gray-400 text-center mt-1';
+                        sizeInfo.innerText = `${(file.size / 1024).toFixed(1)} KB`;
+                        
+                        imageCard.appendChild(checkbox);
+                        imageCard.appendChild(imgContainer);
+                        imageCard.appendChild(label);
+                        imageCard.appendChild(formatBadge);
+                        imageCard.appendChild(convertBadge);
+                        imageCard.appendChild(sizeInfo);
+                        
+                        const imgItem = {
+                            id: imageId, file: file, originalUrl: e.target.result,
+                            originalFileSize: file.size, originalImgElement: img,
+                            originalWidth: img.width, originalHeight: img.height,
+                            isJpg: false, currentDisplayUrl: e.target.result,
+                            currentJpgBlob: null, element: imageCard, checkbox: checkbox
+                        };
+                        
+                        images.push(imgItem);
+                        
+                        if (galleryContainer.querySelector('.col-span-full')) galleryContainer.innerHTML = '';
+                        galleryContainer.appendChild(imageCard);
+                        
+                        checkbox.addEventListener('change', () => updateCounts());
+                        imageCard.addEventListener('click', (e) => {
+                            if (e.target !== checkbox && !checkbox.contains(e.target)) {
+                                checkbox.checked = !checkbox.checked;
+                                updateCounts();
+                            }
+                        });
+                        
+                        updateCounts();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function selectAll() { images.forEach(img => { if (img.checkbox) img.checkbox.checked = true; }); updateCounts(); }
+        function deselectAll() { images.forEach(img => { if (img.checkbox) img.checkbox.checked = false; }); updateCounts(); }
+        function clearAll() { images = []; galleryContainer.innerHTML = '<div class="text-center text-gray-400 col-span-full py-12"><i class="fas fa-cloud-upload-alt text-4xl mb-2 block"></i><p class="text-sm">No images uploaded yet</p></div>'; updateCounts(); }
+        
+        selectAllBtn.addEventListener('click', selectAll);
+        deselectAllBtn.addEventListener('click', deselectAll);
+        clearAllBtn.addEventListener('click', clearAll);
+        convertSelectedBtn.addEventListener('click', convertSelected);
+        convertAllBtn.addEventListener('click', convertAll);
+        downloadAllBtn.addEventListener('click', downloadAllAsZip);
+        
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files && files.length > 0) addImages(files);
+            fileInput.value = '';
+        }
+        
+        fileInput.addEventListener('change', handleFileSelect);
+        selectImagesBtn.addEventListener('click', () => fileInput.click());
+        
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('dragover'); });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) addImages(e.dataTransfer.files);
+        });
+        dropzone.addEventListener('click', (e) => {
+            if (e.target !== selectImagesBtn && !selectImagesBtn.contains(e.target)) fileInput.click();
+        });
+        
+        updateCounts();
+    </script>
+</body>
+</html>

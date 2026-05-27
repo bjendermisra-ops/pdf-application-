@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Pixelation Effect</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+  <style>
+    canvas {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+
+
+<?php include 'includes/navbar.html'; ?>
+<nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+<div class="max-w-4xl mx-auto mt-12 mb-12">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">
+    Image Pixelation Effect
+  </h1>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div class="flex flex-col md:flex-row gap-6">
+      <div class="w-full md:w-1/2">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Upload Image</label>
+        <div class="flex items-center justify-center w-full">
+          <label
+            class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6" id="upload-area">
+              <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 20 16">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+              </svg>
+              <p class="mb-2 text-sm text-gray-500">
+                Click to upload or drag and drop
+              </p>
+              <p class="text-xs text-gray-500">PNG, JPG (MAX. 2MB)</p>
+            </div>
+            <input id="file-input" type="file" class="hidden" accept="image/*" />
+          </label>
+        </div>
+      </div>
+
+      <div class="w-full md:w-1/2">
+        <div class="mb-4">
+          <label for="pixel-size" class="block text-sm font-medium text-gray-700 mb-2">Pixelation Level</label>
+          <input type="range" id="pixel-size" min="2" max="50" value="10"
+            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+          <div class="flex justify-between text-xs text-gray-500 mt-1">
+            <span>Low</span>
+            <span>High</span>
+          </div>
+        </div>
+
+        <div class="border-2 border-gray-200 rounded-lg overflow-hidden">
+          <canvas id="pixelated-canvas" class="w-full"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-center">
+      <button id="download-btn"
+        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled>
+        Download Pixelated Image
+      </button>
+    </div>
+  </div>
+</div>
+<?php include 'includes/footer.html'; ?>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("file-input");
+    const uploadArea = document.getElementById("upload-area");
+    const canvas = document.getElementById("pixelated-canvas");
+    const ctx = canvas.getContext("2d");
+    const pixelSizeSlider = document.getElementById("pixel-size");
+    const downloadBtn = document.getElementById("download-btn");
+
+    let originalImage = null;
+    let pixelSize = parseInt(pixelSizeSlider.value);
+
+    // Handle file upload
+    fileInput.addEventListener("change", function (e) {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+          originalImage = new Image();
+          originalImage.onload = function () {
+            // Set canvas dimensions to match image
+            const maxWidth = 500;
+            const maxHeight = 500;
+            let width = originalImage.width;
+            let height = originalImage.height;
+
+            // Scale down if too large
+            if (width > maxWidth || height > maxHeight) {
+              const ratio = Math.min(maxWidth / width, maxHeight / height);
+              width *= ratio;
+              height *= ratio;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            // Initial pixelation
+            pixelateImage();
+
+            // Update upload area to show thumbnail
+            uploadArea.innerHTML = `
+                        <img src="${event.target.result}" class="max-h-60 object-contain" alt="Uploaded image">
+                        <p class="mt-2 text-sm text-gray-500">Click to change image</p>
+                    `;
+
+            // Enable download button
+            downloadBtn.disabled = false;
+          };
+          originalImage.src = event.target.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+    // Handle pixel size change
+    pixelSizeSlider.addEventListener("input", function () {
+      pixelSize = parseInt(this.value);
+      if (originalImage) {
+        pixelateImage();
+      }
+    });
+
+    // Pixelation function
+    function pixelateImage() {
+      if (!originalImage) return;
+
+      const width = canvas.width;
+      const height = canvas.height;
+
+      // Draw original image first
+      ctx.drawImage(originalImage, 0, 0, width, height);
+
+      // Pixelation effect
+      const pixelSizeAdjusted = pixelSize;
+
+      // Temporarily scale down and then scale back up
+      const smallWidth = Math.floor(width / pixelSizeAdjusted);
+      const smallHeight = Math.floor(height / pixelSizeAdjusted);
+
+      // Scale down
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(
+        canvas,
+        0,
+        0,
+        width,
+        height,
+        0,
+        0,
+        smallWidth,
+        smallHeight
+      );
+
+      // Scale back up
+      ctx.drawImage(
+        canvas,
+        0,
+        0,
+        smallWidth,
+        smallHeight,
+        0,
+        0,
+        width,
+        height
+      );
+    }
+
+    // Handle download
+    downloadBtn.addEventListener("click", function () {
+      if (!originalImage) return;
+
+      const link = document.createElement("a");
+      link.download = "pixelated-image.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+
+    // Drag and drop functionality
+    uploadArea.addEventListener("dragover", function (e) {
+      e.preventDefault();
+      this.classList.add("border-blue-500", "bg-blue-50");
+    });
+
+    uploadArea.addEventListener("dragleave", function (e) {
+      e.preventDefault();
+      this.classList.remove("border-blue-500", "bg-blue-50");
+    });
+
+    uploadArea.addEventListener("drop", function (e) {
+      e.preventDefault();
+      this.classList.remove("border-blue-500", "bg-blue-50");
+
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        fileInput.files = e.dataTransfer.files;
+        const event = new Event("change");
+        fileInput.dispatchEvent(event);
+      }
+    });
+  });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dentsu - SEO Tools</title>
+    <meta
+      name="description"
+      content="Professional SEO tools and utilities for technical SEO analysis, crawling, rendering, and optimization."
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="canonical" href="https://seo.vibeloopdaily.com/" />
+    <!-- Required -->
+    <meta property="og:title" content="Your Page Title Here" />
+    <meta
+      property="og:description"
+      content="A short description of the page content."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://seo.vibeloopdaily.com/" />
+    <meta
+      property="og:image"
+      content="https://seo.vibeloopdaily.com/path-to-your-image.jpg"
+    />
+
+    <!-- Optional but good to include -->
+    <meta property="og:site_name" content="Vibeloop Daily SEO" />
+    <meta property="og:locale" content="en_US" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Vibeloop Daily SEO",
+        "url": "https://seo.vibeloopdaily.com/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://seo.vibeloopdaily.com/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
+    <style>
+      .sidebar-transition {
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .tool-card {
+        transition: all 0.3s ease;
+      }
+
+      .tool-card:hover {
+        transform: translateY(-4px);
+      }
+
+      .modal-backdrop {
+        backdrop-filter: blur(8px);
+      }
+
+      @media (max-width: 1023px) {
+        .sidebar-closed {
+          transform: translateX(-100%);
+        }
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen bg-white text-black">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto p-4">
+      <div class="flex items-center mb-4">
+        <button class="text-blue-600 mr-2">←</button>
+        <h2 class="text-xl font-bold text-black">Pre-rendering Testing Tool</h2>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow-lg">
+        <p class="text-sm text-gray-700 mb-4">
+          HTML snapshots, pre-rendering, dynamic rendering - regardless the name
+          and specifics of the implementation, the result is usually a different
+          HTML response based on the user agent making the request. Use this
+          tool to check what content is being served to different user agents.
+        </p>
+        <form id="testForm" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div>
+              <label class="block text-sm text-gray-700">URL</label>
+              <input
+                type="text"
+                name="url"
+                class="w-full bg-white border border-gray-300 rounded p-2 mt-1 text-black"
+                required
+                placeholder="https://example.com"
+              />
+            </div>
+            <div>
+              <label class="block text-sm text-gray-700">User Agents</label>
+              <select
+                name="userAgent"
+                class="w-full bg-white border border-gray-300 rounded p-2 mt-1 text-black"
+              >
+                <option value="desktop">Desktop (Chrome)</option>
+                <option value="mobile">Mobile (Safari)</option>
+                <option value="bot">Googlebot</option>
+              </select>
+            </div>
+            <div>
+              <button
+                type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                TEST
+              </button>
+            </div>
+          </div>
+        </form>
+        <div id="result" class="mt-4 text-green-600 hidden"></div>
+      </div>
+    </div>
+    <script>
+      // Handle form submission and simulate pre-rendering test
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("testForm");
+        const resultDiv = document.getElementById("result");
+
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData.entries());
+
+          // Basic validation
+          if (!data.url) {
+            resultDiv.textContent = "Please enter a URL.";
+            resultDiv.classList.remove("hidden");
+            return;
+          }
+
+          // Simulate pre-rendering test based on user agent
+          const timestamp = new Date().toLocaleString("en-US", {
+            timeZone: "Asia/Kolkata",
+          });
+          let responseMessage = `Testing URL: ${data.url} at ${timestamp} with User Agent: ${data.userAgent}.`;
+
+          switch (data.userAgent) {
+            case "desktop":
+              responseMessage +=
+                " Response: Full HTML with JavaScript rendered.";
+              break;
+            case "mobile":
+              responseMessage += " Response: Mobile-optimized HTML.";
+              break;
+            case "bot":
+              responseMessage +=
+                " Response: Pre-rendered HTML snapshot for Googlebot.";
+              break;
+            default:
+              responseMessage += " Response: Unknown user agent response.";
+          }
+
+          resultDiv.textContent = responseMessage;
+          resultDiv.classList.remove("hidden");
+
+          // Log data (for demonstration)
+          console.log(data);
+        });
+      });
+    </script>
+  </body>
+</html>

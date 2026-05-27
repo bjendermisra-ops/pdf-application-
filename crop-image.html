@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Crop Image Online Free â€” Aspect Ratios, Circle Crop, Passport Size</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Cropper.js for professional cropping -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <style>
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s ease;
+        }
+        .upload-area.dragover {
+            border-color: #4f46e5;
+            background-color: #eef2ff;
+        }
+        .fade-in {
+            animation: fadeSlideUp 0.3s ease-out;
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .crop-container {
+            background: #f1f5f9;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .cropper-view-box,
+        .cropper-face {
+            border-radius: 0;
+        }
+        .circle-crop .cropper-view-box {
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        .circle-crop .cropper-face {
+            border-radius: 50%;
+        }
+        .preset-btn-active {
+            background-color: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+        .preset-btn-inactive {
+            background-color: #f3f4f6;
+            color: #374151;
+            border-color: #e5e7eb;
+        }
+        .preset-btn-inactive:hover {
+            background-color: #e5e7eb;
+        }
+        .result-img {
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-slate-100 antialiased">
+
+    <!-- Breadcrumb -->
+    <div class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 md:py-4">
+            <div class="flex items-center gap-2 text-sm">
+                <a href="/" class="text-gray-600 hover:text-indigo-600 transition"><i class="fas fa-home"></i> Home</a>
+                <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                <span class="text-indigo-700 font-semibold">Crop Image Online Free</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
+        <!-- Header section -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center gap-2 bg-indigo-50 px-4 py-1.5 rounded-full text-indigo-700 text-sm font-medium mb-4">
+                <i class="fas fa-crop-alt"></i> Professional cropping
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-gray-800 to-indigo-700 bg-clip-text text-transparent mb-4">
+                Crop Image Online Free
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Crop images with preset aspect ratios, perfect circle crops, or standard passport photo dimensions â€” 
+                <span class="text-indigo-500 font-medium">all free, right in your browser.</span>
+                <i class="fas fa-shield-alt text-green-500 ml-1"></i>
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- LEFT PANEL: Upload & Crop Area -->
+            <div class="lg:col-span-7 space-y-6">
+                <!-- Dropzone -->
+                <div id="dropzone" class="upload-area rounded-2xl p-8 text-center bg-white transition-all cursor-pointer shadow-sm hover:shadow-md">
+                    <div class="flex flex-col items-center">
+                        <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-crop-alt text-3xl text-indigo-500"></i>
+                        </div>
+                        <p id="uploadStatus" class="text-gray-800 font-semibold text-lg">Upload your image</p>
+                        <p class="text-gray-400 text-sm mt-1">JPEG, PNG, WEBP Â· Max 20MB</p>
+                        <div class="flex flex-wrap gap-2 justify-center my-4">
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fas fa-crop"></i> Free crop</span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fas fa-circle"></i> Circle crop</span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fas fa-passport"></i> Passport size</span>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" class="hidden">
+                        <button id="selectImageBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-xl transition shadow-md flex items-center gap-2">
+                            <i class="fas fa-upload"></i> Select image
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cropper Container -->
+                <div id="cropperCard" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hidden fade-in">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-vector-square text-indigo-500"></i> Crop Area
+                        </h3>
+                        <button id="resetCropBtn" class="text-gray-500 hover:text-indigo-600 text-sm transition"><i class="fas fa-undo-alt"></i> Reset crop</button>
+                    </div>
+                    <div class="crop-container" id="cropContainer">
+                        <img id="cropImage" src="#" alt="Crop preview" style="max-width: 100%; display: none;">
+                    </div>
+                </div>
+
+                <!-- Result Preview -->
+                <div id="resultCard" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hidden fade-in">
+                    <h3 class="font-bold text-gray-800 flex items-center gap-2 mb-3">
+                        <i class="fas fa-check-circle text-green-500"></i> Cropped Result
+                    </h3>
+                    <div class="flex flex-col items-center">
+                        <img id="resultImage" src="#" alt="Cropped result" class="result-img rounded-lg shadow-md">
+                        <div id="resultMeta" class="mt-3 text-xs text-gray-500 text-center"></div>
+                        <button id="downloadBtn" class="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-6 rounded-xl transition shadow flex items-center gap-2">
+                            <i class="fas fa-download"></i> Download Cropped Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Controls -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm sticky top-24">
+                    <div class="flex items-center gap-2 border-b border-gray-100 pb-4 mb-5">
+                        <i class="fas fa-sliders-h text-indigo-500 text-xl"></i>
+                        <h2 class="text-xl font-bold text-gray-800">Crop Settings</h2>
+                    </div>
+
+                    <!-- Crop Type Toggle -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium text-sm mb-2">Crop shape</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button id="cropTypeRect" class="crop-type-btn bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition">
+                                <i class="fas fa-square"></i> Rectangle
+                            </button>
+                            <button id="cropTypeCircle" class="crop-type-btn bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium transition">
+                                <i class="fas fa-circle"></i> Circle
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2">Circle crop creates transparent background PNG</p>
+                    </div>
+
+                    <!-- Aspect Ratio Presets -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium text-sm mb-2">Aspect ratio presets</label>
+                        <div class="grid grid-cols-3 gap-2 mb-3">
+                            <button data-ratio="free" class="ratio-preset preset-btn-active px-3 py-2 rounded-lg text-sm font-medium transition">Free</button>
+                            <button data-ratio="1:1" class="ratio-preset preset-btn-inactive px-3 py-2 rounded-lg text-sm font-medium transition">1:1 (Square)</button>
+                            <button data-ratio="4:3" class="ratio-preset preset-btn-inactive px-3 py-2 rounded-lg text-sm font-medium transition">4:3</button>
+                            <button data-ratio="16:9" class="ratio-preset preset-btn-inactive px-3 py-2 rounded-lg text-sm font-medium transition">16:9 (Wide)</button>
+                            <button data-ratio="3:2" class="ratio-preset preset-btn-inactive px-3 py-2 rounded-lg text-sm font-medium transition">3:2</button>
+                            <button data-ratio="2:3" class="ratio-preset preset-btn-inactive px-3 py-2 rounded-lg text-sm font-medium transition">2:3</button>
+                        </div>
+                    </div>
+
+                    <!-- Passport/Visa Presets -->
+                    <div class="mb-6 pb-4 border-b border-gray-100">
+                        <label class="block text-gray-700 font-medium text-sm mb-2">Standard photo sizes</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button data-preset="passport_us" class="size-preset bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-xs font-medium transition">
+                                ðŸ‡ºðŸ‡¸ Passport (2x2 inch)
+                            </button>
+                            <button data-preset="passport_eu" class="size-preset bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-xs font-medium transition">
+                                ðŸ‡ªðŸ‡º EU Visa (35x45mm)
+                            </button>
+                            <button data-preset="id_photo" class="size-preset bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-xs font-medium transition">
+                                ðŸªª ID Photo (1.5x1.5 inch)
+                            </button>
+                            <button data-preset="instagram" class="size-preset bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-xs font-medium transition">
+                                ðŸ“¸ Instagram Post (1080x1080)
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-gray-400 mt-2">Click to set exact aspect ratio for official documents</p>
+                    </div>
+
+                    <!-- Manual Dimensions -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium text-sm mb-2">Manual dimensions (px)</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <input type="number" id="manualWidth" placeholder="Width" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <input type="number" id="manualHeight" placeholder="Height" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                        <button id="applyManualBtn" class="w-full mt-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium py-1.5 rounded-lg text-sm transition">
+                            Apply custom size
+                        </button>
+                    </div>
+
+                    <!-- Zoom Control -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium text-sm mb-2">Zoom</label>
+                        <input type="range" id="zoomSlider" min="0.1" max="2" step="0.01" value="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                            <span>Zoom out</span>
+                            <span>Zoom in</span>
+                        </div>
+                    </div>
+
+                    <!-- Rotate Controls -->
+                    <div class="mb-6 flex justify-between items-center">
+                        <span class="text-gray-700 text-sm font-medium">Rotate</span>
+                        <div class="flex gap-2">
+                            <button id="rotateLeft" class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-sm transition"><i class="fas fa-undo-alt"></i> Left</button>
+                            <button id="rotateRight" class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-sm transition"><i class="fas fa-redo-alt"></i> Right</button>
+                        </div>
+                    </div>
+
+                    <!-- Apply Crop Button -->
+                    <button id="applyCropBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-base">
+                        <i class="fas fa-cut"></i> Apply Crop
+                    </button>
+
+                    <!-- Info Box -->
+                    <div class="mt-5 p-3 bg-amber-50 rounded-lg">
+                        <p class="text-xs text-amber-800 flex items-start gap-2">
+                            <i class="fas fa-info-circle mt-0.5"></i>
+                            <span>Circle crops are saved as PNG with transparent background. Rectangle crops save as JPEG/PNG based on original format.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center text-gray-400 text-xs mt-10 pb-4">
+            <i class="fas fa-laptop-code"></i> 100% client-side â€” your images never leave your device. All cropping happens locally in your browser.
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const selectImageBtn = document.getElementById('selectImageBtn');
+        const cropperCard = document.getElementById('cropperCard');
+        const resultCard = document.getElementById('resultCard');
+        const cropImage = document.getElementById('cropImage');
+        const resultImage = document.getElementById('resultImage');
+        const resultMeta = document.getElementById('resultMeta');
+        const resetCropBtn = document.getElementById('resetCropBtn');
+        const applyCropBtn = document.getElementById('applyCropBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const zoomSlider = document.getElementById('zoomSlider');
+        const rotateLeft = document.getElementById('rotateLeft');
+        const rotateRight = document.getElementById('rotateRight');
+        const cropTypeRect = document.getElementById('cropTypeRect');
+        const cropTypeCircle = document.getElementById('cropTypeCircle');
+        const manualWidth = document.getElementById('manualWidth');
+        const manualHeight = document.getElementById('manualHeight');
+        const applyManualBtn = document.getElementById('applyManualBtn');
+        const uploadStatus = document.getElementById('uploadStatus');
+
+        // State
+        let cropper = null;
+        let currentImageFile = null;
+        let currentImageUrl = null;
+        let currentCropType = 'rect'; // 'rect' or 'circle'
+        let currentAspectRatio = NaN; // NaN means free
+
+        // Initialize cropper
+        function initCropper(imageUrl) {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            
+            cropImage.src = imageUrl;
+            cropImage.style.display = 'block';
+            
+            const options = {
+                aspectRatio: isNaN(currentAspectRatio) ? NaN : currentAspectRatio,
+                viewMode: 1,
+                dragMode: 'move',
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                zoomable: true,
+                zoomOnWheel: true,
+                autoCropArea: 0.8,
+                background: true,
+                backgroundColor: '#f1f5f9'
+            };
+            
+            cropper = new Cropper(cropImage, options);
+            
+            // Apply circle crop class if needed
+            if (currentCropType === 'circle') {
+                document.querySelector('.crop-container').classList.add('circle-crop');
+            } else {
+                document.querySelector('.crop-container').classList.remove('circle-crop');
+            }
+            
+            cropperCard.classList.remove('hidden');
+        }
+        
+        // Load image from file
+        function loadImage(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file.');
+                return false;
+            }
+            if (file.size > 20 * 1024 * 1024) {
+                alert('File too large. Maximum size is 20MB.');
+                return false;
+            }
+            
+            currentImageFile = file;
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                if (currentImageUrl) {
+                    URL.revokeObjectURL(currentImageUrl);
+                }
+                currentImageUrl = e.target.result;
+                initCropper(currentImageUrl);
+                uploadStatus.innerHTML = 'âœ“ Image loaded <i class="fas fa-check-circle text-green-500"></i>';
+                resultCard.classList.add('hidden');
+            };
+            
+            reader.readAsDataURL(file);
+            return true;
+        }
+        
+        // Apply crop and get result
+        function applyCrop() {
+            if (!cropper) {
+                alert('Please load an image first.');
+                return;
+            }
+            
+            const croppedCanvas = cropper.getCroppedCanvas();
+            if (!croppedCanvas) {
+                alert('Unable to crop. Please adjust the crop area.');
+                return;
+            }
+            
+            let finalCanvas = croppedCanvas;
+            
+            // If circle crop, create circular mask
+            if (currentCropType === 'circle') {
+                const size = Math.min(croppedCanvas.width, croppedCanvas.height);
+                const circleCanvas = document.createElement('canvas');
+                circleCanvas.width = size;
+                circleCanvas.height = size;
+                const ctx = circleCanvas.getContext('2d');
+                
+                ctx.beginPath();
+                ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
+                ctx.closePath();
+                ctx.clip();
+                
+                // Draw the cropped image centered
+                const offsetX = (size - croppedCanvas.width) / 2;
+                const offsetY = (size - croppedCanvas.height) / 2;
+                ctx.drawImage(croppedCanvas, offsetX, offsetY);
+                
+                finalCanvas = circleCanvas;
+            }
+            
+            // Get blob and display
+            const mimeType = currentCropType === 'circle' ? 'image/png' : 'image/jpeg';
+            const quality = mimeType === 'image/jpeg' ? 0.92 : undefined;
+            
+            finalCanvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                resultImage.src = url;
+                const sizeKB = (blob.size / 1024).toFixed(1);
+                const dimensions = `${finalCanvas.width} Ã— ${finalCanvas.height} px`;
+                resultMeta.innerHTML = `<i class="fas fa-image"></i> ${dimensions} â€¢ ${sizeKB} KB â€¢ ${currentCropType === 'circle' ? 'Circle crop (PNG)' : 'Rectangle crop'}`;
+                resultCard.classList.remove('hidden');
+                
+                // Store for download
+                window.currentCroppedBlob = blob;
+                window.currentCroppedUrl = url;
+            }, mimeType, quality);
+        }
+        
+        // Download cropped image
+        function downloadCropped() {
+            if (!window.currentCroppedBlob) {
+                alert('Please apply crop first.');
+                return;
+            }
+            
+            const extension = currentCropType === 'circle' ? 'png' : 'jpg';
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(window.currentCroppedBlob);
+            link.download = `cropped_image_${Date.now()}.${extension}`;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+        }
+        
+        // Reset crop to full image
+        function resetCrop() {
+            if (cropper) {
+                cropper.reset();
+                cropper.clear();
+                setTimeout(() => {
+                    cropper.crop();
+                }, 50);
+            }
+        }
+        
+        // Set aspect ratio
+        function setAspectRatio(ratio) {
+            currentAspectRatio = ratio;
+            if (cropper) {
+                cropper.setAspectRatio(ratio);
+            }
+            
+            // Update UI buttons
+            document.querySelectorAll('.ratio-preset').forEach(btn => {
+                btn.classList.remove('preset-btn-active');
+                btn.classList.add('preset-btn-inactive');
+            });
+            
+            if (ratio === 'free' || isNaN(ratio)) {
+                document.querySelector('[data-ratio="free"]').classList.add('preset-btn-active');
+                currentAspectRatio = NaN;
+                if (cropper) cropper.setAspectRatio(NaN);
+            } else {
+                const btn = document.querySelector(`[data-ratio="${ratio}"]`);
+                if (btn) btn.classList.add('preset-btn-active');
+                currentAspectRatio = parseFloat(ratio.split(':')[0]) / parseFloat(ratio.split(':')[1]);
+                if (cropper) cropper.setAspectRatio(currentAspectRatio);
+            }
+        }
+        
+        // Set preset size (passport, etc)
+        function setPresetSize(preset) {
+            const presets = {
+                'passport_us': { w: 2, h: 2, unit: 'inch', ratio: 1/1 },
+                'passport_eu': { w: 35, h: 45, unit: 'mm', ratio: 35/45 },
+                'id_photo': { w: 1.5, h: 1.5, unit: 'inch', ratio: 1/1 },
+                'instagram': { w: 1080, h: 1080, unit: 'px', ratio: 1/1 }
+            };
+            
+            const presetData = presets[preset];
+            if (presetData) {
+                setAspectRatio(presetData.ratio.toString());
+                manualWidth.value = presetData.w;
+                manualHeight.value = presetData.h;
+            }
+        }
+        
+        // Apply manual dimensions (just sets aspect ratio)
+        function applyManualDimensions() {
+            const w = parseFloat(manualWidth.value);
+            const h = parseFloat(manualHeight.value);
+            if (w && h && w > 0 && h > 0) {
+                const ratio = w / h;
+                setAspectRatio(ratio.toString());
+            } else {
+                alert('Please enter valid width and height values.');
+            }
+        }
+        
+        // Toggle crop type
+        function setCropType(type) {
+            currentCropType = type;
+            if (type === 'circle') {
+                cropTypeRect.classList.remove('bg-indigo-600', 'text-white');
+                cropTypeRect.classList.add('bg-gray-100', 'text-gray-700');
+                cropTypeCircle.classList.remove('bg-gray-100', 'text-gray-700');
+                cropTypeCircle.classList.add('bg-indigo-600', 'text-white');
+                document.querySelector('.crop-container').classList.add('circle-crop');
+            } else {
+                cropTypeCircle.classList.remove('bg-indigo-600', 'text-white');
+                cropTypeCircle.classList.add('bg-gray-100', 'text-gray-700');
+                cropTypeRect.classList.remove('bg-gray-100', 'text-gray-700');
+                cropTypeRect.classList.add('bg-indigo-600', 'text-white');
+                document.querySelector('.crop-container').classList.remove('circle-crop');
+            }
+            
+            // Reinitialize cropper to apply circle class
+            if (cropper && currentImageUrl) {
+                const currentData = cropper.getData();
+                initCropper(currentImageUrl);
+                if (currentData) {
+                    setTimeout(() => {
+                        try {
+                            cropper.setData(currentData);
+                        } catch(e) {}
+                    }, 100);
+                }
+            }
+        }
+        
+        // Zoom control
+        zoomSlider.addEventListener('input', (e) => {
+            if (cropper) {
+                const zoomValue = parseFloat(e.target.value);
+                cropper.zoomTo(zoomValue);
+            }
+        });
+        
+        // Rotate
+        rotateLeft.addEventListener('click', () => {
+            if (cropper) cropper.rotate(-90);
+        });
+        rotateRight.addEventListener('click', () => {
+            if (cropper) cropper.rotate(90);
+        });
+        
+        // Event listeners
+        selectImageBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                loadImage(e.target.files[0]);
+            }
+            fileInput.value = '';
+        });
+        
+        applyCropBtn.addEventListener('click', applyCrop);
+        downloadBtn.addEventListener('click', downloadCropped);
+        resetCropBtn.addEventListener('click', resetCrop);
+        
+        // Aspect ratio presets
+        document.querySelectorAll('.ratio-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const ratio = btn.dataset.ratio;
+                setAspectRatio(ratio);
+            });
+        });
+        
+        // Size presets
+        document.querySelectorAll('.size-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const preset = btn.dataset.preset;
+                setPresetSize(preset);
+            });
+        });
+        
+        applyManualBtn.addEventListener('click', applyManualDimensions);
+        
+        // Crop type toggles
+        cropTypeRect.addEventListener('click', () => setCropType('rect'));
+        cropTypeCircle.addEventListener('click', () => setCropType('circle'));
+        
+        // Drag and drop
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files && files[0]) {
+                loadImage(files[0]);
+            }
+        });
+        dropzone.addEventListener('click', (e) => {
+            if (e.target === selectImageBtn || selectImageBtn.contains(e.target)) return;
+            fileInput.click();
+        });
+        
+        // Initialize with default
+        setAspectRatio('free');
+        setCropType('rect');
+        
+        // Manual input auto-apply on enter
+        manualWidth.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') applyManualDimensions();
+        });
+        manualHeight.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') applyManualDimensions();
+        });
+    </script>
+</body>
+</html>

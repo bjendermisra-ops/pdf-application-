@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DTI Ratio Calculator (₹ INR)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .fade-in { animation: fadeIn 0.6s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .result-card { opacity: 0; transform: translateY(20px); transition: all 0.6s ease; }
+    .result-card.show { opacity: 1; transform: translateY(0); }
+    .error-inline { @apply text-red-600 text-sm mt-1 opacity-0 transition-opacity duration-300; }
+    .error-inline.show { opacity: 1; }
+    .input-error { @apply border-red-500 ring-red-300 focus:ring-red-300; }
+    .rupee { font-weight: bold; }
+    .debt-item { animation: slideIn 0.4s ease-out; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+    .dti-gauge { height: 12px; border-radius: 6px; transition: width 0.6s ease; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 min-h-screen font-sans">
+
+    <!-- Back Button -->
+<div class="fixed top-6 left-6 z-50">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <a href="/"
+     class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white
+            rounded-full shadow-md w-fit
+            bg-gradient-to-r from-blue-600 to-blue-700
+            hover:from-blue-700 hover:to-indigo-800
+            hover:-translate-x-1 hover:shadow-lg
+            transition-all duration-300 ease-in-out">
+    <i class="fas fa-arrow-left text-sm"></i>
+    <span>Back to All Tools</span>
+  </a>
+</div>
+
+
+  <div class="max-w-4xl mx-auto p-6 md:p-10">
+
+    <!-- Header -->
+    <header class="text-center mb-12">
+      <h1 class="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 mb-4">
+        <i class="fas fa-calculator mr-3"></i>DTI Ratio Calculator
+      </h1>
+      <p class="text-lg text-gray-700">Check Loan Eligibility & EMI Affordability in ₹ INR</p>
+    </header>
+
+    <!-- Calculator Form -->
+    <div class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-8 md:p-12 mb-10">
+      <form id="dtiForm" class="space-y-8">
+
+        <!-- Monthly Income -->
+        <div>
+          <label class="block text-xl font-bold text-gray-800 mb-4 flex items-center">
+            <span class="rupee text-blue-600 mr-2">₹</span> Total Monthly Income
+          </label>
+          <input type="number" id="monthlyIncome" placeholder="e.g., 85000" min="0" step="1000"
+            class="w-full px-6 py-4 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition-all" required />
+          <p class="text-sm text-gray-500 mt-1">Include salary, rental, business, interest income</p>
+          <p id="errorIncome" class="error-inline">Please enter income greater than ₹0</p>
+        </div>
+
+        <!-- Monthly Debts -->
+        <div id="debtsSection" class="space-y-4">
+          <div class="flex justify-between items-center mb-4">
+            <label class="text-xl font-bold text-gray-800">Monthly Debt Obligations</label>
+            <button type="button" id="addDebt" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-5 py-3 rounded-lg flex items-center gap-2 shadow-lg transition-all transform hover:scale-105">
+              <i class="fas fa-plus"></i> Add Debt
+            </button>
+          </div>
+          <div id="debtsList" class="space-y-3"></div>
+          <p id="errorDebts" class="error-inline text-center">Add at least one debt or enter ₹0 if none</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col md:flex-row gap-4 mt-8">
+          <button type="submit"
+            class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xl py-5 rounded-xl transition-all transform hover:scale-105 shadow-xl">
+            <i class="fas fa-chart-pie mr-3"></i>Calculate DTI
+          </button>
+          <button type="button" id="resetForm"
+            class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold text-xl py-5 rounded-xl transition-all transform hover:scale-105 shadow-xl">
+            <i class="fas fa-redo mr-3"></i>Reset
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Results -->
+    <div id="resultSection" class="hidden result-card space-y-8">
+
+      <!-- DTI Summary -->
+      <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-8 rounded-3xl shadow-2xl">
+        <h3 class="text-2xl font-bold mb-6 text-center">Your Debt-to-Income Ratio</h3>
+        <div class="text-center">
+          <div class="text-6xl font-extrabold mb-2" id="dtiValue">0%</div>
+          <p class="text-lg opacity-90" id="dtiStatus">Excellent</p>
+        </div>
+        <div class="mt-6 bg-white/20 rounded-xl p-4">
+          <div class="flex justify-between text-sm">
+            <span>Monthly Income:</span>
+            <span id="resIncome" class="font-bold">₹0</span>
+          </div>
+          <div class="flex justify-between text-sm mt-2">
+            <span>Total Monthly Debt:</span>
+            <span id="resDebt" class="font-bold">₹0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DTI Gauge -->
+      <div class="bg-white p-6 rounded-3xl shadow-xl">
+        <h4 class="text-lg font-bold text-gray-800 mb-4">DTI Risk Level</h4>
+        <div class="relative h-12 bg-gray-200 rounded-full overflow-hidden">
+          <div class="absolute inset-0 flex">
+            <div class="w-1/3 bg-green-500"></div>
+            <div class="w-1/3 bg-yellow-500"></div>
+            <div class="w-1/3 bg-red-500"></div>
+          </div>
+          <div id="dtiGauge" class="dti-gauge bg-white/90" style="width: 0%"></div>
+          <div class="absolute inset-0 flex justify-around items-center text-xs font-bold text-white">
+            <span>0%</span>
+            <span>36%</span>
+            <span>43%</span>
+            <span>50%+</span>
+          </div>
+        </div>
+        <div class="flex justify-between mt-2 text-xs text-gray-600">
+          <span>Healthy</span>
+          <span class="text-yellow-600">Caution</span>
+          <span class="text-red-600">High Risk</span>
+        </div>
+      </div>
+
+      <!-- Debt Breakdown Chart -->
+      <div class="bg-white p-8 rounded-3xl shadow-2xl">
+        <canvas id="debtChart"></canvas>
+      </div>
+
+      <!-- Loan Eligibility -->
+      <div class="bg-gradient-to-r from-purple-500 to-pink-600 text-white p-8 rounded-3xl shadow-2xl">
+        <h3 class="text-xl font-bold mb-4">Loan Eligibility (Home Loan Example)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <p class="text-sm opacity-90">Max EMI (at 40% DTI)</p>
+            <p class="text-2xl font-bold" id="maxEMI">₹0</p>
+          </div>
+          <div>
+            <p class="text-sm opacity-90">Est. Loan Amount (9% for 20 yrs)</p>
+            <p class="text-2xl font-bold" id="estLoan">₹0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="bg-white p-8 rounded-3xl shadow-2xl">
+        <h3 class="text-xl font-bold mb-4 text-gray-800">Tips to Improve DTI</h3>
+        <ul class="space-y-2 text-gray-700">
+          <li class="flex items-start gap-2"><i class="fas fa-check text-green-600 mt-1"></i> Pay off credit card debt first</li>
+          <li class="flex items-start gap-2"><i class="fas fa-check text-green-600 mt-1"></i> Increase income via side hustle</li>
+          <li class="flex items-start gap-2"><i class="fas fa-check text-green-600 mt-1"></i> Refinance high-interest loans</li>
+          <li class="flex items-start gap-2"><i class="fas fa-check text-green-600 mt-1"></i> Avoid new debt before loan application</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- About DTI -->
+    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 md:p-10 border border-blue-200 mb-10">
+      <h3 class="text-2xl font-bold text-blue-800 mb-6 flex items-center">
+        <i class="fas fa-info-circle mr-3 text-blue-600"></i>About Debt-to-Income (DTI) Ratio
+      </h3>
+      <div class="prose prose-lg text-gray-700 space-y-4">
+        <p>
+          <strong>DTI Ratio = (Total Monthly Debt Payments ÷ Gross Monthly Income) × 100</strong>
+        </p>
+        <p>
+          Banks in India use DTI to assess your repayment capacity. Lower DTI = Higher loan approval chance.
+        </p>
+
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-blue-500">
+          <p class="text-lg font-mono text-blue-700 text-center">
+            DTI < 36% → Excellent<br>
+            36%–43% → Acceptable<br>
+            43%–50% → Risky<br>
+            >50% → High Risk
+          </p>
+        </div>
+
+        <p><strong>Common Debts Included:</strong></p>
+        <ul class="list-disc list-inside space-y-1 ml-4">
+          <li>Home Loan EMI</li>
+          <li>Car Loan EMI</li>
+          <li>Personal Loan EMI</li>
+          <li>Credit Card Minimum Due</li>
+          <li>Education Loan EMI</li>
+        </ul>
+
+        <p class="mt-6 italic text-blue-600">
+          Used by <strong>SBI, HDFC, ICICI, Axis</strong> and all major lenders in India.
+        </p>
+
+        <p class="text-sm text-gray-600 mt-6">
+          <strong>Sources</strong>: RBI Guidelines, CIBIL, BankBazaar, Paisabazaar (2025)
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center text-gray-600 text-sm">
+      © 2025 DTI Calculator (India) | <i class="fas fa-heart text-red-500"></i> Built for Financial Clarity
+    </footer>
+  </div>
+
+  <script>
+    let debts = [];
+    let chart = null;
+
+    const form = document.getElementById('dtiForm');
+    const incomeInput = document.getElementById('monthlyIncome');
+    const debtsList = document.getElementById('debtsList');
+    const addDebtBtn = document.getElementById('addDebt');
+    const resultSection = document.getElementById('resultSection');
+
+    // Error elements
+    const errors = {
+      income: document.getElementById('errorIncome'),
+      debts: document.getElementById('errorDebts')
+    };
+
+    function clearErrors() {
+      Object.values(errors).forEach(el => el.classList.remove('show'));
+      document.querySelectorAll('input').forEach(inp => inp.classList.remove('input-error'));
+    }
+
+    function showError(field, message) {
+      const el = errors[field];
+      if (el) {
+        el.textContent = message;
+        el.classList.add('show');
+        const input = el.closest('div').querySelector('input');
+        if (input) input.classList.add('input-error');
+      }
+    }
+
+    // Add Debt Field
+    function addDebtItem(data = {}) {
+      const div = document.createElement('div');
+      div.className = 'debt-item grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200';
+
+      div.innerHTML = `
+        <input type="text" placeholder="Debt Type (e.g., Home Loan)" value="${data.type || ''}" 
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all">
+        <input type="number" placeholder="Monthly EMI (₹)" value="${data.emi || ''}" min="0" 
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all emi-input">
+        <button type="button" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-all">
+          <i class="fas fa-trash"></i>
+        </button>
+      `;
+
+      div.querySelector('button').addEventListener('click', () => {
+        div.remove();
+        validateDebts();
+      });
+
+      // Auto-focus EMI
+      const emiInput = div.querySelector('.emi-input');
+      emiInput.focus();
+
+      debtsList.appendChild(div);
+      validateDebts();
+    }
+
+    function validateDebts() {
+      const items = document.querySelectorAll('.debt-item');
+      let totalEMI = 0;
+      let valid = true;
+
+      items.forEach(item => {
+        const emi = parseFloat(item.querySelector('.emi-input').value) || 0;
+        if (emi < 0) valid = false;
+        totalEMI += emi;
+      });
+
+      if (items.length === 0 && totalEMI === 0) {
+        errors.debts.classList.remove('show');
+        return true;
+      }
+
+      if (!valid || (items.length > 0 && totalEMI === 0)) {
+        errors.debts.classList.add('show');
+        return false;
+      } else {
+        errors.debts.classList.remove('show');
+        return true;
+      }
+    }
+
+    addDebtBtn.addEventListener('click', () => addDebtItem());
+
+    // Calculate DTI
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearErrors();
+
+      const income = parseFloat(incomeInput.value) || 0;
+      let totalDebt = 0;
+
+      let valid = true;
+      if (income <= 0) { showError('income', 'Please enter income greater than ₹0'); valid = false; }
+      if (!validateDebts()) valid = false;
+
+      if (!valid) return;
+
+      document.querySelectorAll('.debt-item').forEach(item => {
+        totalDebt += parseFloat(item.querySelector('.emi-input').value) || 0;
+      });
+
+      const dti = income > 0 ? (totalDebt / income) * 100 : 0;
+
+      // Update Results
+      document.getElementById('dtiValue').textContent = dti.toFixed(1) + '%';
+      document.getElementById('resIncome').textContent = '₹' + income.toLocaleString('en-IN');
+      document.getElementById('resDebt').textContent = '₹' + totalDebt.toLocaleString('en-IN');
+
+      // Status
+      let status = '';
+      let gaugeWidth = 0;
+      if (dti <= 36) { status = 'Excellent'; gaugeWidth = (dti / 36) * 33; }
+      else if (dti <= 43) { status = 'Acceptable'; gaugeWidth = 33 + ((dti - 36) / 7) * 33; }
+      else if (dti <= 50) { status = 'Risky'; gaugeWidth = 66 + ((dti - 43) / 7) * 17; }
+      else { status = 'High Risk'; gaugeWidth = 83 + Math.min((dti - 50) / 50 * 17, 17); }
+
+      document.getElementById('dtiStatus').textContent = status;
+      document.getElementById('dtiGauge').style.width = gaugeWidth + '%';
+
+      // Loan Eligibility (9% for 20 years)
+      const maxEMI = income * 0.40;
+      const loanAmount = maxEMI * ((1 - Math.pow(1 + 0.0075, -240)) / 0.0075);
+      document.getElementById('maxEMI').textContent = '₹' + Math.round(maxEMI).toLocaleString('en-IN');
+      document.getElementById('estLoan').textContent = '₹' + Math.round(loanAmount).toLocaleString('en-IN');
+
+      // Debt Chart
+      const ctx = document.getElementById('debtChart').getContext('2d');
+      if (chart) chart.destroy();
+
+      const labels = ['Income', 'Debt Payments', 'Disposable'];
+      const data = [income, totalDebt, income - totalDebt];
+
+      chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: ['#10b981', '#ef4444', '#3b82f6']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const value = context.parsed;
+                  return context.label + ': ₹' + value.toLocaleString('en-IN');
+                }
+              }
+            }
+          }
+        }
+      });
+
+      resultSection.classList.remove('hidden');
+      resultSection.classList.add('show');
+      resultSection.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    document.getElementById('resetForm').addEventListener('click', () => {
+      form.reset();
+      debtsList.innerHTML = '';
+      resultSection.classList.add('hidden');
+      clearErrors();
+      addDebtItem({ type: 'Home Loan', emi: 25000 });
+      addDebtItem({ type: 'Car Loan', emi: 12000 });
+    });
+
+    // Init with sample
+    addDebtItem({ type: 'Home Loan', emi: 25000 });
+    addDebtItem({ type: 'Car Loan', emi: 12000 });
+    addDebtItem({ type: 'Credit Card', emi: 5000 });
+    incomeInput.value = 85000;
+  </script>
+</body>
+</html>

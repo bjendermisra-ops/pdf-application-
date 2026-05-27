@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Late Payment Fee Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .fee-card {
+        transition: all 0.3s ease;
+      }
+      .fee-card:hover {
+        transform: translateY(-2px);
+      }
+      .tab-active {
+        background-color: #4f46e5;
+        color: white;
+      }
+      .penalty-badge {
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen"
+  >
+  <nav>
+      <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 9999px;
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      }
+
+      .back-button i {
+        font-size: 1rem;
+      }
+
+      .back-button:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        transform: translateX(-0.25rem);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+      }
+    </style>
+    <div class="max-w-6xl mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-10">
+        <h1 class="text-4xl font-bold text-indigo-800">
+          Late Payment Fee Calculator
+        </h1>
+        <p class="text-lg text-gray-600 mt-3">
+          Calculate penalties for overdue payments and understand the cost of
+          delays
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Input Section -->
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">Payment Details</h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Original Amount -->
+            <div>
+              <label
+                for="originalAmount"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Original Amount Due (₹)
+              </label>
+              <div class="relative">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <span class="text-gray-500">₹</span>
+                </div>
+                <input
+                  type="number"
+                  id="originalAmount"
+                  class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="10,000"
+                  value="10000"
+                  min="0"
+                />
+              </div>
+            </div>
+
+            <!-- Due Date -->
+            <div>
+              <label
+                for="dueDate"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Due Date
+              </label>
+              <input
+                type="date"
+                id="dueDate"
+                class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value=""
+              />
+            </div>
+
+            <!-- Payment Date -->
+            <div>
+              <label
+                for="paymentDate"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Actual Payment Date
+              </label>
+              <input
+                type="date"
+                id="paymentDate"
+                class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value=""
+              />
+            </div>
+
+            <!-- Days Late -->
+            <div>
+              <label
+                for="daysLate"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Days Late (Auto-calculated)
+              </label>
+              <input
+                type="number"
+                id="daysLate"
+                class="block w-full px-3 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                readonly
+                value="0"
+              />
+            </div>
+          </div>
+
+          <!-- Fee Structure -->
+          <div class="mt-8">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+              Fee Structure
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div class="relative">
+                <input
+                  class="sr-only peer"
+                  type="radio"
+                  value="flat"
+                  name="feeStructure"
+                  id="feeFlat"
+                  checked
+                />
+                <label
+                  class="flex flex-col bg-white border border-gray-300 rounded-lg p-4 cursor-pointer focus:outline-none hover:bg-gray-50 peer-checked:ring-2 peer-checked:ring-indigo-500 peer-checked:border-indigo-500"
+                  for="feeFlat"
+                >
+                  <span class="font-medium text-gray-900">Flat Fee</span>
+                  <span class="text-gray-500 text-sm mt-1"
+                    >Fixed amount per late period</span
+                  >
+                </label>
+              </div>
+              <div class="relative">
+                <input
+                  class="sr-only peer"
+                  type="radio"
+                  value="percentage"
+                  name="feeStructure"
+                  id="feePercentage"
+                />
+                <label
+                  class="flex flex-col bg-white border border-gray-300 rounded-lg p-4 cursor-pointer focus:outline-none hover:bg-gray-50 peer-checked:ring-2 peer-checked:ring-indigo-500 peer-checked:border-indigo-500"
+                  for="feePercentage"
+                >
+                  <span class="font-medium text-gray-900"
+                    >Percentage Based</span
+                  >
+                  <span class="text-gray-500 text-sm mt-1"
+                    >Percentage of original amount</span
+                  >
+                </label>
+              </div>
+              <div class="relative">
+                <input
+                  class="sr-only peer"
+                  type="radio"
+                  value="daily"
+                  name="feeStructure"
+                  id="feeDaily"
+                />
+                <label
+                  class="flex flex-col bg-white border border-gray-300 rounded-lg p-4 cursor-pointer focus:outline-none hover:bg-gray-50 peer-checked:ring-2 peer-checked:ring-indigo-500 peer-checked:border-indigo-500"
+                  for="feeDaily"
+                >
+                  <span class="font-medium text-gray-900">Daily Interest</span>
+                  <span class="text-gray-500 text-sm mt-1"
+                    >Accrues daily interest</span
+                  >
+                </label>
+              </div>
+              <div class="relative">
+                <input
+                  class="sr-only peer"
+                  type="radio"
+                  value="tiered"
+                  name="feeStructure"
+                  id="feeTiered"
+                />
+                <label
+                  class="flex flex-col bg-white border border-gray-300 rounded-lg p-4 cursor-pointer focus:outline-none hover:bg-gray-50 peer-checked:ring-2 peer-checked:ring-indigo-500 peer-checked:border-indigo-500"
+                  for="feeTiered"
+                >
+                  <span class="font-medium text-gray-900"
+                    >Tiered Structure</span
+                  >
+                  <span class="text-gray-500 text-sm mt-1"
+                    >Different rates for different periods</span
+                  >
+                </label>
+              </div>
+            </div>
+
+            <!-- Fee Parameters -->
+            <div id="feeParameters" class="space-y-4">
+              <!-- Flat Fee Parameters -->
+              <div id="flatFeeParams" class="fee-params">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      for="flatFeeAmount"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Flat Fee Amount (₹)
+                    </label>
+                    <div class="relative">
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                      >
+                        <span class="text-gray-500">₹</span>
+                      </div>
+                      <input
+                        type="number"
+                        id="flatFeeAmount"
+                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="500"
+                        value="500"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      for="flatFeePeriod"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Fee Applies Every (Days)
+                    </label>
+                    <input
+                      type="number"
+                      id="flatFeePeriod"
+                      class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="30"
+                      value="30"
+                      min="1"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Percentage Fee Parameters -->
+              <div id="percentageFeeParams" class="fee-params hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      for="percentageRate"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Late Fee Percentage (%)
+                    </label>
+                    <div class="relative">
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                      >
+                        <span class="text-gray-500">%</span>
+                      </div>
+                      <input
+                        type="number"
+                        id="percentageRate"
+                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="5"
+                        value="5"
+                        min="0"
+                        step="0.1"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      for="percentageMinFee"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Minimum Fee (₹)
+                    </label>
+                    <div class="relative">
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                      >
+                        <span class="text-gray-500">₹</span>
+                      </div>
+                      <input
+                        type="number"
+                        id="percentageMinFee"
+                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="100"
+                        value="100"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Daily Interest Parameters -->
+              <div id="dailyFeeParams" class="fee-params hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      for="dailyInterestRate"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Daily Interest Rate (%)
+                    </label>
+                    <div class="relative">
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                      >
+                        <span class="text-gray-500">%</span>
+                      </div>
+                      <input
+                        type="number"
+                        id="dailyInterestRate"
+                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="0.1"
+                        value="0.1"
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      for="dailyMinFee"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Minimum Daily Fee (₹)
+                    </label>
+                    <div class="relative">
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                      >
+                        <span class="text-gray-500">₹</span>
+                      </div>
+                      <input
+                        type="number"
+                        id="dailyMinFee"
+                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="10"
+                        value="10"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tiered Structure Parameters -->
+              <div id="tieredFeeParams" class="fee-params hidden">
+                <div class="space-y-4">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                        >Days 1-15</label
+                      >
+                      <div class="relative">
+                        <div
+                          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                        >
+                          <span class="text-gray-500">%</span>
+                        </div>
+                        <input
+                          type="number"
+                          id="tier1Rate"
+                          class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          placeholder="2"
+                          value="2"
+                          min="0"
+                          step="0.1"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                        >Days 16-30</label
+                      >
+                      <div class="relative">
+                        <div
+                          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                        >
+                          <span class="text-gray-500">%</span>
+                        </div>
+                        <input
+                          type="number"
+                          id="tier2Rate"
+                          class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          placeholder="3"
+                          value="3"
+                          min="0"
+                          step="0.1"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                        >Days 31+</label
+                      >
+                      <div class="relative">
+                        <div
+                          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                        >
+                          <span class="text-gray-500">%</span>
+                        </div>
+                        <input
+                          type="number"
+                          id="tier3Rate"
+                          class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          placeholder="5"
+                          value="5"
+                          min="0"
+                          step="0.1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      for="tieredMinFee"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Minimum Total Fee (₹)
+                    </label>
+                    <div class="relative">
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                      >
+                        <span class="text-gray-500">₹</span>
+                      </div>
+                      <input
+                        type="number"
+                        id="tieredMinFee"
+                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="200"
+                        value="200"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grace Period -->
+          <div class="mt-6">
+            <label
+              for="gracePeriod"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Grace Period (Days)
+            </label>
+            <input
+              type="number"
+              id="gracePeriod"
+              class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="0"
+              value="0"
+              min="0"
+            />
+            <p class="text-sm text-gray-500 mt-1">
+              Number of days after due date before late fees apply
+            </p>
+          </div>
+
+          <!-- Calculate Button -->
+          <div class="mt-8">
+            <button
+              id="calculateBtn"
+              class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Calculate Late Fees
+            </button>
+          </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="space-y-8">
+          <!-- Summary Card -->
+          <div class="bg-white rounded-2xl shadow-xl p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+              Late Payment Summary
+            </h2>
+
+            <div class="space-y-4">
+              <div
+                class="flex justify-between items-center p-3 bg-blue-50 rounded-lg"
+              >
+                <span class="text-blue-700">Original Amount</span>
+                <span id="originalAmountResult" class="font-bold text-blue-800"
+                  >₹0</span
+                >
+              </div>
+
+              <div
+                class="flex justify-between items-center p-3 bg-red-50 rounded-lg"
+              >
+                <span class="text-red-700">Late Fee</span>
+                <span id="lateFeeResult" class="font-bold text-red-800"
+                  >₹0</span
+                >
+              </div>
+
+              <div
+                class="flex justify-between items-center p-3 bg-green-50 rounded-lg border-t border-green-200 pt-4"
+              >
+                <span class="text-green-700 font-semibold">Total to Pay</span>
+                <span
+                  id="totalAmountResult"
+                  class="font-bold text-green-800 text-xl"
+                  >₹0</span
+                >
+              </div>
+            </div>
+
+            <!-- Days Late Warning -->
+            <div
+              id="daysLateWarning"
+              class="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200 hidden"
+            >
+              <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
+                <span class="text-yellow-700 font-medium"
+                  >Payment is <span id="daysLateCount">0</span> days late</span
+                >
+              </div>
+            </div>
+
+            <!-- Grace Period Notice -->
+            <div
+              id="gracePeriodNotice"
+              class="mt-4 p-3 bg-green-50 rounded-lg border border-green-200 hidden"
+            >
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                <span class="text-green-700"
+                  >Within grace period - no late fees apply</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Fee Breakdown -->
+          <div class="bg-white rounded-2xl shadow-xl p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Fee Breakdown</h2>
+
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Effective Days Late:</span>
+                <span id="effectiveDaysLate" class="font-medium">0 days</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Fee Structure:</span>
+                <span id="feeStructureUsed" class="font-medium">Flat Fee</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Fee Rate:</span>
+                <span id="feeRateUsed" class="font-medium"
+                  >₹500 per 30 days</span
+                >
+              </div>
+              <div class="flex justify-between border-t border-gray-200 pt-3">
+                <span class="text-gray-800 font-semibold"
+                  >Fee Calculation:</span
+                >
+                <span id="feeCalculation" class="font-medium text-right"
+                  >₹0 × 0 periods</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Cost Over Time Chart -->
+          <div class="bg-white rounded-2xl shadow-xl p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+              Cost Over Time
+            </h2>
+            <div class="h-64">
+              <canvas id="costOverTimeChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Late Payment Tips -->
+          <div class="bg-white rounded-2xl shadow-xl p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+              Avoiding Late Fees
+            </h2>
+
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <div class="flex-shrink-0 mt-1">
+                  <i class="fas fa-calendar-check text-green-500"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-gray-700">
+                    Set up payment reminders before due dates
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-start">
+                <div class="flex-shrink-0 mt-1">
+                  <i class="fas fa-mobile-alt text-blue-500"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-gray-700">
+                    Use automatic payments for recurring bills
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-start">
+                <div class="flex-shrink-0 mt-1">
+                  <i class="fas fa-handshake text-purple-500"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-gray-700">
+                    Contact creditors for payment extensions if needed
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-start">
+                <div class="flex-shrink-0 mt-1">
+                  <i class="fas fa-file-invoice-dollar text-orange-500"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-gray-700">
+                    Prioritize payments with highest late fees
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // DOM Elements
+        const originalAmountInput = document.getElementById("originalAmount");
+        const dueDateInput = document.getElementById("dueDate");
+        const paymentDateInput = document.getElementById("paymentDate");
+        const daysLateInput = document.getElementById("daysLate");
+        const feeStructureInputs = document.querySelectorAll(
+          'input[name="feeStructure"]'
+        );
+        const gracePeriodInput = document.getElementById("gracePeriod");
+        const calculateBtn = document.getElementById("calculateBtn");
+
+        // Fee parameter containers
+        const flatFeeParams = document.getElementById("flatFeeParams");
+        const percentageFeeParams = document.getElementById(
+          "percentageFeeParams"
+        );
+        const dailyFeeParams = document.getElementById("dailyFeeParams");
+        const tieredFeeParams = document.getElementById("tieredFeeParams");
+
+        // Results elements
+        const originalAmountResult = document.getElementById(
+          "originalAmountResult"
+        );
+        const lateFeeResult = document.getElementById("lateFeeResult");
+        const totalAmountResult = document.getElementById("totalAmountResult");
+        const daysLateWarning = document.getElementById("daysLateWarning");
+        const daysLateCount = document.getElementById("daysLateCount");
+        const gracePeriodNotice = document.getElementById("gracePeriodNotice");
+        const effectiveDaysLate = document.getElementById("effectiveDaysLate");
+        const feeStructureUsed = document.getElementById("feeStructureUsed");
+        const feeRateUsed = document.getElementById("feeRateUsed");
+        const feeCalculation = document.getElementById("feeCalculation");
+
+        // Chart
+        let costOverTimeChart = null;
+
+        // Set default dates (today and 15 days ago)
+        function setDefaultDates() {
+          const today = new Date();
+          const dueDate = new Date();
+          dueDate.setDate(today.getDate() - 15);
+
+          dueDateInput.value = formatDate(dueDate);
+          paymentDateInput.value = formatDate(today);
+
+          calculateDaysLate();
+        }
+
+        // Format date as YYYY-MM-DD
+        function formatDate(date) {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+          return `${year}-${month}-${day}`;
+        }
+
+        // Calculate days late
+        function calculateDaysLate() {
+          if (!dueDateInput.value || !paymentDateInput.value) return;
+
+          const dueDate = new Date(dueDateInput.value);
+          const paymentDate = new Date(paymentDateInput.value);
+
+          const timeDiff = paymentDate.getTime() - dueDate.getTime();
+          const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+          daysLateInput.value = Math.max(0, daysDiff);
+        }
+
+        // Format number as Indian Rupees
+        function formatIndianRupees(amount) {
+          amount = parseFloat(amount);
+          return new Intl.NumberFormat("en-IN", {
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0,
+          }).format(amount);
+        }
+
+        // Show appropriate fee parameters based on selection
+        function showFeeParameters() {
+          // Hide all parameter sections first
+          flatFeeParams.classList.add("hidden");
+          percentageFeeParams.classList.add("hidden");
+          dailyFeeParams.classList.add("hidden");
+          tieredFeeParams.classList.add("hidden");
+
+          // Show selected parameter section
+          const selectedFeeStructure = document.querySelector(
+            'input[name="feeStructure"]:checked'
+          ).value;
+
+          switch (selectedFeeStructure) {
+            case "flat":
+              flatFeeParams.classList.remove("hidden");
+              break;
+            case "percentage":
+              percentageFeeParams.classList.remove("hidden");
+              break;
+            case "daily":
+              dailyFeeParams.classList.remove("hidden");
+              break;
+            case "tiered":
+              tieredFeeParams.classList.remove("hidden");
+              break;
+          }
+        }
+
+        // Calculate late fees
+        function calculateLateFees() {
+          const originalAmount = parseFloat(originalAmountInput.value) || 0;
+          const daysLate = parseInt(daysLateInput.value) || 0;
+          const gracePeriod = parseInt(gracePeriodInput.value) || 0;
+          const effectiveDaysLate = Math.max(0, daysLate - gracePeriod);
+
+          const feeStructure = document.querySelector(
+            'input[name="feeStructure"]:checked'
+          ).value;
+
+          let lateFee = 0;
+          let feeDescription = "";
+
+          // Calculate based on fee structure
+          switch (feeStructure) {
+            case "flat":
+              const flatFeeAmount =
+                parseFloat(document.getElementById("flatFeeAmount").value) || 0;
+              const flatFeePeriod =
+                parseFloat(document.getElementById("flatFeePeriod").value) ||
+                30;
+
+              const periods = Math.ceil(effectiveDaysLate / flatFeePeriod);
+              lateFee = periods * flatFeeAmount;
+              feeDescription = `₹${formatIndianRupees(
+                flatFeeAmount
+              )} every ${flatFeePeriod} days`;
+              feeCalculation.textContent = `${periods} × ₹${formatIndianRupees(
+                flatFeeAmount
+              )}`;
+              break;
+
+            case "percentage":
+              const percentageRate =
+                parseFloat(document.getElementById("percentageRate").value) ||
+                0;
+              const percentageMinFee =
+                parseFloat(document.getElementById("percentageMinFee").value) ||
+                0;
+
+              lateFee = originalAmount * (percentageRate / 100);
+              lateFee = Math.max(lateFee, percentageMinFee);
+              feeDescription = `${percentageRate}% of original amount`;
+              feeCalculation.textContent = `₹${formatIndianRupees(
+                originalAmount
+              )} × ${percentageRate}%`;
+              break;
+
+            case "daily":
+              const dailyInterestRate =
+                parseFloat(
+                  document.getElementById("dailyInterestRate").value
+                ) || 0;
+              const dailyMinFee =
+                parseFloat(document.getElementById("dailyMinFee").value) || 0;
+
+              const dailyFee = originalAmount * (dailyInterestRate / 100);
+              lateFee = Math.max(dailyFee, dailyMinFee) * effectiveDaysLate;
+              feeDescription = `${dailyInterestRate}% daily interest`;
+              feeCalculation.textContent = `${effectiveDaysLate} days × ₹${formatIndianRupees(
+                Math.max(dailyFee, dailyMinFee)
+              )}`;
+              break;
+
+            case "tiered":
+              const tier1Rate =
+                parseFloat(document.getElementById("tier1Rate").value) || 0;
+              const tier2Rate =
+                parseFloat(document.getElementById("tier2Rate").value) || 0;
+              const tier3Rate =
+                parseFloat(document.getElementById("tier3Rate").value) || 0;
+              const tieredMinFee =
+                parseFloat(document.getElementById("tieredMinFee").value) || 0;
+
+              let tieredFee = 0;
+
+              if (effectiveDaysLate > 30) {
+                tieredFee +=
+                  originalAmount *
+                  (tier3Rate / 100) *
+                  Math.max(0, effectiveDaysLate - 30);
+                tieredFee += originalAmount * (tier2Rate / 100) * 15;
+                tieredFee += originalAmount * (tier1Rate / 100) * 15;
+              } else if (effectiveDaysLate > 15) {
+                tieredFee +=
+                  originalAmount *
+                  (tier2Rate / 100) *
+                  Math.max(0, effectiveDaysLate - 15);
+                tieredFee += originalAmount * (tier1Rate / 100) * 15;
+              } else {
+                tieredFee +=
+                  originalAmount * (tier1Rate / 100) * effectiveDaysLate;
+              }
+
+              lateFee = Math.max(tieredFee, tieredMinFee);
+              feeDescription = "Tiered rate structure";
+              feeCalculation.textContent = "Calculated based on tiered rates";
+              break;
+          }
+
+          // Update results
+          originalAmountResult.textContent = `₹${formatIndianRupees(
+            originalAmount
+          )}`;
+          lateFeeResult.textContent = `₹${formatIndianRupees(lateFee)}`;
+          totalAmountResult.textContent = `₹${formatIndianRupees(
+            originalAmount + lateFee
+          )}`;
+
+          // Update breakdown
+          effectiveDaysLate.textContent = `${effectiveDaysLate} days`;
+          feeStructureUsed.textContent =
+            feeStructure.charAt(0).toUpperCase() + feeStructure.slice(1);
+          feeRateUsed.textContent = feeDescription;
+
+          // Show/hide warnings
+          if (effectiveDaysLate > 0) {
+            daysLateWarning.classList.remove("hidden");
+            gracePeriodNotice.classList.add("hidden");
+            daysLateCount.textContent = effectiveDaysLate;
+          } else {
+            daysLateWarning.classList.add("hidden");
+            if (daysLate > 0) {
+              gracePeriodNotice.classList.remove("hidden");
+            } else {
+              gracePeriodNotice.classList.add("hidden");
+            }
+          }
+
+          // Update chart
+          updateChart(originalAmount, lateFee, effectiveDaysLate, feeStructure);
+        }
+
+        // Update cost over time chart
+        function updateChart(
+          originalAmount,
+          lateFee,
+          effectiveDaysLate,
+          feeStructure
+        ) {
+          const ctx = document
+            .getElementById("costOverTimeChart")
+            .getContext("2d");
+
+          // Destroy existing chart if it exists
+          if (costOverTimeChart) {
+            costOverTimeChart.destroy();
+          }
+
+          // Generate data for the chart
+          const labels = [];
+          const data = [];
+
+          for (let i = 0; i <= Math.min(effectiveDaysLate, 60); i += 5) {
+            labels.push(`Day ${i}`);
+
+            let fee = 0;
+
+            // Calculate fee for each day based on fee structure
+            switch (feeStructure) {
+              case "flat":
+                const flatFeeAmount =
+                  parseFloat(document.getElementById("flatFeeAmount").value) ||
+                  0;
+                const flatFeePeriod =
+                  parseFloat(document.getElementById("flatFeePeriod").value) ||
+                  30;
+                const periods = Math.ceil(i / flatFeePeriod);
+                fee = periods * flatFeeAmount;
+                break;
+
+              case "percentage":
+                const percentageRate =
+                  parseFloat(document.getElementById("percentageRate").value) ||
+                  0;
+                const percentageMinFee =
+                  parseFloat(
+                    document.getElementById("percentageMinFee").value
+                  ) || 0;
+                fee = Math.max(
+                  originalAmount * (percentageRate / 100),
+                  percentageMinFee
+                );
+                break;
+
+              case "daily":
+                const dailyInterestRate =
+                  parseFloat(
+                    document.getElementById("dailyInterestRate").value
+                  ) || 0;
+                const dailyMinFee =
+                  parseFloat(document.getElementById("dailyMinFee").value) || 0;
+                const dailyFee = Math.max(
+                  originalAmount * (dailyInterestRate / 100),
+                  dailyMinFee
+                );
+                fee = dailyFee * i;
+                break;
+
+              case "tiered":
+                const tier1Rate =
+                  parseFloat(document.getElementById("tier1Rate").value) || 0;
+                const tier2Rate =
+                  parseFloat(document.getElementById("tier2Rate").value) || 0;
+                const tier3Rate =
+                  parseFloat(document.getElementById("tier3Rate").value) || 0;
+                const tieredMinFee =
+                  parseFloat(document.getElementById("tieredMinFee").value) ||
+                  0;
+
+                let tieredFee = 0;
+
+                if (i > 30) {
+                  tieredFee +=
+                    originalAmount * (tier3Rate / 100) * Math.max(0, i - 30);
+                  tieredFee += originalAmount * (tier2Rate / 100) * 15;
+                  tieredFee += originalAmount * (tier1Rate / 100) * 15;
+                } else if (i > 15) {
+                  tieredFee +=
+                    originalAmount * (tier2Rate / 100) * Math.max(0, i - 15);
+                  tieredFee += originalAmount * (tier1Rate / 100) * 15;
+                } else {
+                  tieredFee += originalAmount * (tier1Rate / 100) * i;
+                }
+
+                fee = Math.max(tieredFee, tieredMinFee);
+                break;
+            }
+
+            data.push(fee);
+          }
+
+          costOverTimeChart = new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: "Late Fee Amount",
+                  data: data,
+                  borderColor: "rgb(239, 68, 68)",
+                  backgroundColor: "rgba(239, 68, 68, 0.1)",
+                  borderWidth: 2,
+                  fill: true,
+                  tension: 0.4,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: {
+                    display: true,
+                    text: "Late Fee (₹)",
+                  },
+                  ticks: {
+                    callback: function (value) {
+                      return "₹" + formatIndianRupees(value);
+                    },
+                  },
+                },
+                x: {
+                  title: {
+                    display: true,
+                    text: "Days Late",
+                  },
+                },
+              },
+              plugins: {
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      return `Fee: ₹${formatIndianRupees(context.raw)}`;
+                    },
+                  },
+                },
+              },
+            },
+          });
+        }
+
+        // Event listeners
+        dueDateInput.addEventListener("change", calculateDaysLate);
+        paymentDateInput.addEventListener("change", calculateDaysLate);
+
+        feeStructureInputs.forEach((input) => {
+          input.addEventListener("change", showFeeParameters);
+        });
+
+        calculateBtn.addEventListener("click", calculateLateFees);
+
+        // Calculate when any input changes
+        const allInputs = document.querySelectorAll("input, select");
+        allInputs.forEach((input) => {
+          input.addEventListener("input", calculateLateFees);
+        });
+
+        // Initialize
+        setDefaultDates();
+        showFeeParameters();
+        calculateLateFees();
+      });
+    </script>
+  </body>
+</html>
