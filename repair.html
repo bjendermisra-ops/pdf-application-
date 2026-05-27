@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Repair PDF Tool</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- PDF.js CDN for preview -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+    <!-- PDFLib CDN for repair -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background: #fff;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      .drop-zone {
+        border: 2px dashed #93c5fd;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        background: #eef2ff;
+        transition: all 0.3s ease;
+      }
+      .drop-zone.dragover {
+        border-color: #2563eb;
+        background: #eff6ff;
+      }
+      .repair-box {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      canvas {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+      }
+      @media (max-width: 640px) {
+        .container {
+          padding: 0.5rem;
+        }
+        .drop-zone {
+          padding: 1rem;
+        }
+        button,
+        input {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1
+        class="text-5xl font-extrabold text-center text-black mt-10 mb-4 sm:text-3xl"
+      >
+        Repair PDF Tool
+      </h1>
+      <h3 class="text-xl text-center text-gray-600 mb-10 sm:text-xl">
+        The Repair PDF tool helps fix corrupted, damaged, or unreadable PDF
+        file.
+      </h3>
+
+      <!-- Drop Zone -->
+      <div
+        class="drop-zone max-w-2xl mx-auto"
+        id="dropZone"
+        style="min-height: 300px"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-12 w-12 mx-auto text-gray-500 mb-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+          />
+        </svg>
+        <p class="text-gray-600 text-lg sm:text-base">
+          Drag & Drop Damaged PDF here
+        </p>
+        <input type="file" id="pdfInput" accept=".pdf" class="hidden" />
+        <button
+          class="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm sm:text-xs"
+        >
+          Browse Files
+        </button>
+        <p class="mt-4 text-gray-500 text-base">
+          All processing happens locally in your browser.
+        </p>
+      </div>
+
+      <!-- Repair Controls -->
+      <div class="repair-box mt-6 hidden max-w-3xl mx-auto" id="repairBox">
+        <div class="p-6">
+          <div class="flex flex-col gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Preview (if possible)</label
+              >
+              <canvas id="pdfCanvas" class="w-full"></canvas>
+            </div>
+            <button
+              id="repairBtn"
+              class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm disabled:bg-gray-400"
+            >
+              Repair & Download
+            </button>
+            <p id="status" class="text-gray-600 mt-4 text-sm hidden">
+              Processing...
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        let selectedFile = null;
+        let pdfDoc = null;
+        const $dropZone = $("#dropZone");
+        const $input = $("#pdfInput");
+        const $repairBox = $("#repairBox");
+        const $status = $("#status");
+        const $canvas = $("#pdfCanvas");
+        const ctx = $canvas[0].getContext("2d");
+
+        // Setup drag and drop
+        $dropZone.on({
+          dragover: function (e) {
+            e.preventDefault();
+            $(this).addClass("dragover");
+          },
+          dragleave: function () {
+            $(this).removeClass("dragover");
+          },
+          drop: function (e) {
+            e.preventDefault();
+            $(this).removeClass("dragover");
+            const files = e.originalEvent.dataTransfer.files;
+            if (files.length) {
+              $input[0].files = files;
+              $input.trigger("change");
+            }
+          },
+        });
+
+        $("#dropZone button").on("click", () => $input.click());
+
+        $input.on("change", async function (e) {
+          const file = this.files[0];
+          if (file && file.type === "application/pdf") {
+            selectedFile = file;
+            $dropZone.hide();
+            $repairBox.removeClass("hidden");
+            await previewPDF(file);
+          } else {
+            alert("Please select a valid PDF file");
+          }
+        });
+
+        // Attempt to preview PDF (even if corrupted)
+        async function previewPDF(file) {
+          const arrayBuffer = await file.arrayBuffer();
+          try {
+            pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            await renderPage(1); // Render first page as preview
+          } catch (error) {
+            console.warn("Preview failed (PDF may be corrupted):", error);
+            $canvas[0].width = 300;
+            $canvas[0].height = 100;
+            ctx.fillStyle = "#f3f4f6";
+            ctx.fillRect(0, 0, 300, 100);
+            ctx.fillStyle = "#6b7280";
+            ctx.font = "16px Inter";
+            ctx.textAlign = "center";
+            ctx.fillText("Preview unavailable", 150, 50);
+          }
+        }
+
+        // Render PDF page on canvas
+        async function renderPage(pageNum) {
+          const page = await pdfDoc.getPage(pageNum);
+          const scale = 2; // Moderate quality for preview
+          const viewport = page.getViewport({ scale });
+          $canvas[0].width = viewport.width;
+          $canvas[0].height = viewport.height;
+          await page.render({
+            canvasContext: ctx,
+            viewport: viewport,
+          }).promise;
+        }
+
+        // Repair PDF and download
+        $("#repairBtn").on("click", async function () {
+          if (!selectedFile) {
+            alert("Please upload a PDF first.");
+            return;
+          }
+
+          try {
+            $(this).prop("disabled", true);
+            $status.removeClass("hidden").text("Repairing PDF...");
+
+            const arrayBuffer = await selectedFile.arrayBuffer();
+            let repairedDoc;
+
+            try {
+              // Attempt to load the PDF with PDFLib
+              repairedDoc = await PDFLib.PDFDocument.load(arrayBuffer, {
+                ignoreEncryption: true, // Bypass encryption issues
+              });
+            } catch (loadError) {
+              console.warn(
+                "Initial load failed, attempting repair:",
+                loadError
+              );
+              // If loading fails, create a new document and copy pages if possible
+              repairedDoc = await PDFLib.PDFDocument.create();
+              const corruptDoc = await pdfjsLib.getDocument({
+                data: arrayBuffer,
+              }).promise;
+              const numPages = corruptDoc.numPages;
+              for (let i = 1; i <= numPages; i++) {
+                try {
+                  const page = await corruptDoc.getPage(i);
+                  const newPage = repairedDoc.addPage([
+                    page.getViewport({ scale: 1 }).width,
+                    page.getViewport({ scale: 1 }).height,
+                  ]);
+                  const contentStream = await page.getOperatorList();
+                  // Basic repair: re-render page content (limited by PDFLib capabilities)
+                  newPage.node.content = contentStream;
+                } catch (pageError) {
+                  console.warn(
+                    `Page ${i} skipped due to corruption:`,
+                    pageError
+                  );
+                }
+              }
+            }
+
+            // Save the repaired PDF
+            const repairedBytes = await repairedDoc.save({
+              useObjectStreams: false, // Ensure compatibility
+              updateFieldAppearances: true,
+            });
+
+            // Trigger download
+            const blob = new Blob([repairedBytes], { type: "application/pdf" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "repaired.pdf";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            $status.text("PDF repaired successfully!");
+            console.log("PDF repaired and downloaded successfully");
+          } catch (error) {
+            console.error("Error repairing PDF:", error);
+            alert("Failed to repair PDF: " + error.message);
+            $status.text("Repair failed.");
+          } finally {
+            $(this).prop("disabled", false);
+            setTimeout(() => $status.addClass("hidden"), 3000);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

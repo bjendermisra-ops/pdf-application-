@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Retirement Calculator | EasyToolsForU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#06b6d4',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <nav>
+      <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 9999px;
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      }
+
+      .back-button i {
+        font-size: 1rem;
+      }
+
+      .back-button:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        transform: translateX(-0.25rem);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+      }
+    </style>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Advanced Retirement Calculator</h1>
+                    <p class="text-gray-600 mt-2">Plan your retirement with accurate calculations and projections</p>
+                </div>
+                
+                <!-- Currency Selection -->
+                <div class="mt-4 md:mt-0">
+                    <div class="flex space-x-2 bg-gray-100 p-1 rounded-lg">
+                        <button id="usdBtn" class="currency-btn active px-4 py-2 rounded-md transition">
+                            <i class="fas fa-dollar-sign mr-2"></i>USD
+                        </button>
+                        <button id="inrBtn" class="currency-btn px-4 py-2 rounded-md transition bg-white text-gray-700">
+                            <i class="fas fa-rupee-sign mr-2"></i>INR
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex flex-wrap border-b border-gray-200 mb-6">
+                <button id="needsTab" class="tab-button active px-4 py-2 font-medium rounded-t-lg mr-1">
+                    Retirement Needs
+                </button>
+                <button id="savingsTab" class="tab-button px-4 py-2 font-medium rounded-t-lg mr-1">
+                    Savings Plan
+                </button>
+                <button id="withdrawalsTab" class="tab-button px-4 py-2 font-medium rounded-t-lg mr-1">
+                    Withdrawals
+                </button>
+                <button id="longevityTab" class="tab-button px-4 py-2 font-medium rounded-t-lg">
+                    Longevity
+                </button>
+            </div>
+
+            <!-- Retirement Needs Tab -->
+            <div id="needsContent" class="space-y-6">
+                <h2 class="text-xl font-bold text-gray-800">How much do you need to retire comfortably?</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Input Section -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Personal Information -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-user mr-2 text-primary"></i>Personal Information
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Current Age</label>
+                                        <input type="number" id="currentAge" value="35" min="18" max="80" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Planned Retirement Age</label>
+                                        <input type="number" id="retirementAge" value="65" min="40" max="80" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Life Expectancy</label>
+                                        <input type="number" id="lifeExpectancy" value="85" min="65" max="120" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Financial Information -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-money-bill-wave mr-2 text-primary"></i>Financial Information
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Current Annual Income</label>
+                                        <div class="input-with-icon">
+                                            <span id="incomeCurrency" class="currency-symbol">$</span>
+                                            <input type="number" id="currentIncome" value="70000" min="0" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Current Retirement Savings</label>
+                                        <div class="input-with-icon">
+                                            <span id="savingsCurrency" class="currency-symbol">$</span>
+                                            <input type="number" id="currentSavings" value="50000" min="0" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Annual Savings Rate</label>
+                                        <div class="input-with-icon">
+                                            <input type="number" id="savingsRate" value="15" min="0" max="100" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                            <span class="percentage-symbol">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Assumptions -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-chart-line mr-2 text-primary"></i>Assumptions
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Annual Income Increase</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" id="incomeIncrease" value="2" step="0.1" min="0" max="20" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <span class="percentage-symbol">%</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Retirement Income Target</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" id="retirementIncomePercent" value="80" min="0" max="200" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <span class="percentage-symbol">%</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Investment Return</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" id="investmentReturn" value="7" step="0.1" min="0" max="30" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <span class="percentage-symbol">%</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Inflation Rate</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" id="inflationRate" value="3" step="0.1" min="0" max="20" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <span class="percentage-symbol">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex space-x-4">
+                            <button id="calculateNeedsBtn" class="bg-primary hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition flex items-center">
+                                <i class="fas fa-calculator mr-2"></i> Calculate
+                            </button>
+                            <button id="clearNeedsBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Section -->
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 result-card">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Retirement Summary</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Years to Retirement</span>
+                                    <span class="font-medium text-lg" id="yearsToRetirement">30</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Required Savings</span>
+                                    <span class="font-medium text-lg" id="requiredSavings">$1,250,000</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Projected Savings</span>
+                                    <span class="font-medium text-lg" id="projectedSavings">$980,000</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Monthly Retirement Income</span>
+                                    <span class="font-medium text-lg" id="monthlyIncome">$4,167</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t border-blue-200">
+                                    <span class="text-gray-700 font-bold">Shortfall/Surplus</span>
+                                    <span class="font-bold text-lg text-danger" id="shortfall">-$270,000</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Chart -->
+                        <div class="bg-white p-4 rounded-lg border border-gray-200">
+                            <h3 class="font-bold text-gray-800 mb-4">Savings Projection</h3>
+                            <div class="h-64">
+                                <canvas id="needsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Savings Plan Tab -->
+            <div id="savingsContent" class="space-y-6 hidden">
+                <h2 class="text-xl font-bold text-gray-800">Create your personalized savings plan</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Input Section -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-piggy-bank mr-2 text-primary"></i>Savings Goals
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Current Age</label>
+                                    <input type="number" id="savingsCurrentAge" value="35" min="18" max="80" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Retirement Age</label>
+                                    <input type="number" id="savingsRetirementAge" value="65" min="40" max="80" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Retirement Savings Goal</label>
+                                    <div class="input-with-icon">
+                                        <span id="goalCurrency" class="currency-symbol">$</span>
+                                        <input type="number" id="savingsTarget" value="1000000" min="0" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Current Savings</label>
+                                    <div class="input-with-icon">
+                                        <span id="currentSavingsCurrency" class="currency-symbol">$</span>
+                                        <input type="number" id="savingsCurrent" value="50000" min="0" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Expected Annual Return</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" id="savingsReturn" value="7" step="0.1" min="0" max="30" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <span class="percentage-symbol">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex space-x-4">
+                            <button id="calculateSavingsBtn" class="bg-primary hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition flex items-center">
+                                <i class="fas fa-calculator mr-2"></i> Calculate
+                            </button>
+                            <button id="clearSavingsBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Section -->
+                    <div class="space-y-6">
+                        <div class="bg-green-50 p-4 rounded-lg border border-green-200 result-card">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Savings Plan</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Years Until Retirement</span>
+                                    <span class="font-medium text-lg" id="yearsUntilRetirement">30</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Monthly Contribution</span>
+                                    <span class="font-medium text-lg" id="requiredMonthly">$850</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Annual Contribution</span>
+                                    <span class="font-medium text-lg" id="requiredAnnual">$10,200</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">% of Income</span>
+                                    <span class="font-medium text-lg" id="requiredPercentage">14.6%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Chart -->
+                        <div class="bg-white p-4 rounded-lg border border-gray-200">
+                            <h3 class="font-bold text-gray-800 mb-4">Savings Growth</h3>
+                            <div class="h-64">
+                                <canvas id="savingsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Withdrawals Tab -->
+            <div id="withdrawalsContent" class="space-y-6 hidden">
+                <h2 class="text-xl font-bold text-gray-800">Plan your retirement withdrawals</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Input Section -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-hand-holding-usd mr-2 text-primary"></i>Withdrawal Strategy
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Retirement Age</label>
+                                    <input type="number" id="withdrawalRetirementAge" value="65" min="40" max="80" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Life Expectancy</label>
+                                    <input type="number" id="withdrawalLifeExpectancy" value="85" min="65" max="120" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Retirement Savings</label>
+                                    <div class="input-with-icon">
+                                        <span id="withdrawalSavingsCurrency" class="currency-symbol">$</span>
+                                        <input type="number" id="withdrawalSavings" value="1000000" min="0" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Annual Return</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" id="withdrawalReturn" value="5" step="0.1" min="0" max="30" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <span class="percentage-symbol">%</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Inflation Rate</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" id="withdrawalInflation" value="3" step="0.1" min="0" max="20" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <span class="percentage-symbol">%</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Withdrawal Rate</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" id="withdrawalRate" value="4" step="0.1" min="0" max="20" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <span class="percentage-symbol">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex space-x-4">
+                            <button id="calculateWithdrawalBtn" class="bg-primary hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition flex items-center">
+                                <i class="fas fa-calculator mr-2"></i> Calculate
+                            </button>
+                            <button id="clearWithdrawalBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Section -->
+                    <div class="space-y-6">
+                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-200 result-card">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Withdrawal Plan</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Annual Withdrawal</span>
+                                    <span class="font-medium text-lg" id="annualWithdrawal">$40,000</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Monthly Withdrawal</span>
+                                    <span class="font-medium text-lg" id="monthlyWithdrawal">$3,333</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Years of Retirement</span>
+                                    <span class="font-medium text-lg" id="retirementYears">20</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Funds Last Until Age</span>
+                                    <span class="font-medium text-lg" id="fundsLastUntil">85</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Chart -->
+                        <div class="bg-white p-4 rounded-lg border border-gray-200">
+                            <h3 class="font-bold text-gray-800 mb-4">Withdrawal Projection</h3>
+                            <div class="h-64">
+                                <canvas id="withdrawalChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Longevity Tab -->
+            <div id="longevityContent" class="space-y-6 hidden">
+                <h2 class="text-xl font-bold text-gray-800">How long will your retirement savings last?</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Input Section -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-hourglass-half mr-2 text-primary"></i>Longevity Analysis
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Retirement Savings</label>
+                                    <div class="input-with-icon">
+                                        <span id="longevitySavingsCurrency" class="currency-symbol">$</span>
+                                        <input type="number" id="longevitySavings" value="1000000" min="0" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Withdrawal</label>
+                                    <div class="input-with-icon">
+                                        <span id="longevityWithdrawalCurrency" class="currency-symbol">$</span>
+                                        <input type="number" id="longevityMonthlyWithdrawal" value="4000" min="0" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Annual Return</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" id="longevityReturn" value="5" step="0.1" min="0" max="30" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <span class="percentage-symbol">%</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Inflation Rate</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" id="longevityInflation" value="3" step="0.1" min="0" max="20" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <span class="percentage-symbol">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex space-x-4">
+                            <button id="calculateLongevityBtn" class="bg-primary hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition flex items-center">
+                                <i class="fas fa-calculator mr-2"></i> Calculate
+                            </button>
+                            <button id="clearLongevityBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Section -->
+                    <div class="space-y-6">
+                        <div class="bg-orange-50 p-4 rounded-lg border border-orange-200 result-card">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Longevity Results</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Annual Withdrawal Rate</span>
+                                    <span class="font-medium text-lg" id="withdrawalRateResult">4.8%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Years Until Depletion</span>
+                                    <span class="font-medium text-lg" id="yearsUntilDepletion">25.3</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Age When Funds Run Out</span>
+                                    <span class="font-medium text-lg" id="depletionAge">90.3</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">Total Withdrawn</span>
+                                    <span class="font-medium text-lg" id="totalWithdrawn">$1,212,000</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Chart -->
+                        <div class="bg-white p-4 rounded-lg border border-gray-200">
+                            <h3 class="font-bold text-gray-800 mb-4">Savings Depletion</h3>
+                            <div class="h-64">
+                                <canvas id="longevityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Currency state
+            let currentCurrency = 'USD';
+            let currencySymbol = '$';
+            let currencyMultiplier = 1;
+            
+            // Chart instances
+            let needsChart, savingsChart, withdrawalChart, longevityChart;
+            
+            // Initialize all charts
+            function initializeCharts() {
+                // Needs Chart
+                const needsChartCtx = document.getElementById('needsChart').getContext('2d');
+                needsChart = new Chart(needsChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Required', 'Projected'],
+                        datasets: [{
+                            label: 'Retirement Savings',
+                            data: [1250000, 980000],
+                            backgroundColor: ['#3B82F6', '#10B981'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return currencySymbol + (value / 1000).toLocaleString() + 'K';
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return currencySymbol + context.raw.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Savings Chart
+                const savingsChartCtx = document.getElementById('savingsChart').getContext('2d');
+                savingsChart = new Chart(savingsChartCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Now', 'Year 5', 'Year 10', 'Year 15', 'Year 20', 'Year 25', 'Year 30'],
+                        datasets: [{
+                            label: 'Projected Savings',
+                            data: [50000, 120000, 220000, 350000, 520000, 730000, 1000000],
+                            borderColor: '#3B82F6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return currencySymbol + (value / 1000).toLocaleString() + 'K';
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Savings: ' + currencySymbol + context.raw.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Withdrawal Chart
+                const withdrawalChartCtx = document.getElementById('withdrawalChart').getContext('2d');
+                withdrawalChart = new Chart(withdrawalChartCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Annual Withdrawal', 'Remaining Balance'],
+                        datasets: [{
+                            data: [40000, 960000],
+                            backgroundColor: ['#F59E0B', '#E5E7EB'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        return `${label}: ${currencySymbol}${value.toLocaleString()}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Longevity Chart
+                const longevityChartCtx = document.getElementById('longevityChart').getContext('2d');
+                longevityChart = new Chart(longevityChartCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Retirement', 'Year 5', 'Year 10', 'Year 15', 'Year 20', 'Year 25'],
+                        datasets: [{
+                            label: 'Account Balance',
+                            data: [1000000, 850000, 675000, 475000, 240000, 0],
+                            borderColor: '#3B82F6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return currencySymbol + (value / 1000).toLocaleString() + 'K';
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Balance: ' + currencySymbol + context.raw.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Format currency
+            function formatCurrency(amount) {
+                return currencySymbol + amount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+            
+            // Format percentage
+            function formatPercentage(value) {
+                return value.toFixed(1) + '%';
+            }
+            
+            // Set currency
+            function setCurrency(currency) {
+                currentCurrency = currency;
+                
+                if (currency === 'USD') {
+                    currencySymbol = '$';
+                    currencyMultiplier = 1;
+                    
+                    document.getElementById('usdBtn').classList.add('active', 'bg-primary', 'text-white');
+                    document.getElementById('usdBtn').classList.remove('bg-white', 'text-gray-700');
+                    document.getElementById('inrBtn').classList.remove('active', 'bg-primary', 'text-white');
+                    document.getElementById('inrBtn').classList.add('bg-white', 'text-gray-700');
+                } else {
+                    currencySymbol = '₹';
+                    currencyMultiplier = 83; // Approximate USD to INR conversion
+                    
+                    document.getElementById('inrBtn').classList.add('active', 'bg-primary', 'text-white');
+                    document.getElementById('inrBtn').classList.remove('bg-white', 'text-gray-700');
+                    document.getElementById('usdBtn').classList.remove('active', 'bg-primary', 'text-white');
+                    document.getElementById('usdBtn').classList.add('bg-white', 'text-gray-700');
+                }
+                
+                // Update all currency symbols
+                document.querySelectorAll('.currency-symbol').forEach(el => {
+                    el.textContent = currencySymbol;
+                });
+                
+                // Recalculate all
+                calculateRetirementNeeds();
+                calculateSavingsPlan();
+                calculateWithdrawals();
+                calculateLongevity();
+            }
+            
+            // Tab switching
+            function setupTabs() {
+                const tabs = [
+                    { button: 'needsTab', content: 'needsContent' },
+                    { button: 'savingsTab', content: 'savingsContent' },
+                    { button: 'withdrawalsTab', content: 'withdrawalsContent' },
+                    { button: 'longevityTab', content: 'longevityContent' }
+                ];
+                
+                tabs.forEach(tab => {
+                    document.getElementById(tab.button).addEventListener('click', function() {
+                        // Remove active class from all tabs
+                        tabs.forEach(t => {
+                            document.getElementById(t.button).classList.remove('active', 'bg-primary', 'text-white');
+                            document.getElementById(t.button).classList.add('bg-white', 'text-gray-700');
+                            document.getElementById(t.content).classList.add('hidden');
+                        });
+                        
+                        // Add active class to current tab
+                        this.classList.add('active', 'bg-primary', 'text-white');
+                        this.classList.remove('bg-white', 'text-gray-700');
+                        document.getElementById(tab.content).classList.remove('hidden');
+                    });
+                });
+            }
+            
+            // Calculate retirement needs
+            function calculateRetirementNeeds() {
+                const currentAge = parseInt(document.getElementById('currentAge').value) || 0;
+                const retirementAge = parseInt(document.getElementById('retirementAge').value) || 0;
+                const lifeExpectancy = parseInt(document.getElementById('lifeExpectancy').value) || 0;
+                const currentIncome = parseFloat(document.getElementById('currentIncome').value) * currencyMultiplier || 0;
+                const currentSavings = parseFloat(document.getElementById('currentSavings').value) * currencyMultiplier || 0;
+                const savingsRate = parseFloat(document.getElementById('savingsRate').value) / 100 || 0;
+                const incomeIncrease = parseFloat(document.getElementById('incomeIncrease').value) / 100 || 0;
+                const retirementIncomePercent = parseFloat(document.getElementById('retirementIncomePercent').value) / 100 || 0;
+                const investmentReturn = parseFloat(document.getElementById('investmentReturn').value) / 100 || 0;
+                const inflationRate = parseFloat(document.getElementById('inflationRate').value) / 100 || 0;
+                
+                const yearsToRetirement = retirementAge - currentAge;
+                const retirementYears = lifeExpectancy - retirementAge;
+                
+                // Calculate final salary at retirement
+                const finalSalary = currentIncome * Math.pow(1 + incomeIncrease, yearsToRetirement);
+                
+                // Calculate required annual retirement income (in today's dollars)
+                const requiredAnnualIncome = finalSalary * retirementIncomePercent;
+                
+                // Adjust for inflation to get retirement income in future dollars
+                const futureRequiredIncome = requiredAnnualIncome * Math.pow(1 + inflationRate, yearsToRetirement);
+                
+                // Calculate required retirement savings (present value of annuity due)
+                const realReturn = (1 + investmentReturn) / (1 + inflationRate) - 1;
+                let requiredSavings = 0;
+                
+                if (realReturn > 0) {
+                    requiredSavings = futureRequiredIncome * (1 - Math.pow(1 + realReturn, -retirementYears)) / realReturn;
+                } else {
+                    requiredSavings = futureRequiredIncome * retirementYears;
+                }
+                
+                // Calculate projected savings
+                let projectedSavings = currentSavings * Math.pow(1 + investmentReturn, yearsToRetirement);
+                
+                for (let i = 1; i <= yearsToRetirement; i++) {
+                    const yearSalary = currentIncome * Math.pow(1 + incomeIncrease, i);
+                    const yearContribution = yearSalary * savingsRate;
+                    projectedSavings += yearContribution * Math.pow(1 + investmentReturn, yearsToRetirement - i);
+                }
+                
+                // Calculate monthly retirement income
+                const monthlyIncome = futureRequiredIncome / 12;
+                
+                // Calculate shortfall/surplus
+                const shortfall = requiredSavings - projectedSavings;
+                
+                // Update UI
+                document.getElementById('yearsToRetirement').textContent = yearsToRetirement;
+                document.getElementById('requiredSavings').textContent = formatCurrency(requiredSavings);
+                document.getElementById('projectedSavings').textContent = formatCurrency(projectedSavings);
+                document.getElementById('monthlyIncome').textContent = formatCurrency(monthlyIncome);
+                
+                const shortfallElement = document.getElementById('shortfall');
+                shortfallElement.textContent = formatCurrency(shortfall);
+                if (shortfall > 0) {
+                    shortfallElement.classList.remove('text-success');
+                    shortfallElement.classList.add('text-danger');
+                } else {
+                    shortfallElement.classList.remove('text-danger');
+                    shortfallElement.classList.add('text-success');
+                }
+                
+                // Update chart
+                needsChart.data.datasets[0].data = [requiredSavings, projectedSavings];
+                needsChart.update();
+            }
+            
+            // Calculate savings plan
+            function calculateSavingsPlan() {
+                const currentAge = parseInt(document.getElementById('savingsCurrentAge').value) || 0;
+                const retirementAge = parseInt(document.getElementById('savingsRetirementAge').value) || 0;
+                const target = parseFloat(document.getElementById('savingsTarget').value) * currencyMultiplier || 0;
+                const currentSavings = parseFloat(document.getElementById('savingsCurrent').value) * currencyMultiplier || 0;
+                const returnRate = parseFloat(document.getElementById('savingsReturn').value) / 100 || 0;
+                
+                const years = retirementAge - currentAge;
+                const months = years * 12;
+                
+                // Calculate required monthly contribution
+                let monthlyContribution = 0;
+                if (returnRate > 0) {
+                    const futureValueOfCurrent = currentSavings * Math.pow(1 + returnRate, years);
+                    const neededFromContributions = target - futureValueOfCurrent;
+                    monthlyContribution = (neededFromContributions * (returnRate / 12)) / 
+                                         (Math.pow(1 + returnRate / 12, months) - 1);
+                } else {
+                    monthlyContribution = (target - currentSavings) / months;
+                }
+                
+                const annualContribution = monthlyContribution * 12;
+                const currentIncome = 70000 * currencyMultiplier; // Default from input
+                const percentageOfIncome = (annualContribution / currentIncome) * 100;
+                
+                // Update UI
+                document.getElementById('yearsUntilRetirement').textContent = years;
+                document.getElementById('requiredMonthly').textContent = formatCurrency(monthlyContribution);
+                document.getElementById('requiredAnnual').textContent = formatCurrency(annualContribution);
+                document.getElementById('requiredPercentage').textContent = formatPercentage(percentageOfIncome);
+                
+                // Update chart (simplified projection)
+                const labels = ['Now'];
+                const data = [currentSavings];
+                
+                for (let i = 5; i <= years; i += 5) {
+                    labels.push(`Year ${i}`);
+                    
+                    let balance = currentSavings * Math.pow(1 + returnRate, i);
+                    for (let j = 1; j <= i; j++) {
+                        balance += annualContribution * Math.pow(1 + returnRate, i - j);
+                    }
+                    data.push(balance);
+                }
+                
+                if (years % 5 !== 0) {
+                    labels.push(`Retirement`);
+                    
+                    let balance = currentSavings * Math.pow(1 + returnRate, years);
+                    for (let j = 1; j <= years; j++) {
+                        balance += annualContribution * Math.pow(1 + returnRate, years - j);
+                    }
+                    data.push(balance);
+                }
+                
+                savingsChart.data.labels = labels;
+                savingsChart.data.datasets[0].data = data;
+                savingsChart.update();
+            }
+            
+            // Calculate withdrawals
+            function calculateWithdrawals() {
+                const retirementAge = parseInt(document.getElementById('withdrawalRetirementAge').value) || 0;
+                const lifeExpectancy = parseInt(document.getElementById('withdrawalLifeExpectancy').value) || 0;
+                const savings = parseFloat(document.getElementById('withdrawalSavings').value) * currencyMultiplier || 0;
+                const returnRate = parseFloat(document.getElementById('withdrawalReturn').value) / 100 || 0;
+                const inflationRate = parseFloat(document.getElementById('withdrawalInflation').value) / 100 || 0;
+                const withdrawalRate = parseFloat(document.getElementById('withdrawalRate').value) / 100 || 0;
+                
+                const retirementYears = lifeExpectancy - retirementAge;
+                
+                // Calculate annual withdrawal
+                const annualWithdrawal = savings * withdrawalRate;
+                const monthlyWithdrawal = annualWithdrawal / 12;
+                
+                // Calculate how long funds will last
+                let balance = savings;
+                let yearsFundsLast = 0;
+                
+                while (balance > 0 && yearsFundsLast < 50) {
+                    balance = (balance - annualWithdrawal) * (1 + returnRate);
+                    yearsFundsLast++;
+                }
+                
+                const fundsLastUntil = retirementAge + yearsFundsLast;
+                
+                // Update UI
+                document.getElementById('annualWithdrawal').textContent = formatCurrency(annualWithdrawal);
+                document.getElementById('monthlyWithdrawal').textContent = formatCurrency(monthlyWithdrawal);
+                document.getElementById('retirementYears').textContent = retirementYears;
+                document.getElementById('fundsLastUntil').textContent = fundsLastUntil;
+                
+                // Update chart
+                withdrawalChart.data.datasets[0].data = [annualWithdrawal, savings - annualWithdrawal];
+                withdrawalChart.update();
+            }
+            
+            // Calculate longevity
+            function calculateLongevity() {
+                const savings = parseFloat(document.getElementById('longevitySavings').value) * currencyMultiplier || 0;
+                const monthlyWithdrawal = parseFloat(document.getElementById('longevityMonthlyWithdrawal').value) * currencyMultiplier || 0;
+                const returnRate = parseFloat(document.getElementById('longevityReturn').value) / 100 || 0;
+                const inflationRate = parseFloat(document.getElementById('longevityInflation').value) / 100 || 0;
+                
+                const annualWithdrawal = monthlyWithdrawal * 12;
+                const withdrawalRate = (annualWithdrawal / savings) * 100;
+                
+                // Calculate years until depletion
+                let balance = savings;
+                let years = 0;
+                let totalWithdrawn = 0;
+                const balanceData = [savings];
+                const yearLabels = ['Retirement'];
+                const retirementAge = 65; // Default retirement age
+                
+                while (balance > 0 && years < 50) {
+                    // Adjust withdrawal for inflation
+                    const inflationAdjustedWithdrawal = annualWithdrawal * Math.pow(1 + inflationRate, years);
+                    balance = (balance - inflationAdjustedWithdrawal) * (1 + returnRate);
+                    totalWithdrawn += inflationAdjustedWithdrawal;
+                    years++;
+                    
+                    // Add data points for chart
+                    if (years % 5 === 0 || balance <= 0) {
+                        yearLabels.push(`Year ${years}`);
+                        balanceData.push(Math.max(0, balance));
+                    }
+                }
+                
+                const depletionAge = retirementAge + years;
+                
+                // Update UI
+                document.getElementById('withdrawalRateResult').textContent = formatPercentage(withdrawalRate);
+                document.getElementById('yearsUntilDepletion').textContent = years.toFixed(1);
+                document.getElementById('depletionAge').textContent = depletionAge.toFixed(1);
+                document.getElementById('totalWithdrawn').textContent = formatCurrency(totalWithdrawn);
+                
+                // Update chart
+                longevityChart.data.labels = yearLabels;
+                longevityChart.data.datasets[0].data = balanceData;
+                longevityChart.update();
+            }
+            
+            // Setup event listeners
+            function setupEventListeners() {
+                // Currency buttons
+                document.getElementById('usdBtn').addEventListener('click', () => setCurrency('USD'));
+                document.getElementById('inrBtn').addEventListener('click', () => setCurrency('INR'));
+                
+                // Calculate buttons
+                document.getElementById('calculateNeedsBtn').addEventListener('click', calculateRetirementNeeds);
+                document.getElementById('calculateSavingsBtn').addEventListener('click', calculateSavingsPlan);
+                document.getElementById('calculateWithdrawalBtn').addEventListener('click', calculateWithdrawals);
+                document.getElementById('calculateLongevityBtn').addEventListener('click', calculateLongevity);
+                
+                // Clear buttons
+                document.getElementById('clearNeedsBtn').addEventListener('click', function() {
+                    document.getElementById('currentAge').value = '35';
+                    document.getElementById('retirementAge').value = '65';
+                    document.getElementById('lifeExpectancy').value = '85';
+                    document.getElementById('currentIncome').value = '70000';
+                    document.getElementById('currentSavings').value = '50000';
+                    document.getElementById('savingsRate').value = '15';
+                    document.getElementById('incomeIncrease').value = '2';
+                    document.getElementById('retirementIncomePercent').value = '80';
+                    document.getElementById('investmentReturn').value = '7';
+                    document.getElementById('inflationRate').value = '3';
+                    calculateRetirementNeeds();
+                });
+                
+                document.getElementById('clearSavingsBtn').addEventListener('click', function() {
+                    document.getElementById('savingsCurrentAge').value = '35';
+                    document.getElementById('savingsRetirementAge').value = '65';
+                    document.getElementById('savingsTarget').value = '1000000';
+                    document.getElementById('savingsCurrent').value = '50000';
+                    document.getElementById('savingsReturn').value = '7';
+                    calculateSavingsPlan();
+                });
+                
+                document.getElementById('clearWithdrawalBtn').addEventListener('click', function() {
+                    document.getElementById('withdrawalRetirementAge').value = '65';
+                    document.getElementById('withdrawalLifeExpectancy').value = '85';
+                    document.getElementById('withdrawalSavings').value = '1000000';
+                    document.getElementById('withdrawalReturn').value = '5';
+                    document.getElementById('withdrawalInflation').value = '3';
+                    document.getElementById('withdrawalRate').value = '4';
+                    calculateWithdrawals();
+                });
+                
+                document.getElementById('clearLongevityBtn').addEventListener('click', function() {
+                    document.getElementById('longevitySavings').value = '1000000';
+                    document.getElementById('longevityMonthlyWithdrawal').value = '4000';
+                    document.getElementById('longevityReturn').value = '5';
+                    document.getElementById('longevityInflation').value = '3';
+                    calculateLongevity();
+                });
+                
+                // Real-time calculation for retirement needs
+                const needsInputs = [
+                    'currentAge', 'retirementAge', 'lifeExpectancy', 'currentIncome', 
+                    'currentSavings', 'savingsRate', 'incomeIncrease', 'retirementIncomePercent',
+                    'investmentReturn', 'inflationRate'
+                ];
+                
+                needsInputs.forEach(id => {
+                    document.getElementById(id).addEventListener('input', calculateRetirementNeeds);
+                });
+                
+                // Real-time calculation for savings plan
+                const savingsInputs = [
+                    'savingsCurrentAge', 'savingsRetirementAge', 'savingsTarget', 
+                    'savingsCurrent', 'savingsReturn'
+                ];
+                
+                savingsInputs.forEach(id => {
+                    document.getElementById(id).addEventListener('input', calculateSavingsPlan);
+                });
+                
+                // Real-time calculation for withdrawals
+                const withdrawalInputs = [
+                    'withdrawalRetirementAge', 'withdrawalLifeExpectancy', 'withdrawalSavings',
+                    'withdrawalReturn', 'withdrawalInflation', 'withdrawalRate'
+                ];
+                
+                withdrawalInputs.forEach(id => {
+                    document.getElementById(id).addEventListener('input', calculateWithdrawals);
+                });
+                
+                // Real-time calculation for longevity
+                const longevityInputs = [
+                    'longevitySavings', 'longevityMonthlyWithdrawal', 'longevityReturn', 'longevityInflation'
+                ];
+                
+                longevityInputs.forEach(id => {
+                    document.getElementById(id).addEventListener('input', calculateLongevity);
+                });
+            }
+            
+            // Initialize the application
+            function init() {
+                initializeCharts();
+                setupTabs();
+                setupEventListeners();
+                setCurrency('USD');
+                
+                // Calculate all on initial load
+                calculateRetirementNeeds();
+                calculateSavingsPlan();
+                calculateWithdrawals();
+                calculateLongevity();
+            }
+            
+            // Start the application
+            init();
+        });
+    </script>
+</body>
+</html>

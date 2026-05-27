@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Small Text Generator | SEO Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .copy-btn {
+            transition: all 0.2s;
+        }
+        .copy-btn.copied {
+            background-color: #16a34a;
+            border-color: #16a34a;
+        }
+        .text-option {
+            transition: all 0.2s;
+        }
+        .text-option:hover {
+            background-color: #e5e7eb;
+        }
+        .text-option.active {
+            background-color: #d1d5db;
+            border-color: #9ca3af;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen text-black">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-black mb-2">Small Text Generator</h1>
+            <p class="text-lg text-gray-700">Create tiny text for social media bios, posts, and SEO snippets</p>
+        </header>
+
+        <main class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-black mb-4">Input Text</h2>
+                
+                <div class="mb-6">
+                    <label for="input-text" class="block text-sm font-medium text-black mb-1">Enter your text:</label>
+                    <textarea id="input-text" rows="3" class="w-full px-4 py-3 bg-white text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your text here..."></textarea>
+                </div>
+                
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="generateText()" class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2">
+                        <i class="fas fa-magic"></i> Generate Text
+                    </button>
+                    <button onclick="clearAll()" class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2">
+                        <i class="fas fa-broom"></i> Clear
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-black mb-4">Text Styles</h2>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
+                    <button onclick="selectStyle('tiny')" class="text-option px-4 py-3 bg-white text-black border border-gray-200 rounded-md hover:bg-gray-100 transition flex flex-col items-center active">
+                        <span class="text-xs">ᵗⁱⁿʸ ᵗᵉˣᵗ</span>
+                        <span class="text-xs mt-1 text-gray-500">Superscript</span>
+                    </button>
+                    
+                    <button onclick="selectStyle('small-caps')" class="text-option px-4 py-3 bg-white text-black border border-gray-200 rounded-md hover:bg-gray-100 transition flex flex-col items-center">
+                        <span class="text-xs" style="font-variant: small-caps;">Small Caps</span>
+                        <span class="text-xs mt-1 text-gray-500">Small Caps</span>
+                    </button>
+                    
+                    <button onclick="selectStyle('bubble')" class="text-option px-4 py-3 bg-white text-black border border-gray-200 rounded-md hover:bg-gray-100 transition flex flex-col items-center">
+                        <span class="text-xs">Ⓑⓤⓑⓑⓛⓔ Ⓣⓔⓧⓣ</span>
+                        <span class="text-xs mt-1 text-gray-500">Bubble</span>
+                    </button>
+                    
+                    <button onclick="selectStyle('upside-down')" class="text-option px-4 py-3 bg-white text-black border border-gray-200 rounded-md hover:bg-gray-100 transition flex flex-col items-center">
+                        <span class="text-xs">ɐᴉlɐɹʇsnⱯ uʍop-ǝpᴉsdn</span>
+                        <span class="text-xs mt-1 text-gray-500">Upside Down</span>
+                    </button>
+                    
+                    <button onclick="selectStyle('gothic')" class="text-option px-4 py-3 bg-white text-black border border-gray-200 rounded-md hover:bg-gray-100 transition flex flex-col items-center">
+                        <span class="text-xs">𝙶𝚘𝚝𝚑𝚒𝚌 𝚃𝚎𝚡𝚝</span>
+                        <span class="text-xs mt-1 text-gray-500">Gothic</span>
+                    </button>
+                    
+                    <button onclick="selectStyle('cursive')" class="text-option px-4 py-3 bg-white text-black border border-gray-200 rounded-md hover:bg-gray-100 transition flex flex-col items-center">
+                        <span class="text-xs">𝒞𝓊𝓇𝓈𝒾𝓋ℯ 𝒯ℯ𝓍𝓉</span>
+                        <span class="text-xs mt-1 text-gray-500">Cursive</span>
+                    </button>
+                    
+                    <button onclick="selectStyle('double-struck')" class="text-option px-4 py-3 bg-white text-black border border-gray-200 rounded-md hover:bg-gray-100 transition flex flex-col items-center">
+                        <span class="text-xs">𝔻𝕠𝕦𝕓𝕝𝕖-𝕊𝕥𝕣𝕦𝕔𝕜</span>
+                        <span class="text-xs mt-1 text-gray-500">Double Struck</span>
+                    </button>
+                    
+                    <button onclick="selectStyle('squares')" class="text-option px-4 py-3 bg-white text-black border border-gray-200 rounded-md hover:bg-gray-100 transition flex flex-col items-center">
+                        <span class="text-xs">🅂🅀🅄🄰🅁🄴🅂</span>
+                        <span class="text-xs mt-1 text-gray-500">Squares</span>
+                    </button>
+                </div>
+                
+                <div class="bg-blue-50 p-4 rounded-md border border-blue-200">
+                    <h3 class="text-lg font-medium text-blue-800 mb-2">How to use small text</h3>
+                    <ul class="list-disc pl-5 text-blue-700 space-y-1 text-sm">
+                        <li>Great for social media bios and posts</li>
+                        <li>Use in email subject lines for attention</li>
+                        <li>Create unique headings for blog posts</li>
+                        <li>Not recommended for main content (accessibility)</li>
+                        <li>Works on most modern platforms (Twitter, Instagram, etc.)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md overflow-hidden p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-semibold text-black">Generated Output</h2>
+                    <button onclick="copyOutput()" id="copy-output-btn" class="copy-btn px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+                
+                <div id="output-container" class="bg-white p-4 rounded-md min-h-20 border border-gray-200 font-mono text-center text-xl">
+                    <p class="text-gray-500 italic">Your small text will appear here...</p>
+                </div>
+                
+                <div class="mt-4">
+                    <label for="font-size" class="block text-sm font-medium text-black mb-1">Preview Size:</label>
+                    <input type="range" id="font-size" min="8" max="72" value="24" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer">
+                    <div class="flex justify-between text-xs text-gray-500">
+                        <span>Small</span>
+                        <span>Large</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm">
+        <p>Small Text Generator © 2023 | For social media and creative content</p>
+    </footer>
+
+    <script>
+        let currentStyle = 'tiny';
+        const styleMaps = {
+            'tiny': {
+                name: 'Tiny Text',
+                map: {
+                    'a': 'ᵃ', 'b': 'ᵇ', 'c': 'ᶜ', 'd': 'ᵈ', 'e': 'ᵉ', 'f': 'ᶠ', 'g': 'ᵍ', 'h': 'ʰ', 'i': 'ⁱ', 
+                    'j': 'ʲ', 'k': 'ᵏ', 'l': 'ˡ', 'm': 'ᵐ', 'n': 'ⁿ', 'o': 'ᵒ', 'p': 'ᵖ', 'q': 'ᑫ', 'r': 'ʳ', 
+                    's': 'ˢ', 't': 'ᵗ', 'u': 'ᵘ', 'v': 'ᵛ', 'w': 'ʷ', 'x': 'ˣ', 'y': 'ʸ', 'z': 'ᶻ',
+                    'A': 'ᴬ', 'B': 'ᴮ', 'C': 'ᶜ', 'D': 'ᴰ', 'E': 'ᴱ', 'F': 'ᶠ', 'G': 'ᴳ', 'H': 'ᴴ', 'I': 'ᴵ', 
+                    'J': 'ᴶ', 'K': 'ᴷ', 'L': 'ᴸ', 'M': 'ᴹ', 'N': 'ᴺ', 'O': 'ᴼ', 'P': 'ᴾ', 'Q': 'ᑫ', 'R': 'ᴿ', 
+                    'S': 'ˢ', 'T': 'ᵀ', 'U': 'ᵁ', 'V': 'ⱽ', 'W': 'ᵂ', 'X': 'ˣ', 'Y': 'ʸ', 'Z': 'ᶻ',
+                    '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹',
+                    ' ': ' '
+                }
+            },
+            'small-caps': {
+                name: 'Small Caps',
+                style: 'font-variant: small-caps;'
+            },
+            'bubble': {
+                name: 'Bubble Text',
+                map: {
+                    'a': 'ⓐ', 'b': 'ⓑ', 'c': 'ⓒ', 'd': 'ⓓ', 'e': 'ⓔ', 'f': 'ⓕ', 'g': 'ⓖ', 'h': 'ⓗ', 'i': 'ⓘ', 
+                    'j': 'ⓙ', 'k': 'ⓚ', 'l': 'ⓛ', 'm': 'ⓜ', 'n': 'ⓝ', 'o': 'ⓞ', 'p': 'ⓟ', 'q': 'ⓠ', 'r': 'ⓡ', 
+                    's': 'ⓢ', 't': 'ⓣ', 'u': 'ⓤ', 'v': 'ⓥ', 'w': 'ⓦ', 'x': 'ⓧ', 'y': 'ⓨ', 'z': 'ⓩ',
+                    'A': 'Ⓐ', 'B': 'Ⓑ', 'C': 'Ⓒ', 'D': 'Ⓓ', 'E': 'Ⓔ', 'F': 'Ⓕ', 'G': 'Ⓖ', 'H': 'Ⓗ', 'I': 'Ⓘ', 
+                    'J': 'Ⓙ', 'K': 'Ⓚ', 'L': 'Ⓛ', 'M': 'Ⓜ', 'N': 'Ⓝ', 'O': 'Ⓞ', 'P': 'Ⓟ', 'Q': 'Ⓠ', 'R': 'Ⓡ', 
+                    'S': 'Ⓢ', 'T': 'Ⓣ', 'U': 'Ⓤ', 'V': 'Ⓥ', 'W': 'Ⓦ', 'X': 'Ⓧ', 'Y': 'Ⓨ', 'Z': 'Ⓩ',
+                    '0': '⓪', '1': '①', '2': '②', '3': '③', '4': '④', '5': '⑤', '6': '⑥', '7': '⑦', '8': '⑧', '9': '⑨',
+                    ' ': ' '
+                }
+            },
+            'upside-down': {
+                name: 'Upside Down',
+                map: {
+                    'a': 'ɐ', 'b': 'q', 'c': 'ɔ', 'd': 'p', 'e': 'ǝ', 'f': 'ɟ', 'g': 'ƃ', 'h': 'ɥ', 'i': 'ᴉ', 
+                    'j': 'ɾ', 'k': 'ʞ', 'l': 'l', 'm': 'ɯ', 'n': 'u', 'o': 'o', 'p': 'd', 'q': 'b', 'r': 'ɹ', 
+                    's': 's', 't': 'ʇ', 'u': 'n', 'v': 'ʌ', 'w': 'ʍ', 'x': 'x', 'y': 'ʎ', 'z': 'z',
+                    'A': '∀', 'B': 'q', 'C': 'Ɔ', 'D': 'ᗡ', 'E': 'Ǝ', 'F': 'Ⅎ', 'G': '⅁', 'H': 'H', 'I': 'I', 
+                    'J': 'ſ', 'K': 'ʞ', 'L': '˥', 'M': 'W', 'N': 'N', 'O': 'O', 'P': 'Ԁ', 'Q': 'Ό', 'R': 'ᴚ', 
+                    'S': 'S', 'T': '⊥', 'U': '∩', 'V': 'Λ', 'W': 'M', 'X': 'X', 'Y': '⅄', 'Z': 'Z',
+                    '0': '0', '1': 'Ɩ', '2': 'ᄅ', '3': 'Ɛ', '4': 'ㄣ', '5': 'ϛ', '6': '9', '7': 'ㄥ', '8': '8', '9': '6',
+                    ' ': ' ', '!': '¡', '?': '¿', '.': '˙', ',': '\'', '\'': ',', '"': '„', '`': ',', '(': ')', ')': '(', 
+                    '[': ']', ']': '[', '{': '}', '}': '{', '<': '>', '>': '<', '&': '⅋', '_': '‾'
+                }
+            },
+            'gothic': {
+                name: 'Gothic',
+                map: {
+                    'a': '𝙖', 'b': '𝙗', 'c': '𝙘', 'd': '𝙙', 'e': '𝙚', 'f': '𝙛', 'g': '𝙜', 'h': '𝙝', 'i': '𝙞', 
+                    'j': '𝙟', 'k': '𝙠', 'l': '𝙡', 'm': '𝙢', 'n': '𝙣', 'o': '𝙤', 'p': '𝙥', 'q': '𝙦', 'r': '𝙧', 
+                    's': '𝙨', 't': '𝙩', 'u': '𝙪', 'v': '𝙫', 'w': '𝙬', 'x': '𝙭', 'y': '𝙮', 'z': '𝙯',
+                    'A': '𝙰', 'B': '𝙱', 'C': '𝙲', 'D': '𝙳', 'E': '𝙴', 'F': '𝙵', 'G': '𝙶', 'H': '𝙷', 'I': '𝙸', 
+                    'J': '𝙹', 'K': '𝙺', 'L': '𝙻', 'M': '𝙼', 'N': '𝙽', 'O': '𝙾', 'P': '𝙿', 'Q': '𝚀', 'R': '𝚁', 
+                    'S': '𝚂', 'T': '𝚃', 'U': '𝚄', 'V': '𝚅', 'W': '𝚆', 'X': '𝚇', 'Y': '𝚈', 'Z': '𝚉',
+                    '0': '𝟶', '1': '𝟷', '2': '𝟸', '3': '𝟹', '4': '𝟺', '5': '𝟻', '6': '𝟼', '7': '𝟽', '8': '𝟾', '9': '𝟿',
+                    ' ': ' '
+                }
+            },
+            'cursive': {
+                name: 'Cursive',
+                map: {
+                    'a': '𝒶', 'b': '𝒷', 'c': '𝒸', 'd': '𝒹', 'e': 'ℯ', 'f': '𝒻', 'g': 'ℊ', 'h': '𝒽', 'i': '𝒾', 
+                    'j': '𝒿', 'k': '𝓀', 'l': '𝓁', 'm': '𝓂', 'n': '𝓃', 'o': 'ℴ', 'p': '𝓅', 'q': '𝓆', 'r': '𝓇', 
+                    's': '𝓈', 't': '𝓉', 'u': '𝓊', 'v': '𝓋', 'w': '𝓌', 'x': '𝓍', 'y': '𝓎', 'z': '𝓏',
+                    'A': '𝒜', 'B': 'ℬ', 'C': '𝒞', 'D': '𝒟', 'E': 'ℰ', 'F': 'ℱ', 'G': '𝒢', 'H': 'ℋ', 'I': 'ℐ', 
+                    'J': '𝒥', 'K': '𝒦', 'L': 'ℒ', 'M': 'ℳ', 'N': '𝒩', 'O': '𝒪', 'P': '𝒫', 'Q': '𝒬', 'R': 'ℛ', 
+                    'S': '𝒮', 'T': '𝒯', 'U': '𝒰', 'V': '𝒱', 'W': '𝒲', 'X': '𝒳', 'Y': '𝒴', 'Z': '𝒵',
+                    '0': '0', '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9',
+                    ' ': ' '
+                }
+            },
+            'double-struck': {
+                name: 'Double Struck',
+                map: {
+                    'a': '𝕒', 'b': '𝕓', 'c': '𝕔', 'd': '𝕕', 'e': '𝕖', 'f': '𝕗', 'g': '𝕘', 'h': '𝕙', 'i': '𝕚', 
+                    'j': '𝕛', 'k': '𝕜', 'l': '𝕝', 'm': '𝕞', 'n': '𝕟', 'o': '𝕠', 'p': '𝕡', 'q': '𝕢', 'r': '𝕣', 
+                    's': '𝕤', 't': '𝕥', 'u': '𝕦', 'v': '𝕧', 'w': '𝕨', 'x': '𝕩', 'y': '𝕪', 'z': '𝕫',
+                    'A': '𝔸', 'B': '𝔹', 'C': 'ℂ', 'D': '𝔻', 'E': '𝔼', 'F': '𝔽', 'G': '𝔾', 'H': 'ℍ', 'I': '𝕀', 
+                    'J': '𝕁', 'K': '𝕂', 'L': '𝕃', 'M': '𝕄', 'N': 'ℕ', 'O': '𝕆', 'P': 'ℙ', 'Q': 'ℚ', 'R': 'ℝ', 
+                    'S': '𝕊', 'T': '𝕋', 'U': '𝕌', 'V': '𝕍', 'W': '𝕎', 'X': '𝕏', 'Y': '𝕐', 'Z': 'ℤ',
+                    '0': '𝟘', '1': '𝟙', '2': '𝟚', '3': '𝟛', '4': '𝟜', '5': '𝟝', '6': '𝟞', '7': '𝟟', '8': '𝟠', '9': '𝟡',
+                    ' ': ' '
+                }
+            },
+            'squares': {
+                name: 'Squares',
+                map: {
+                    'a': '🅰', 'b': '🅱', 'c': '🅲', 'd': '🅳', 'e': '🅴', 'f': '🅵', 'g': '🅶', 'h': '🅷', 'i': '🅸', 
+                    'j': '🅹', 'k': '🅺', 'l': '🅻', 'm': '🅼', 'n': '🅽', 'o': '🅾', 'p': '🅿', 'q': '🆀', 'r': '🆁', 
+                    's': '🆂', 't': '🆃', 'u': '🆄', 'v': '🆅', 'w': '🆆', 'x': '🆇', 'y': '🆈', 'z': '🆉',
+                    'A': '🅰', 'B': '🅱', 'C': '🅲', 'D': '🅳', 'E': '🅴', 'F': '🅵', 'G': '🅶', 'H': '🅷', 'I': '🅸', 
+                    'J': '🅹', 'K': '🅺', 'L': '🅻', 'M': '🅼', 'N': '🅽', 'O': '🅾', 'P': '🅿', 'Q': '🆀', 'R': '🆁', 
+                    'S': '🆂', 'T': '🆃', 'U': '🆄', 'V': '🆅', 'W': '🆆', 'X': '🆇', 'Y': '🆈', 'Z': '🆉',
+                    '0': '0', '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9',
+                    ' ': ' '
+                }
+            }
+        };
+
+        function selectStyle(style) {
+            currentStyle = style;
+            
+            // Update active button
+            document.querySelectorAll('.text-option').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.text-option').classList.add('active');
+            
+            // Regenerate text if there's already input
+            const inputText = document.getElementById('input-text').value.trim();
+            if (inputText) {
+                generateText();
+            }
+        }
+
+        function generateText() {
+            const inputText = document.getElementById('input-text').value.trim();
+            
+            if (!inputText) {
+                alert('Please enter some text first');
+                return;
+            }
+            
+            const style = styleMaps[currentStyle];
+            let outputText = '';
+            
+            if (style.map) {
+                // Character mapping style
+                for (let i = 0; i < inputText.length; i++) {
+                    const char = inputText[i];
+                    outputText += style.map[char.toLowerCase()] || style.map[char] || char;
+                }
+            } else if (style.style) {
+                // CSS style
+                outputText = `<span style="${style.style}">${inputText}</span>`;
+            }
+            
+            const fontSize = document.getElementById('font-size').value;
+            document.getElementById('output-container').innerHTML = `
+                <div style="font-size: ${fontSize}px">${outputText}</div>
+                <p class="text-xs text-gray-500 mt-2">${style.name} Style</p>
+            `;
+        }
+
+        function copyOutput() {
+            const outputContainer = document.getElementById('output-container');
+            const outputText = outputContainer.textContent.replace(styleMaps[currentStyle].name + ' Style', '').trim();
+            
+            if (!outputText || outputText.includes('Your small text')) {
+                alert('No text to copy! Generate text first.');
+                return;
+            }
+            
+            navigator.clipboard.writeText(outputText)
+                .then(() => {
+                    const button = document.getElementById('copy-output-btn');
+                    button.classList.add('copied');
+                    button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    
+                    setTimeout(() => {
+                        button.classList.remove('copied');
+                        button.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy text');
+                });
+        }
+
+        function clearAll() {
+            document.getElementById('input-text').value = '';
+            document.getElementById('output-container').innerHTML = '<p class="text-gray-500 italic">Your small text will appear here...</p>';
+        }
+
+        // Update font size preview
+        document.getElementById('font-size').addEventListener('input', function() {
+            const outputDiv = document.getElementById('output-container').querySelector('div');
+            if (outputDiv) {
+                outputDiv.style.fontSize = this.value + 'px';
+            }
+        });
+
+        // Initialize with first style selected
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.text-option').classList.add('active');
+        });
+    </script>
+</body>
+</html>

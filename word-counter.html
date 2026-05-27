@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Word Counter | SEO Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .counter-card {
+        transition: all 0.3s ease;
+      }
+      .counter-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+      }
+      #text-input {
+        min-height: 200px;
+        resize: vertical;
+      }
+    </style>
+  </head>
+  <body class="bg-white min-h-screen text-black">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-black mb-2">Word Counter</h1>
+        <p class="text-lg text-gray-700">
+          Analyze your text for SEO optimization
+        </p>
+      </header>
+
+      <main class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-semibold text-black">Your Text</h2>
+            <button
+              onclick="clearText()"
+              class="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+            >
+              <i class="fas fa-eraser"></i> Clear
+            </button>
+          </div>
+
+          <textarea
+            id="text-input"
+            class="w-full px-4 py-3 bg-white text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Type or paste your text here..."
+          ></textarea>
+
+          <div class="mt-4 flex justify-end">
+            <button
+              onclick="countWords()"
+              class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2"
+            >
+              <i class="fas fa-calculator"></i> Count Words
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div
+            class="counter-card bg-white p-6 rounded-xl border border-gray-200"
+          >
+            <div class="text-4xl font-bold text-blue-600 mb-2" id="word-count">
+              0
+            </div>
+            <div class="text-sm font-medium text-gray-600">Words</div>
+          </div>
+
+          <div
+            class="counter-card bg-white p-6 rounded-xl border border-gray-200"
+          >
+            <div
+              class="text-4xl font-bold text-blue-600 mb-2"
+              id="character-count"
+            >
+              0
+            </div>
+            <div class="text-sm font-medium text-gray-600">Characters</div>
+          </div>
+
+          <div
+            class="counter-card bg-white p-6 rounded-xl border border-gray-200"
+          >
+            <div
+              class="text-4xl font-bold text-blue-600 mb-2"
+              id="character-no-spaces"
+            >
+              0
+            </div>
+            <div class="text-sm font-medium text-gray-600">
+              Chars (no spaces)
+            </div>
+          </div>
+
+          <div
+            class="counter-card bg-white p-6 rounded-xl border border-gray-200"
+          >
+            <div
+              class="text-4xl font-bold text-blue-600 mb-2"
+              id="paragraph-count"
+            >
+              0
+            </div>
+            <div class="text-sm font-medium text-gray-600">Paragraphs</div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md overflow-hidden p-6">
+          <h2 class="text-2xl font-semibold text-black mb-4">
+            SEO Text Analysis
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-blue-50 p-4 rounded-md border border-blue-200">
+              <h3 class="text-lg font-medium text-blue-800 mb-2">
+                Keyword Density
+              </h3>
+              <div id="keyword-density" class="text-blue-700">
+                <p class="text-sm italic">
+                  Enter text to analyze keyword frequency
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-blue-50 p-4 rounded-md border border-blue-200">
+              <h3 class="text-lg font-medium text-blue-800 mb-2">
+                Reading Level
+              </h3>
+              <div id="reading-level" class="text-blue-700">
+                <p class="text-sm italic">Text analysis will appear here</p>
+              </div>
+            </div>
+
+            <div class="bg-blue-50 p-4 rounded-md border border-blue-200">
+              <h3 class="text-lg font-medium text-blue-800 mb-2">
+                Ideal Length Check
+              </h3>
+              <div id="length-check" class="text-blue-700">
+                <p class="text-sm italic">
+                  Compare against SEO recommendations
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-blue-50 p-4 rounded-md border border-blue-200">
+              <h3 class="text-lg font-medium text-blue-800 mb-2">
+                Top Keywords
+              </h3>
+              <div id="top-keywords" class="text-blue-700">
+                <p class="text-sm italic">
+                  Most frequent words will appear here
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-blue-50 rounded-xl shadow-md overflow-hidden p-6 mt-8">
+          <h2 class="text-2xl font-semibold text-black mb-4">
+            SEO Writing Guidelines
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-4 rounded-md border border-gray-200">
+              <h3
+                class="text-lg font-medium text-blue-800 mb-2 flex items-center gap-2"
+              >
+                <i class="fas fa-file-alt"></i> Content Length
+              </h3>
+              <ul class="list-disc pl-5 text-blue-700 space-y-1 text-sm">
+                <li>Blog posts: 1,500-2,500 words</li>
+                <li>Product pages: 300-500 words</li>
+                <li>Landing pages: 500-1,000 words</li>
+                <li>Meta descriptions: 50-160 characters</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-4 rounded-md border border-gray-200">
+              <h3
+                class="text-lg font-medium text-blue-800 mb-2 flex items-center gap-2"
+              >
+                <i class="fas fa-key"></i> Keyword Usage
+              </h3>
+              <ul class="list-disc pl-5 text-blue-700 space-y-1 text-sm">
+                <li>Primary keyword in first 100 words</li>
+                <li>1-2% keyword density (natural usage)</li>
+                <li>Use in H1, H2, and image alt text</li>
+                <li>Include semantic/LSI keywords</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-4 rounded-md border border-gray-200">
+              <h3
+                class="text-lg font-medium text-blue-800 mb-2 flex items-center gap-2"
+              >
+                <i class="fas fa-book-reader"></i> Readability
+              </h3>
+              <ul class="list-disc pl-5 text-blue-700 space-y-1 text-sm">
+                <li>Aim for 8th-9th grade reading level</li>
+                <li>Paragraphs: 3-4 sentences max</li>
+                <li>Sentence length: 15-20 words average</li>
+                <li>Use bullet points and subheadings</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-4 rounded-md border border-gray-200">
+              <h3
+                class="text-lg font-medium text-blue-800 mb-2 flex items-center gap-2"
+              >
+                <i class="fas fa-chart-line"></i> SEO Best Practices
+              </h3>
+              <ul class="list-disc pl-5 text-blue-700 space-y-1 text-sm">
+                <li>Use keywords naturally</li>
+                <li>Optimize for featured snippets</li>
+                <li>Include internal/external links</li>
+                <li>Mobile-friendly formatting</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm">
+      <p>
+        Word Counter SEO Tool © 2023 | For content creators and SEO
+        professionals
+      </p>
+    </footer>
+
+    <script>
+      // Auto-count as user types
+      document
+        .getElementById("text-input")
+        .addEventListener("input", function () {
+          countWords();
+        });
+
+      function countWords() {
+        const text = document.getElementById("text-input").value.trim();
+
+        // Word count (split by whitespace and filter out empty strings)
+        const wordCount = text
+          ? text.split(/\s+/).filter((word) => word.length > 0).length
+          : 0;
+        document.getElementById("word-count").textContent =
+          wordCount.toLocaleString();
+
+        // Character count
+        const characterCount = text.length;
+        document.getElementById("character-count").textContent =
+          characterCount.toLocaleString();
+
+        // Character count without spaces
+        const characterNoSpaces = text.replace(/\s+/g, "").length;
+        document.getElementById("character-no-spaces").textContent =
+          characterNoSpaces.toLocaleString();
+
+        // Paragraph count (split by double newlines)
+        const paragraphCount = text
+          ? text.split(/\n\s*\n/).filter((para) => para.trim().length > 0)
+              .length
+          : 0;
+        document.getElementById("paragraph-count").textContent =
+          paragraphCount.toLocaleString();
+
+        // Run SEO analysis
+        analyzeSEO(text, wordCount);
+      }
+
+      function analyzeSEO(text, wordCount) {
+        if (!text) {
+          resetSEOAnalysis();
+          return;
+        }
+
+        // Keyword density analysis
+        analyzeKeywordDensity(text);
+
+        // Reading level analysis
+        analyzeReadingLevel(text);
+
+        // Length check
+        checkLengths(wordCount, text.length);
+
+        // Top keywords
+        findTopKeywords(text);
+      }
+
+      function analyzeKeywordDensity(text) {
+        // Remove punctuation and convert to lowercase
+        const cleanText = text
+          .toLowerCase()
+          .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+        const words = cleanText.split(/\s+/).filter((word) => word.length > 0);
+
+        if (words.length === 0) {
+          document.getElementById("keyword-density").innerHTML =
+            '<p class="text-sm italic">No words to analyze</p>';
+          return;
+        }
+
+        // Count word frequencies
+        const wordFreq = {};
+        words.forEach((word) => {
+          wordFreq[word] = (wordFreq[word] || 0) + 1;
+        });
+
+        // Calculate density
+        const totalWords = words.length;
+        const uniqueWords = Object.keys(wordFreq).length;
+
+        document.getElementById("keyword-density").innerHTML = `
+                <p class="text-sm"><span class="font-medium">Unique words:</span> ${uniqueWords.toLocaleString()}</p>
+                <p class="text-sm"><span class="font-medium">Total words:</span> ${totalWords.toLocaleString()}</p>
+                <p class="text-sm mt-2 text-blue-600">Top 5 keywords by frequency:</p>
+                <ul class="list-disc pl-5 mt-1">
+                    ${getTopWords(wordFreq, 5)
+                      .map(
+                        (word) =>
+                          `<li class="text-sm">"${word.word}" - ${
+                            word.count
+                          } (${((word.count / totalWords) * 100).toFixed(
+                            2
+                          )}%)</li>`
+                      )
+                      .join("")}
+                </ul>
+            `;
+      }
+
+      function analyzeReadingLevel(text) {
+        // Simple Flesch-Kincaid reading level approximation
+        const sentences = text
+          .split(/[.!?]+/)
+          .filter((s) => s.trim().length > 0);
+        const words = text.split(/\s+/).filter((word) => word.length > 0);
+        const syllables = countSyllables(text);
+
+        if (sentences.length === 0 || words.length === 0) {
+          document.getElementById("reading-level").innerHTML =
+            '<p class="text-sm italic">Not enough text to analyze</p>';
+          return;
+        }
+
+        const wordsPerSentence = words.length / sentences.length;
+        const syllablesPerWord = syllables / words.length;
+
+        // Flesch-Kincaid grade level formula
+        const gradeLevel = Math.round(
+          0.39 * wordsPerSentence + 11.8 * syllablesPerWord - 15.59
+        );
+
+        // Flesch reading ease score
+        const readingEase = Math.round(
+          206.835 - 1.015 * wordsPerSentence - 84.6 * syllablesPerWord
+        );
+
+        let easeAssessment = "";
+        if (readingEase >= 90) easeAssessment = "Very easy (5th grade)";
+        else if (readingEase >= 80) easeAssessment = "Easy (6th grade)";
+        else if (readingEase >= 70) easeAssessment = "Fairly easy (7th grade)";
+        else if (readingEase >= 60) easeAssessment = "Standard (8th-9th grade)";
+        else if (readingEase >= 50)
+          easeAssessment = "Fairly difficult (10th-12th grade)";
+        else if (readingEase >= 30) easeAssessment = "Difficult (college)";
+        else easeAssessment = "Very difficult (graduate level)";
+
+        document.getElementById("reading-level").innerHTML = `
+                <p class="text-sm"><span class="font-medium">Grade level:</span> ~${gradeLevel}</p>
+                <p class="text-sm"><span class="font-medium">Reading ease:</span> ${readingEase}/100</p>
+                <p class="text-sm">${easeAssessment}</p>
+                <p class="text-xs mt-2 text-blue-600">Ideal for web: 60-70 (8th-9th grade)</p>
+            `;
+      }
+
+      function countSyllables(text) {
+        // Simple syllable approximation
+        const words = text.toLowerCase().split(/\s+/);
+        let count = 0;
+
+        words.forEach((word) => {
+          word = word.replace(/'s$/, "").replace(/[^a-z]/g, "");
+          if (word.length <= 3) {
+            count += 1;
+            return;
+          }
+
+          count += word
+            .replace(/[^aeiouy]/g, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+            .split(" ").length;
+        });
+
+        return count;
+      }
+
+      function checkLengths(wordCount, charCount) {
+        let assessment = "";
+
+        // Word count assessment
+        if (wordCount < 300) assessment = "Too short (consider expanding)";
+        else if (wordCount < 500) assessment = "Short (okay for product pages)";
+        else if (wordCount < 1000)
+          assessment = "Medium (good for most content)";
+        else if (wordCount < 1500) assessment = "Long (good for blog posts)";
+        else assessment = "Very long (excellent for in-depth content)";
+
+        // Meta description check
+        const metaAssessment =
+          charCount > 160
+            ? '<span class="text-red-600">Too long for meta description</span>'
+            : charCount >= 50
+            ? '<span class="text-green-600">Good meta description length</span>'
+            : '<span class="text-amber-600">Too short for meta description</span>';
+
+        document.getElementById("length-check").innerHTML = `
+                <p class="text-sm"><span class="font-medium">Word count:</span> ${wordCount.toLocaleString()} (${assessment})</p>
+                <p class="text-sm"><span class="font-medium">Character count:</span> ${charCount.toLocaleString()}</p>
+                <p class="text-sm">${metaAssessment}</p>
+                <p class="text-xs mt-2 text-blue-600">Ideal meta: 50-160 characters</p>
+            `;
+      }
+
+      function findTopKeywords(text) {
+        const cleanText = text
+          .toLowerCase()
+          .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+        const words = cleanText.split(/\s+/).filter((word) => word.length > 2); // Ignore short words
+
+        if (words.length === 0) {
+          document.getElementById("top-keywords").innerHTML =
+            '<p class="text-sm italic">No keywords found</p>';
+          return;
+        }
+
+        // Count word frequencies (ignore common stop words)
+        const stopWords = new Set([
+          "the",
+          "and",
+          "a",
+          "an",
+          "in",
+          "on",
+          "at",
+          "to",
+          "for",
+          "of",
+          "with",
+          "is",
+          "are",
+          "was",
+          "were",
+          "this",
+          "that",
+          "these",
+          "those",
+          "it",
+          "its",
+          "be",
+          "been",
+          "have",
+          "has",
+          "had",
+        ]);
+        const wordFreq = {};
+
+        words.forEach((word) => {
+          if (!stopWords.has(word)) {
+            wordFreq[word] = (wordFreq[word] || 0) + 1;
+          }
+        });
+
+        const topKeywords = getTopWords(wordFreq, 5);
+
+        if (topKeywords.length === 0) {
+          document.getElementById("top-keywords").innerHTML =
+            '<p class="text-sm italic">No significant keywords found</p>';
+          return;
+        }
+
+        document.getElementById("top-keywords").innerHTML = `
+                <ul class="list-disc pl-5">
+                    ${topKeywords
+                      .map(
+                        (word) =>
+                          `<li class="text-sm">"${word.word}" - ${word.count} occurrences</li>`
+                      )
+                      .join("")}
+                </ul>
+                <p class="text-xs mt-2 text-blue-600">Potential SEO keywords</p>
+            `;
+      }
+
+      function getTopWords(wordFreq, count) {
+        return Object.entries(wordFreq)
+          .map(([word, count]) => ({ word, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, count);
+      }
+
+      function resetSEOAnalysis() {
+        document.getElementById("keyword-density").innerHTML =
+          '<p class="text-sm italic">Enter text to analyze keyword frequency</p>';
+        document.getElementById("reading-level").innerHTML =
+          '<p class="text-sm italic">Text analysis will appear here</p>';
+        document.getElementById("length-check").innerHTML =
+          '<p class="text-sm italic">Compare against SEO recommendations</p>';
+        document.getElementById("top-keywords").innerHTML =
+          '<p class="text-sm italic">Most frequent words will appear here</p>';
+      }
+
+      function clearText() {
+        document.getElementById("text-input").value = "";
+        document.getElementById("word-count").textContent = "0";
+        document.getElementById("character-count").textContent = "0";
+        document.getElementById("character-no-spaces").textContent = "0";
+        document.getElementById("paragraph-count").textContent = "0";
+        resetSEOAnalysis();
+      }
+    </script>
+  </body>
+</html>

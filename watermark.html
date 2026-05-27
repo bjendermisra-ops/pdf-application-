@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Watermark Tool | ImageTools</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .gradient-bg {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      }
+
+      .dropzone {
+        border: 2px dashed #3b82f6;
+        transition: all 0.3s ease;
+      }
+
+      .dropzone.active {
+        border-color: #10b981;
+        background-color: #f0fdf4;
+      }
+
+      .canvas-container {
+        position: relative;
+        max-width: 100%;
+        margin: 0 auto;
+      }
+
+      #previewCanvas {
+        max-width: 100%;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      .watermark-preview {
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .slider-thumb::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #3b82f6;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body class="font-sans antialiased text-gray-800">
+    <!-- Navigation -->
+    <?php include 'includes/navbar.html'; ?>
+    <nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="min-h-screen bg-gray-50">
+      <div class="container mx-auto px-4 py-12">
+        <!-- Header -->
+        <div class="text-center mb-12">
+          <h1 class="text-3xl md:text-4xl font-bold mb-4">Watermark Tool</h1>
+          <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            Add text or image watermarks to your photos with customizable
+            options
+          </p>
+        </div>
+
+        <!-- Watermark Tool -->
+        <div
+          class="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden"
+        >
+          <div class="flex flex-col lg:flex-row">
+            <!-- Left Panel - Preview -->
+            <div
+              class="lg:w-2/3 p-6 border-b lg:border-b-0 lg:border-r border-gray-200"
+            >
+              <div class="canvas-container">
+                <canvas id="previewCanvas" class="mx-auto"></canvas>
+                <div id="watermarkPreview" class="watermark-preview"></div>
+              </div>
+              <div class="mt-4 flex justify-center space-x-4">
+                <button
+                  id="downloadBtn"
+                  class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled
+                >
+                  <i class="fas fa-download mr-2"></i> Download Image
+                </button>
+                <button
+                  id="resetBtn"
+                  class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition"
+                >
+                  <i class="fas fa-redo mr-2"></i> Reset
+                </button>
+              </div>
+            </div>
+
+            <!-- Right Panel - Controls -->
+            <div class="lg:w-1/3 p-6">
+              <div class="space-y-6">
+                <!-- Image Upload -->
+                <div>
+                  <h3 class="text-lg font-semibold mb-3">Upload Image</h3>
+                  <div
+                    id="dropzone"
+                    class="dropzone rounded-lg p-4 text-center cursor-pointer mb-3"
+                  >
+                    <div
+                      class="flex flex-col items-center justify-center space-y-2"
+                    >
+                      <i
+                        class="fas fa-cloud-upload-alt text-blue-500 text-2xl"
+                      ></i>
+                      <p class="text-sm">
+                        Drag & drop image or click to browse
+                      </p>
+                      <input
+                        id="fileInput"
+                        type="file"
+                        accept="image/*"
+                        class="hidden"
+                      />
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-500">
+                    Supports JPG, PNG, WEBP (Max 10MB)
+                  </p>
+                </div>
+
+                <!-- Watermark Type Selector -->
+                <div>
+                  <h3 class="text-lg font-semibold mb-3">Watermark Type</h3>
+                  <div class="flex space-x-4">
+                    <button
+                      id="textWatermarkBtn"
+                      class="flex-1 py-2 px-4 border border-blue-500 text-blue-500 rounded-md font-medium watermark-type-btn active"
+                    >
+                      Text
+                    </button>
+                    <button
+                      id="imageWatermarkBtn"
+                      class="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-md font-medium watermark-type-btn"
+                    >
+                      Image
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Text Watermark Options -->
+                <div id="textWatermarkOptions">
+                  <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Watermark Text</label
+                    >
+                    <input
+                      id="watermarkText"
+                      type="text"
+                      value="SAMPLE"
+                      class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Font Size</label
+                      >
+                      <input
+                        id="fontSize"
+                        type="range"
+                        min="10"
+                        max="100"
+                        value="30"
+                        class="w-full slider-thumb"
+                      />
+                      <div
+                        class="text-center text-sm text-gray-600"
+                        id="fontSizeValue"
+                      >
+                        30px
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Opacity</label
+                      >
+                      <input
+                        id="textOpacity"
+                        type="range"
+                        min="10"
+                        max="100"
+                        value="50"
+                        class="w-full slider-thumb"
+                      />
+                      <div
+                        class="text-center text-sm text-gray-600"
+                        id="textOpacityValue"
+                      >
+                        50%
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Color</label
+                    >
+                    <input
+                      id="textColor"
+                      type="color"
+                      value="#ffffff"
+                      class="w-full h-10 cursor-pointer"
+                    />
+                  </div>
+                  <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Font Family</label
+                    >
+                    <select
+                      id="fontFamily"
+                      class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                      <option value="Arial">Arial</option>
+                      <option value="Times New Roman">Times New Roman</option>
+                      <option value="Courier New">Courier New</option>
+                      <option value="Georgia">Georgia</option>
+                      <option value="Verdana">Verdana</option>
+                      <option value="Impact">Impact</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Image Watermark Options -->
+                <div id="imageWatermarkOptions" class="hidden">
+                  <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Watermark Image</label
+                    >
+                    <div
+                      class="dropzone rounded-lg p-4 text-center cursor-pointer mb-2"
+                      id="watermarkImageDropzone"
+                    >
+                      <div
+                        class="flex flex-col items-center justify-center space-y-2"
+                      >
+                        <i class="fas fa-image text-blue-500 text-2xl"></i>
+                        <p class="text-sm">Select watermark image</p>
+                        <input
+                          id="watermarkImageInput"
+                          type="file"
+                          accept="image/*"
+                          class="hidden"
+                        />
+                      </div>
+                    </div>
+                    <p class="text-xs text-gray-500">
+                      PNG with transparency recommended
+                    </p>
+                  </div>
+                  <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Size</label
+                      >
+                      <input
+                        id="watermarkSize"
+                        type="range"
+                        min="10"
+                        max="200"
+                        value="50"
+                        class="w-full slider-thumb"
+                      />
+                      <div
+                        class="text-center text-sm text-gray-600"
+                        id="watermarkSizeValue"
+                      >
+                        50%
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Opacity</label
+                      >
+                      <input
+                        id="imageOpacity"
+                        type="range"
+                        min="10"
+                        max="100"
+                        value="50"
+                        class="w-full slider-thumb"
+                      />
+                      <div
+                        class="text-center text-sm text-gray-600"
+                        id="imageOpacityValue"
+                      >
+                        50%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Position Options -->
+                <div>
+                  <h3 class="text-lg font-semibold mb-3">Position</h3>
+                  <div class="grid grid-cols-3 gap-2 mb-2">
+                    <button
+                      data-position="top-left"
+                      class="position-btn p-2 border rounded-md flex items-center justify-center"
+                    >
+                      <i class="fas fa-arrow-up-left"></i>
+                    </button>
+                    <button
+                      data-position="top-center"
+                      class="position-btn p-2 border rounded-md flex items-center justify-center"
+                    >
+                      <i class="fas fa-arrow-up"></i>
+                    </button>
+                    <button
+                      data-position="top-right"
+                      class="position-btn p-2 border rounded-md flex items-center justify-center"
+                    >
+                      <i class="fas fa-arrow-up-right"></i>
+                    </button>
+                    <button
+                      data-position="middle-left"
+                      class="position-btn p-2 border rounded-md flex items-center justify-center"
+                    >
+                      <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button
+                      data-position="center"
+                      class="position-btn p-2 border rounded-md flex items-center justify-center bg-blue-100 text-blue-600"
+                    >
+                      <i class="fas fa-circle"></i>
+                    </button>
+                    <button
+                      data-position="middle-right"
+                      class="position-btn p-2 border rounded-md flex items-center justify-center"
+                    >
+                      <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button
+                      data-position="bottom-left"
+                      class="position-btn p-2 border rounded-md flex items-center justify-center"
+                    >
+                      <i class="fas fa-arrow-down-left"></i>
+                    </button>
+                    <button
+                      data-position="bottom-center"
+                      class="position-btn p-2 border rounded-md flex items-center justify-center"
+                    >
+                      <i class="fas fa-arrow-down"></i>
+                    </button>
+                    <button
+                      data-position="bottom-right"
+                      class="position-btn p-2 border rounded-md flex items-center justify-center"
+                    >
+                      <i class="fas fa-arrow-down-right"></i>
+                    </button>
+                  </div>
+                  <div class="flex items-center justify-between mt-2">
+                    <span class="text-sm text-gray-600">X Offset:</span>
+                    <input
+                      id="xOffset"
+                      type="range"
+                      min="-100"
+                      max="100"
+                      value="0"
+                      class="w-3/4 slider-thumb"
+                    />
+                    <span
+                      id="xOffsetValue"
+                      class="text-sm text-gray-600 w-10 text-right"
+                      >0</span
+                    >
+                  </div>
+                  <div class="flex items-center justify-between mt-2">
+                    <span class="text-sm text-gray-600">Y Offset:</span>
+                    <input
+                      id="yOffset"
+                      type="range"
+                      min="-100"
+                      max="100"
+                      value="0"
+                      class="w-3/4 slider-thumb"
+                    />
+                    <span
+                      id="yOffsetValue"
+                      class="text-sm text-gray-600 w-10 text-right"
+                      >0</span
+                    >
+                  </div>
+                </div>
+
+                <!-- Tiling Options -->
+                <div>
+                  <div class="flex items-center mb-2">
+                    <input
+                      id="tilingCheckbox"
+                      type="checkbox"
+                      class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label
+                      for="tilingCheckbox"
+                      class="ml-2 block text-sm text-gray-700"
+                      >Tile Watermark</label
+                    >
+                  </div>
+                  <div id="tilingOptions" class="hidden space-y-2">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-gray-600"
+                        >Horizontal Spacing:</span
+                      >
+                      <input
+                        id="hSpacing"
+                        type="range"
+                        min="0"
+                        max="200"
+                        value="50"
+                        class="w-3/4 slider-thumb"
+                      />
+                      <span
+                        id="hSpacingValue"
+                        class="text-sm text-gray-600 w-10 text-right"
+                        >50</span
+                      >
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-gray-600"
+                        >Vertical Spacing:</span
+                      >
+                      <input
+                        id="vSpacing"
+                        type="range"
+                        min="0"
+                        max="200"
+                        value="50"
+                        class="w-3/4 slider-thumb"
+                      />
+                      <span
+                        id="vSpacingValue"
+                        class="text-sm text-gray-600 w-10 text-right"
+                        >50</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <?php include 'includes/footer.html'; ?>
+
+    <script>
+      // DOM Elements
+      const dropzone = document.getElementById("dropzone");
+      const fileInput = document.getElementById("fileInput");
+      const previewCanvas = document.getElementById("previewCanvas");
+      const ctx = previewCanvas.getContext("2d");
+      const watermarkPreview = document.getElementById("watermarkPreview");
+      const downloadBtn = document.getElementById("downloadBtn");
+      const resetBtn = document.getElementById("resetBtn");
+
+      // Watermark type controls
+      const textWatermarkBtn = document.getElementById("textWatermarkBtn");
+      const imageWatermarkBtn = document.getElementById("imageWatermarkBtn");
+      const textWatermarkOptions = document.getElementById(
+        "textWatermarkOptions"
+      );
+      const imageWatermarkOptions = document.getElementById(
+        "imageWatermarkOptions"
+      );
+
+      // Text watermark controls
+      const watermarkText = document.getElementById("watermarkText");
+      const fontSize = document.getElementById("fontSize");
+      const fontSizeValue = document.getElementById("fontSizeValue");
+      const textOpacity = document.getElementById("textOpacity");
+      const textOpacityValue = document.getElementById("textOpacityValue");
+      const textColor = document.getElementById("textColor");
+      const fontFamily = document.getElementById("fontFamily");
+
+      // Image watermark controls
+      const watermarkImageDropzone = document.getElementById(
+        "watermarkImageDropzone"
+      );
+      const watermarkImageInput = document.getElementById(
+        "watermarkImageInput"
+      );
+      const watermarkSize = document.getElementById("watermarkSize");
+      const watermarkSizeValue = document.getElementById("watermarkSizeValue");
+      const imageOpacity = document.getElementById("imageOpacity");
+      const imageOpacityValue = document.getElementById("imageOpacityValue");
+
+      // Position controls
+      const positionBtns = document.querySelectorAll(".position-btn");
+      const xOffset = document.getElementById("xOffset");
+      const xOffsetValue = document.getElementById("xOffsetValue");
+      const yOffset = document.getElementById("yOffset");
+      const yOffsetValue = document.getElementById("yOffsetValue");
+
+      // Tiling controls
+      const tilingCheckbox = document.getElementById("tilingCheckbox");
+      const tilingOptions = document.getElementById("tilingOptions");
+      const hSpacing = document.getElementById("hSpacing");
+      const hSpacingValue = document.getElementById("hSpacingValue");
+      const vSpacing = document.getElementById("vSpacing");
+      const vSpacingValue = document.getElementById("vSpacingValue");
+
+      // State variables
+      let originalImage = null;
+      let watermarkImage = null;
+      let currentWatermarkType = "text"; // 'text' or 'image'
+      let currentPosition = "center";
+      let isTilingEnabled = false;
+
+      // Event Listeners
+      dropzone.addEventListener("click", () => fileInput.click());
+      fileInput.addEventListener("change", handleImageUpload);
+
+      watermarkImageDropzone.addEventListener("click", () =>
+        watermarkImageInput.click()
+      );
+      watermarkImageInput.addEventListener(
+        "change",
+        handleWatermarkImageUpload
+      );
+
+      // Drag and drop for main image
+      ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+        dropzone.addEventListener(eventName, preventDefaults, false);
+      });
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropzone.addEventListener(eventName, highlight, false);
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropzone.addEventListener(eventName, unhighlight, false);
+      });
+
+      dropzone.addEventListener("drop", handleDrop, false);
+
+      // Watermark type toggle
+      textWatermarkBtn.addEventListener("click", () => {
+        currentWatermarkType = "text";
+        textWatermarkBtn.classList.add("border-blue-500", "text-blue-500");
+        textWatermarkBtn.classList.remove("border-gray-300", "text-gray-700");
+        imageWatermarkBtn.classList.add("border-gray-300", "text-gray-700");
+        imageWatermarkBtn.classList.remove("border-blue-500", "text-blue-500");
+        textWatermarkOptions.classList.remove("hidden");
+        imageWatermarkOptions.classList.add("hidden");
+        updateWatermarkPreview();
+      });
+
+      imageWatermarkBtn.addEventListener("click", () => {
+        currentWatermarkType = "image";
+        imageWatermarkBtn.classList.add("border-blue-500", "text-blue-500");
+        imageWatermarkBtn.classList.remove("border-gray-300", "text-gray-700");
+        textWatermarkBtn.classList.add("border-gray-300", "text-gray-700");
+        textWatermarkBtn.classList.remove("border-blue-500", "text-blue-500");
+        imageWatermarkOptions.classList.remove("hidden");
+        textWatermarkOptions.classList.add("hidden");
+        updateWatermarkPreview();
+      });
+
+      // Text watermark controls
+      watermarkText.addEventListener("input", updateWatermarkPreview);
+      fontSize.addEventListener("input", () => {
+        fontSizeValue.textContent = `${fontSize.value}px`;
+        updateWatermarkPreview();
+      });
+      textOpacity.addEventListener("input", () => {
+        textOpacityValue.textContent = `${textOpacity.value}%`;
+        updateWatermarkPreview();
+      });
+      textColor.addEventListener("input", updateWatermarkPreview);
+      fontFamily.addEventListener("change", updateWatermarkPreview);
+
+      // Image watermark controls
+      watermarkSize.addEventListener("input", () => {
+        watermarkSizeValue.textContent = `${watermarkSize.value}%`;
+        updateWatermarkPreview();
+      });
+      imageOpacity.addEventListener("input", () => {
+        imageOpacityValue.textContent = `${imageOpacity.value}%`;
+        updateWatermarkPreview();
+      });
+
+      // Position controls
+      positionBtns.forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          positionBtns.forEach((b) => {
+            b.classList.remove("bg-blue-100", "text-blue-600");
+            b.classList.add("border-gray-300");
+          });
+          e.currentTarget.classList.add("bg-blue-100", "text-blue-600");
+          currentPosition = e.currentTarget.dataset.position;
+          updateWatermarkPreview();
+        });
+      });
+
+      xOffset.addEventListener("input", () => {
+        xOffsetValue.textContent = xOffset.value;
+        updateWatermarkPreview();
+      });
+
+      yOffset.addEventListener("input", () => {
+        yOffsetValue.textContent = yOffset.value;
+        updateWatermarkPreview();
+      });
+
+      // Tiling controls
+      tilingCheckbox.addEventListener("change", () => {
+        isTilingEnabled = tilingCheckbox.checked;
+        tilingOptions.classList.toggle("hidden", !isTilingEnabled);
+        updateWatermarkPreview();
+      });
+
+      hSpacing.addEventListener("input", () => {
+        hSpacingValue.textContent = hSpacing.value;
+        updateWatermarkPreview();
+      });
+
+      vSpacing.addEventListener("input", () => {
+        vSpacingValue.textContent = vSpacing.value;
+        updateWatermarkPreview();
+      });
+
+      // Action buttons
+      downloadBtn.addEventListener("click", downloadImage);
+      resetBtn.addEventListener("click", resetAll);
+
+      // Functions
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      function highlight() {
+        dropzone.classList.add("active");
+      }
+
+      function unhighlight() {
+        dropzone.classList.remove("active");
+      }
+
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleImageFiles(files);
+      }
+
+      function handleImageUpload(e) {
+        const files = e.target.files;
+        handleImageFiles(files);
+      }
+
+      function handleImageFiles(files) {
+        if (files.length === 0) return;
+
+        const file = files[0];
+        if (!file.type.match("image.*")) {
+          alert("Please select an image file.");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          originalImage = new Image();
+          originalImage.onload = function () {
+            drawCanvas();
+            downloadBtn.disabled = false;
+          };
+          originalImage.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function handleWatermarkImageUpload(e) {
+        const files = e.target.files;
+        if (files.length === 0) return;
+
+        const file = files[0];
+        if (!file.type.match("image.*")) {
+          alert("Please select an image file.");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          watermarkImage = new Image();
+          watermarkImage.onload = function () {
+            updateWatermarkPreview();
+          };
+          watermarkImage.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function drawCanvas() {
+        if (!originalImage) return;
+
+        // Set canvas dimensions to match image (with max width 800px)
+        const maxWidth = 800;
+        const ratio = Math.min(maxWidth / originalImage.width, 1);
+        previewCanvas.width = originalImage.width * ratio;
+        previewCanvas.height = originalImage.height * ratio;
+
+        // Draw the original image
+        ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+        ctx.drawImage(
+          originalImage,
+          0,
+          0,
+          previewCanvas.width,
+          previewCanvas.height
+        );
+
+        // Update watermark preview
+        updateWatermarkPreview();
+      }
+
+      function updateWatermarkPreview() {
+        if (!originalImage) return;
+
+        // Clear the canvas and redraw the original image
+        ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+        ctx.drawImage(
+          originalImage,
+          0,
+          0,
+          previewCanvas.width,
+          previewCanvas.height
+        );
+
+        if (currentWatermarkType === "text" && watermarkText.value) {
+          applyTextWatermark();
+        } else if (currentWatermarkType === "image" && watermarkImage) {
+          applyImageWatermark();
+        }
+      }
+
+      function applyTextWatermark() {
+        const text = watermarkText.value;
+        const size = parseInt(fontSize.value);
+        const opacity = parseInt(textOpacity.value) / 100;
+        const color = textColor.value;
+        const font = fontFamily.value;
+
+        ctx.font = `${size}px ${font}`;
+        ctx.fillStyle = color;
+        ctx.globalAlpha = opacity;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        const textWidth = ctx.measureText(text).width;
+        const textHeight = size;
+
+        if (isTilingEnabled) {
+          // Tiled text watermark
+          const hSpace = parseInt(hSpacing.value);
+          const vSpace = parseInt(vSpacing.value);
+
+          const cols = Math.ceil(previewCanvas.width / (textWidth + hSpace));
+          const rows = Math.ceil(previewCanvas.height / (textHeight + vSpace));
+
+          for (let i = 0; i < cols; i++) {
+            for (let j = 0; j < rows; j++) {
+              const x = i * (textWidth + hSpace) + textWidth / 2;
+              const y = j * (textHeight + vSpace) + textHeight / 2;
+              ctx.fillText(text, x, y);
+            }
+          }
+        } else {
+          // Single text watermark
+          let x, y;
+
+          // Calculate position based on selection
+          switch (currentPosition) {
+            case "top-left":
+              x = textWidth / 2 + parseInt(xOffset.value);
+              y = textHeight / 2 + parseInt(yOffset.value);
+              break;
+            case "top-center":
+              x = previewCanvas.width / 2 + parseInt(xOffset.value);
+              y = textHeight / 2 + parseInt(yOffset.value);
+              break;
+            case "top-right":
+              x = previewCanvas.width - textWidth / 2 + parseInt(xOffset.value);
+              y = textHeight / 2 + parseInt(yOffset.value);
+              break;
+            case "middle-left":
+              x = textWidth / 2 + parseInt(xOffset.value);
+              y = previewCanvas.height / 2 + parseInt(yOffset.value);
+              break;
+            case "center":
+              x = previewCanvas.width / 2 + parseInt(xOffset.value);
+              y = previewCanvas.height / 2 + parseInt(yOffset.value);
+              break;
+            case "middle-right":
+              x = previewCanvas.width - textWidth / 2 + parseInt(xOffset.value);
+              y = previewCanvas.height / 2 + parseInt(yOffset.value);
+              break;
+            case "bottom-left":
+              x = textWidth / 2 + parseInt(xOffset.value);
+              y =
+                previewCanvas.height - textHeight / 2 + parseInt(yOffset.value);
+              break;
+            case "bottom-center":
+              x = previewCanvas.width / 2 + parseInt(xOffset.value);
+              y =
+                previewCanvas.height - textHeight / 2 + parseInt(yOffset.value);
+              break;
+            case "bottom-right":
+              x = previewCanvas.width - textWidth / 2 + parseInt(xOffset.value);
+              y =
+                previewCanvas.height - textHeight / 2 + parseInt(yOffset.value);
+              break;
+          }
+
+          ctx.fillText(text, x, y);
+        }
+
+        ctx.globalAlpha = 1.0;
+      }
+
+      function applyImageWatermark() {
+        const sizePercent = parseInt(watermarkSize.value) / 100;
+        const opacity = parseInt(imageOpacity.value) / 100;
+
+        // Calculate watermark dimensions
+        const watermarkWidth = watermarkImage.width * sizePercent;
+        const watermarkHeight = watermarkImage.height * sizePercent;
+
+        // Adjust for canvas scaling
+        const canvasRatio = previewCanvas.width / originalImage.width;
+        const scaledWidth = watermarkWidth * canvasRatio;
+        const scaledHeight = watermarkHeight * canvasRatio;
+
+        ctx.globalAlpha = opacity;
+
+        if (isTilingEnabled) {
+          // Tiled image watermark
+          const hSpace = parseInt(hSpacing.value) * canvasRatio;
+          const vSpace = parseInt(vSpacing.value) * canvasRatio;
+
+          const cols = Math.ceil(previewCanvas.width / (scaledWidth + hSpace));
+          const rows = Math.ceil(
+            previewCanvas.height / (scaledHeight + vSpace)
+          );
+
+          for (let i = 0; i < cols; i++) {
+            for (let j = 0; j < rows; j++) {
+              const x =
+                i * (scaledWidth + hSpace) +
+                parseInt(xOffset.value) * canvasRatio;
+              const y =
+                j * (scaledHeight + vSpace) +
+                parseInt(yOffset.value) * canvasRatio;
+              ctx.drawImage(watermarkImage, x, y, scaledWidth, scaledHeight);
+            }
+          }
+        } else {
+          // Single image watermark
+          let x, y;
+
+          // Calculate position based on selection
+          switch (currentPosition) {
+            case "top-left":
+              x = parseInt(xOffset.value) * canvasRatio;
+              y = parseInt(yOffset.value) * canvasRatio;
+              break;
+            case "top-center":
+              x =
+                (previewCanvas.width - scaledWidth) / 2 +
+                parseInt(xOffset.value) * canvasRatio;
+              y = parseInt(yOffset.value) * canvasRatio;
+              break;
+            case "top-right":
+              x =
+                previewCanvas.width -
+                scaledWidth +
+                parseInt(xOffset.value) * canvasRatio;
+              y = parseInt(yOffset.value) * canvasRatio;
+              break;
+            case "middle-left":
+              x = parseInt(xOffset.value) * canvasRatio;
+              y =
+                (previewCanvas.height - scaledHeight) / 2 +
+                parseInt(yOffset.value) * canvasRatio;
+              break;
+            case "center":
+              x =
+                (previewCanvas.width - scaledWidth) / 2 +
+                parseInt(xOffset.value) * canvasRatio;
+              y =
+                (previewCanvas.height - scaledHeight) / 2 +
+                parseInt(yOffset.value) * canvasRatio;
+              break;
+            case "middle-right":
+              x =
+                previewCanvas.width -
+                scaledWidth +
+                parseInt(xOffset.value) * canvasRatio;
+              y =
+                (previewCanvas.height - scaledHeight) / 2 +
+                parseInt(yOffset.value) * canvasRatio;
+              break;
+            case "bottom-left":
+              x = parseInt(xOffset.value) * canvasRatio;
+              y =
+                previewCanvas.height -
+                scaledHeight +
+                parseInt(yOffset.value) * canvasRatio;
+              break;
+            case "bottom-center":
+              x =
+                (previewCanvas.width - scaledWidth) / 2 +
+                parseInt(xOffset.value) * canvasRatio;
+              y =
+                previewCanvas.height -
+                scaledHeight +
+                parseInt(yOffset.value) * canvasRatio;
+              break;
+            case "bottom-right":
+              x =
+                previewCanvas.width -
+                scaledWidth +
+                parseInt(xOffset.value) * canvasRatio;
+              y =
+                previewCanvas.height -
+                scaledHeight +
+                parseInt(yOffset.value) * canvasRatio;
+              break;
+          }
+
+          ctx.drawImage(watermarkImage, x, y, scaledWidth, scaledHeight);
+        }
+
+        ctx.globalAlpha = 1.0;
+      }
+
+      function downloadImage() {
+        if (!originalImage) return;
+
+        // Create a temporary link
+        const link = document.createElement("a");
+        link.download = "watermarked-image.png";
+        link.href = previewCanvas.toDataURL("image/png");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      function resetAll() {
+        // Reset image
+        originalImage = null;
+        ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+        fileInput.value = "";
+        downloadBtn.disabled = true;
+
+        // Reset watermark
+        watermarkImage = null;
+        watermarkImageInput.value = "";
+
+        // Reset controls to defaults
+        watermarkText.value = "SAMPLE";
+        fontSize.value = 30;
+        fontSizeValue.textContent = "30px";
+        textOpacity.value = 50;
+        textOpacityValue.textContent = "50%";
+        textColor.value = "#ffffff";
+        fontFamily.value = "Arial";
+
+        watermarkSize.value = 50;
+        watermarkSizeValue.textContent = "50%";
+        imageOpacity.value = 50;
+        imageOpacityValue.textContent = "50%";
+
+        // Reset position
+        positionBtns.forEach((btn) => {
+          btn.classList.remove("bg-blue-100", "text-blue-600");
+          if (btn.dataset.position === "center") {
+            btn.classList.add("bg-blue-100", "text-blue-600");
+          }
+        });
+        currentPosition = "center";
+        xOffset.value = 0;
+        xOffsetValue.textContent = "0";
+        yOffset.value = 0;
+        yOffsetValue.textContent = "0";
+
+        // Reset tiling
+        tilingCheckbox.checked = false;
+        isTilingEnabled = false;
+        tilingOptions.classList.add("hidden");
+        hSpacing.value = 50;
+        hSpacingValue.textContent = "50";
+        vSpacing.value = 50;
+        vSpacingValue.textContent = "50";
+
+        // Set to text watermark by default
+        currentWatermarkType = "text";
+        textWatermarkBtn.classList.add("border-blue-500", "text-blue-500");
+        textWatermarkBtn.classList.remove("border-gray-300", "text-gray-700");
+        imageWatermarkBtn.classList.add("border-gray-300", "text-gray-700");
+        imageWatermarkBtn.classList.remove("border-blue-500", "text-blue-500");
+        textWatermarkOptions.classList.remove("hidden");
+        imageWatermarkOptions.classList.add("hidden");
+      }
+    </script>
+  </body>
+</html>

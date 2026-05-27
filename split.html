@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Split PDF Tool</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- PDF.js CDN for preview -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+    <!-- PDFLib CDN for splitting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background: #fff;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1.5rem;
+      }
+      .drop-zone {
+        border: 3px dashed #93c5fd;
+        border-radius: 16px;
+        padding: 2.5rem;
+        text-align: center;
+        background: #eef2ff;
+        transition: all 0.3s ease;
+      }
+      .drop-zone.dragover {
+        border-color: #2563eb;
+        background: #dbeafe;
+        transform: scale(1.02);
+      }
+      .split-box {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+      }
+      .page-preview {
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 1rem 0;
+      }
+      canvas {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+      }
+      @media (max-width: 640px) {
+        .container {
+          padding: 1rem;
+        }
+        .drop-zone {
+          padding: 1.5rem;
+        }
+        button,
+        input,
+        select {
+          width: 100%;
+          font-size: 0.875rem;
+        }
+        .split-box {
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1
+        class="text-5xl font-extrabold text-center text-black mt-20 mb-4 sm:text-3xl animate-fade-in"
+      >
+        Split PDF Tool
+      </h1>
+      <h3
+        class="text-5xl text-center text-gray-600 mb-12 sm:text-xl animate-fade-in"
+      >
+        Split Your Files Content
+      </h3>
+
+      <!-- Drop Zone -->
+      <div class="drop-zone max-w-2xl mx-auto" id="dropZone">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-12 w-12 mx-auto text-indigo-500"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+          />
+        </svg>
+        <p class="text-gray-700 text-xl font-medium sm:text-base">
+          Drop your PDF here or
+        </p>
+        <input type="file" id="pdfInput" accept=".pdf" class="hidden" />
+        <button
+          class="mt-4 px-6 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition text-base sm:text-sm shadow-md"
+        >
+          Select File
+        </button>
+      </div>
+
+      <!-- Split Controls -->
+      <div class="split-box mt-8 hidden max-w-3xl mx-auto" id="splitBox">
+        <div class="flex flex-col gap-6">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2"
+              >Preview (First Page)</label
+            >
+            <div class="page-preview">
+              <canvas id="pdfCanvas"></canvas>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Split Method</label
+              >
+              <select
+                id="splitMethod"
+                class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              >
+                <option value="each">Each Page Separately</option>
+                <option value="range">Custom Range</option>
+              </select>
+            </div>
+            <div id="rangeInput" class="hidden">
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Page Range (e.g., 1-3, 5)</label
+              >
+              <input
+                type="text"
+                id="pageRange"
+                placeholder="e.g., 1-3, 5"
+                class="focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          </div>
+          <button
+            id="splitBtn"
+            class="px-6 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition text-base sm:text-sm disabled:bg-gray-400 shadow-md"
+          >
+            Split & Download
+          </button>
+          <p id="status" class="text-gray-600 mt-2 text-sm hidden">
+            Processing...
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        let selectedFile = null;
+        let pdfDoc = null;
+        const $dropZone = $("#dropZone");
+        const $input = $("#pdfInput");
+        const $splitBox = $("#splitBox");
+        const $status = $("#status");
+        const $canvas = $("#pdfCanvas");
+        const $splitMethod = $("#splitMethod");
+        const $rangeInput = $("#rangeInput");
+        const ctx = $canvas[0].getContext("2d");
+
+        // Setup drag and drop
+        $dropZone.on({
+          dragover: function (e) {
+            e.preventDefault();
+            $(this).addClass("dragover");
+          },
+          dragleave: function () {
+            $(this).removeClass("dragover");
+          },
+          drop: function (e) {
+            e.preventDefault();
+            $(this).removeClass("dragover");
+            const files = e.originalEvent.dataTransfer.files;
+            if (files.length) {
+              $input[0].files = files;
+              $input.trigger("change");
+            }
+          },
+        });
+
+        $("#dropZone button").on("click", () => $input.click());
+
+        $input.on("change", async function (e) {
+          const file = this.files[0];
+          if (file && file.type === "application/pdf") {
+            selectedFile = file;
+            $dropZone.slideUp(300);
+            $splitBox.removeClass("hidden").slideDown(300);
+            await previewPDF(file);
+          } else {
+            alert("Please select a valid PDF file");
+          }
+        });
+
+        // Preview PDF (first page)
+        async function previewPDF(file) {
+          const arrayBuffer = await file.arrayBuffer();
+          try {
+            pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            await renderPage(1); // Render first page as preview
+          } catch (error) {
+            console.error("Preview failed:", error);
+            $canvas[0].width = 300;
+            $canvas[0].height = 100;
+            ctx.fillStyle = "#f3f4f6";
+            ctx.fillRect(0, 0, 300, 100);
+            ctx.fillStyle = "#6b7280";
+            ctx.font = "16px Inter";
+            ctx.textAlign = "center";
+            ctx.fillText("Preview unavailable", 150, 50);
+          }
+        }
+
+        // Render PDF page on canvas
+        async function renderPage(pageNum) {
+          const page = await pdfDoc.getPage(pageNum);
+          const scale = 2; // Moderate quality for preview
+          const viewport = page.getViewport({ scale });
+          $canvas[0].width = viewport.width;
+          $canvas[0].height = viewport.height;
+          await page.render({
+            canvasContext: ctx,
+            viewport: viewport,
+          }).promise;
+        }
+
+        // Toggle range input based on split method
+        $splitMethod.on("change", function () {
+          if ($(this).val() === "range") {
+            $rangeInput.removeClass("hidden");
+          } else {
+            $rangeInput.addClass("hidden");
+          }
+        });
+
+        // Split PDF and download
+        $("#splitBtn").on("click", async function () {
+          if (!selectedFile || !pdfDoc) {
+            alert("Please upload a PDF first.");
+            return;
+          }
+
+          try {
+            $(this).prop("disabled", true);
+            $status.removeClass("hidden").text("Splitting PDF...");
+
+            const arrayBuffer = await selectedFile.arrayBuffer();
+            const sourceDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+            const numPages = sourceDoc.getPageCount();
+            const method = $splitMethod.val();
+
+            if (method === "each") {
+              // Split into individual pages
+              for (let i = 0; i < numPages; i++) {
+                const newDoc = await PDFLib.PDFDocument.create();
+                const [page] = await newDoc.copyPages(sourceDoc, [i]);
+                newDoc.addPage(page);
+                const bytes = await newDoc.save();
+                downloadFile(bytes, `split_page_${i + 1}.pdf`);
+              }
+            } else if (method === "range") {
+              // Split by custom range
+              const rangeInput = $("#pageRange").val().trim();
+              if (!rangeInput) {
+                throw new Error("Please enter a page range (e.g., 1-3, 5).");
+              }
+
+              const ranges = parseRange(rangeInput, numPages);
+              let fileIndex = 1;
+              for (const range of ranges) {
+                const newDoc = await PDFLib.PDFDocument.create();
+                const pageIndices = Array.from(
+                  { length: range.end - range.start + 1 },
+                  (_, i) => range.start - 1 + i
+                );
+                const pages = await newDoc.copyPages(sourceDoc, pageIndices);
+                pages.forEach((page) => newDoc.addPage(page));
+                const bytes = await newDoc.save();
+                downloadFile(bytes, `split_part_${fileIndex}.pdf`);
+                fileIndex++;
+              }
+            }
+
+            $status.text("PDF split successfully!");
+            console.log("PDF split and downloaded");
+          } catch (error) {
+            console.error("Error splitting PDF:", error);
+            alert("Failed to split PDF: " + error.message);
+            $status.text("Splitting failed.");
+          } finally {
+            $(this).prop("disabled", false);
+            setTimeout(() => $status.addClass("hidden"), 3000);
+          }
+        });
+
+        // Helper function to download a file
+        function downloadFile(bytes, filename) {
+          const blob = new Blob([bytes], { type: "application/pdf" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }
+
+        // Parse page range input (e.g., "1-3, 5" -> [{start: 1, end: 3}, {start: 5, end: 5}])
+        function parseRange(input, maxPages) {
+          const ranges = [];
+          const parts = input.split(",").map((part) => part.trim());
+          for (const part of parts) {
+            if (part.includes("-")) {
+              const [start, end] = part.split("-").map(Number);
+              if (
+                isNaN(start) ||
+                isNaN(end) ||
+                start < 1 ||
+                end > maxPages ||
+                start > end
+              ) {
+                throw new Error(`Invalid range: ${part}`);
+              }
+              ranges.push({ start, end });
+            } else {
+              const page = Number(part);
+              if (isNaN(page) || page < 1 || page > maxPages) {
+                throw new Error(`Invalid page: ${part}`);
+              }
+              ranges.push({ start: page, end: page });
+            }
+          }
+          return ranges;
+        }
+      });
+    </script>
+  </body>
+</html>

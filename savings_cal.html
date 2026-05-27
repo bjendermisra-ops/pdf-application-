@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Savings Goal Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              emerald: {
+                50: "#ecfdf5",
+                100: "#d1fae5",
+                500: "#10b981",
+                600: "#059669",
+                700: "#047857",
+                800: "#065f46",
+                900: "#064e3b",
+              },
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-gradient-to-br from-emerald-50 to-blue-100 min-h-screen">
+    <nav>
+      <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 9999px;
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      }
+
+      .back-button i {
+        font-size: 1rem;
+      }
+
+      .back-button:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        transform: translateX(-0.25rem);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+      }
+    </style>
+    <div class="max-w-6xl mx-auto mt-5">
+      <!-- Header -->
+      <header class="text-center mb-10">
+        <h1 class="text-4xl font-bold text-emerald-800 mb-3">
+          Savings Goal Calculator
+        </h1>
+        <p class="text-gray-600 text-lg">
+          Plan how much to save monthly to achieve your financial goals
+        </p>
+      </header>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Input Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+            Your Savings Goal
+          </h2>
+
+          <!-- Goal Name -->
+          <div class="mb-6">
+            <label for="goal-name" class="block text-gray-700 mb-2 font-medium"
+              >Goal Name</label
+            >
+            <input
+              type="text"
+              id="goal-name"
+              class="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="e.g., Down Payment, Vacation, Emergency Fund"
+              value="New Car"
+            />
+          </div>
+
+          <!-- Target Amount -->
+          <div class="mb-6">
+            <label
+              for="target-amount"
+              class="block text-gray-700 mb-2 font-medium"
+              >Target Amount (₹)</label
+            >
+            <div class="relative">
+              <span class="absolute left-3 top-3 text-gray-400">₹</span>
+              <input
+                type="range"
+                id="target-amount-range"
+                min="10000"
+                max="10000000"
+                step="10000"
+                value="500000"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <input
+                type="number"
+                id="target-amount"
+                class="w-full mt-2 pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                value="500000"
+              />
+            </div>
+            <div class="text-xs text-gray-500 mt-1 flex justify-between">
+              <span>₹10,000</span>
+              <span>₹1,00,00,000</span>
+            </div>
+          </div>
+
+          <!-- Time Frame -->
+          <div class="mb-6">
+            <label for="time-frame" class="block text-gray-700 mb-2 font-medium"
+              >Time Frame (years)</label
+            >
+            <div class="relative">
+              <input
+                type="range"
+                id="time-frame-range"
+                min="1"
+                max="30"
+                step="1"
+                value="5"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <input
+                type="number"
+                id="time-frame"
+                class="w-full mt-2 pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                value="5"
+              />
+            </div>
+            <div class="text-xs text-gray-500 mt-1 flex justify-between">
+              <span>1 year</span>
+              <span>30 years</span>
+            </div>
+          </div>
+
+          <!-- Interest Rate -->
+          <div class="mb-6">
+            <label
+              for="interest-rate"
+              class="block text-gray-700 mb-2 font-medium"
+              >Expected Annual Return (%)</label
+            >
+            <div class="relative">
+              <span class="absolute left-3 top-3 text-gray-400">%</span>
+              <input
+                type="range"
+                id="interest-rate-range"
+                min="0"
+                max="20"
+                step="0.1"
+                value="7"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <input
+                type="number"
+                id="interest-rate"
+                class="w-full mt-2 pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                value="7"
+              />
+            </div>
+            <div class="text-xs text-gray-500 mt-1 flex justify-between">
+              <span>0%</span>
+              <span>20%</span>
+            </div>
+          </div>
+
+          <!-- Initial Savings -->
+          <div class="mb-6">
+            <label
+              for="initial-savings"
+              class="block text-gray-700 mb-2 font-medium"
+              >Initial Savings (₹)</label
+            >
+            <div class="relative">
+              <span class="absolute left-3 top-3 text-gray-400">₹</span>
+              <input
+                type="number"
+                id="initial-savings"
+                class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                value="50000"
+              />
+            </div>
+          </div>
+
+          <!-- Calculate Button -->
+          <button
+            id="calculate-btn"
+            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-lg transition-colors shadow-md flex items-center justify-center"
+          >
+            <i class="fas fa-calculator mr-2"></i> Calculate Savings Plan
+          </button>
+
+          <!-- Info Section -->
+          <div class="mt-6 p-4 bg-emerald-50 rounded-lg">
+            <h3 class="font-medium text-emerald-800 mb-2">
+              Tips for Reaching Your Goal
+            </h3>
+            <ul class="text-sm text-emerald-700 list-disc pl-5 space-y-1">
+              <li>Set up automatic transfers to your savings account</li>
+              <li>Review your progress quarterly and adjust if needed</li>
+              <li>Consider increasing contributions with income growth</li>
+              <li>Look for ways to reduce expenses and save more</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+            Your Savings Plan
+          </h2>
+
+          <div class="text-center mb-8 p-4 bg-emerald-50 rounded-lg">
+            <h3 class="text-lg font-medium text-emerald-800 mb-1">
+              To reach your goal of
+            </h3>
+            <p class="text-2xl font-bold text-emerald-800" id="goal-display">
+              ₹5,00,000 for a New Car
+            </p>
+          </div>
+
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="bg-emerald-50 p-4 rounded-lg">
+              <p class="text-sm text-emerald-700">Monthly Savings Needed</p>
+              <p class="text-xl font-bold text-emerald-800">₹6,903</p>
+            </div>
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <p class="text-sm text-blue-700">Total Contributions</p>
+              <p class="text-xl font-bold text-blue-800">₹4,14,180</p>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <p class="text-sm text-purple-700">Interest Earned</p>
+              <p class="text-xl font-bold text-purple-800">₹85,820</p>
+            </div>
+            <div class="bg-amber-50 p-4 rounded-lg">
+              <p class="text-sm text-amber-700">Initial Amount</p>
+              <p class="text-xl font-bold text-amber-800">₹50,000</p>
+            </div>
+          </div>
+
+          <!-- Chart -->
+          <div class="mb-8">
+            <canvas id="savingsChart" height="250"></canvas>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="mb-8">
+            <div class="flex justify-between mb-2">
+              <span class="text-sm font-medium text-emerald-800"
+                >Goal Progress</span
+              >
+              <span class="text-sm font-medium text-emerald-800">10%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+              <div
+                class="bg-emerald-600 h-2.5 rounded-full"
+                style="width: 10%"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div>
+            <h3 class="font-medium text-gray-700 mb-3">Yearly Progress</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left border-b border-gray-200">
+                    <th class="pb-2 text-gray-600">Year</th>
+                    <th class="pb-2 text-gray-600">Total Saved</th>
+                    <th class="pb-2 text-gray-600">Interest</th>
+                    <th class="pb-2 text-gray-600">Progress</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-2">1</td>
+                    <td class="py-2">₹1,32,836</td>
+                    <td class="py-2">₹4,836</td>
+                    <td class="py-2">26.6%</td>
+                  </tr>
+                  <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-2">2</td>
+                    <td class="py-2">₹2,20,299</td>
+                    <td class="py-2">₹15,299</td>
+                    <td class="py-2">44.1%</td>
+                  </tr>
+                  <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-2">3</td>
+                    <td class="py-2">₹3,12,679</td>
+                    <td class="py-2">₹30,679</td>
+                    <td class="py-2">62.5%</td>
+                  </tr>
+                  <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-2">4</td>
+                    <td class="py-2">₹4,10,384</td>
+                    <td class="py-2">₹50,384</td>
+                    <td class="py-2">82.1%</td>
+                  </tr>
+                  <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-2">5</td>
+                    <td class="py-2">₹5,00,000</td>
+                    <td class="py-2">₹85,820</td>
+                    <td class="py-2">100%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategies Section -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mt-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+          Strategies to Reach Your Goal Faster
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="flex items-start">
+            <div
+              class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0"
+            >
+              <i class="fas fa-chart-line text-emerald-600"></i>
+            </div>
+            <div>
+              <h3 class="font-medium text-gray-800 mb-2">
+                Increase Monthly Contributions
+              </h3>
+              <p class="text-gray-600 text-sm">
+                Even a small increase in your monthly savings can significantly
+                reduce the time needed to reach your goal.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start">
+            <div
+              class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0"
+            >
+              <i class="fas fa-percentage text-blue-600"></i>
+            </div>
+            <div>
+              <h3 class="font-medium text-gray-800 mb-2">Boost Your Returns</h3>
+              <p class="text-gray-600 text-sm">
+                Consider slightly higher-risk investments for potentially better
+                returns if your time horizon allows.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start">
+            <div
+              class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0"
+            >
+              <i class="fas fa-money-bill-wave text-amber-600"></i>
+            </div>
+            <div>
+              <h3 class="font-medium text-gray-800 mb-2">Save Windfalls</h3>
+              <p class="text-gray-600 text-sm">
+                Put tax refunds, bonuses, or gifts directly toward your goal to
+                accelerate your progress.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start">
+            <div
+              class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0"
+            >
+              <i class="fas fa-receipt text-purple-600"></i>
+            </div>
+            <div>
+              <h3 class="font-medium text-gray-800 mb-2">Reduce Expenses</h3>
+              <p class="text-gray-600 text-sm">
+                Identify areas where you can cut back spending and redirect
+                those funds to your savings goal.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // DOM Elements
+        const goalNameInput = document.getElementById("goal-name");
+        const targetAmountInput = document.getElementById("target-amount");
+        const targetAmountRange = document.getElementById(
+          "target-amount-range"
+        );
+        const timeFrameInput = document.getElementById("time-frame");
+        const timeFrameRange = document.getElementById("time-frame-range");
+        const interestRateInput = document.getElementById("interest-rate");
+        const interestRateRange = document.getElementById(
+          "interest-rate-range"
+        );
+        const initialSavingsInput = document.getElementById("initial-savings");
+        const calculateButton = document.getElementById("calculate-btn");
+
+        // Chart variable
+        let savingsChart;
+
+        // Sync range and input values
+        targetAmountRange.addEventListener("input", function () {
+          targetAmountInput.value = this.value;
+          calculateSavings();
+        });
+
+        targetAmountInput.addEventListener("input", function () {
+          targetAmountRange.value = this.value;
+          calculateSavings();
+        });
+
+        timeFrameRange.addEventListener("input", function () {
+          timeFrameInput.value = this.value;
+          calculateSavings();
+        });
+
+        timeFrameInput.addEventListener("input", function () {
+          timeFrameRange.value = this.value;
+          calculateSavings();
+        });
+
+        interestRateRange.addEventListener("input", function () {
+          interestRateInput.value = this.value;
+          calculateSavings();
+        });
+
+        interestRateInput.addEventListener("input", function () {
+          interestRateRange.value = this.value;
+          calculateSavings();
+        });
+
+        // Calculate on any input change
+        goalNameInput.addEventListener("input", updateGoalDisplay);
+        initialSavingsInput.addEventListener("input", calculateSavings);
+
+        // Calculate Savings function
+        function calculateSavings() {
+          const targetAmount = parseFloat(targetAmountInput.value);
+          const timeFrame = parseFloat(timeFrameInput.value);
+          const interestRate = parseFloat(interestRateInput.value) / 100; // Convert to decimal
+          const initialSavings = parseFloat(initialSavingsInput.value) || 0;
+
+          // Calculate monthly savings needed
+          // Using future value of a series formula: FV = P * (((1 + r)^n - 1) / r)
+          // Rearranged to solve for P: P = FV * (r / ((1 + r)^n - 1))
+          const months = timeFrame * 12;
+          const monthlyRate = interestRate / 12;
+
+          // Adjust target for initial savings
+          const adjustedTarget =
+            targetAmount -
+            initialSavings * Math.pow(1 + interestRate, timeFrame);
+
+          let monthlySavings;
+          if (interestRate > 0) {
+            monthlySavings =
+              adjustedTarget *
+              (monthlyRate / (Math.pow(1 + monthlyRate, months) - 1));
+          } else {
+            monthlySavings = (targetAmount - initialSavings) / months;
+          }
+
+          // Calculate total contributions and interest
+          const totalContributions = monthlySavings * months;
+          const interestEarned =
+            targetAmount - totalContributions - initialSavings;
+
+          // Update the UI with calculated values
+          document.querySelectorAll(
+            ".bg-emerald-50 .text-xl"
+          )[0].textContent = `₹${Math.round(monthlySavings).toLocaleString()}`;
+          document.querySelectorAll(
+            ".bg-blue-50 .text-xl"
+          )[0].textContent = `₹${Math.round(
+            totalContributions
+          ).toLocaleString()}`;
+          document.querySelectorAll(
+            ".bg-purple-50 .text-xl"
+          )[0].textContent = `₹${Math.round(interestEarned).toLocaleString()}`;
+          document.querySelectorAll(
+            ".bg-amber-50 .text-xl"
+          )[0].textContent = `₹${Math.round(initialSavings).toLocaleString()}`;
+
+          // Update goal display
+          updateGoalDisplay();
+
+          // Update chart
+          updateChart(totalContributions, interestEarned, initialSavings);
+
+          // Update yearly breakdown
+          updateYearlyBreakdown(
+            monthlySavings,
+            interestRate,
+            timeFrame,
+            initialSavings,
+            targetAmount
+          );
+        }
+
+        // Update goal display
+        function updateGoalDisplay() {
+          const goalName = goalNameInput.value || "Your Goal";
+          const targetAmount = parseFloat(targetAmountInput.value);
+          document.getElementById(
+            "goal-display"
+          ).textContent = `₹${targetAmount.toLocaleString()} for ${goalName}`;
+        }
+
+        // Update chart function
+        function updateChart(contributions, interest, initial) {
+          const ctx = document.getElementById("savingsChart").getContext("2d");
+
+          // Destroy previous chart if it exists
+          if (savingsChart) {
+            savingsChart.destroy();
+          }
+
+          // Create new chart
+          savingsChart = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+              labels: [
+                "Your Contributions",
+                "Interest Earned",
+                "Initial Savings",
+              ],
+              datasets: [
+                {
+                  data: [contributions, interest, initial],
+                  backgroundColor: [
+                    "#059669", // emerald-600
+                    "#8b5cf6", // purple-500
+                    "#f59e0b", // amber-500
+                  ],
+                  borderWidth: 0,
+                  hoverOffset: 10,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              cutout: "70%",
+              plugins: {
+                legend: {
+                  position: "bottom",
+                  labels: {
+                    font: {
+                      size: 13,
+                    },
+                    padding: 20,
+                  },
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      return `${
+                        context.label
+                      }: ₹${context.raw.toLocaleString()}`;
+                    },
+                  },
+                },
+              },
+            },
+          });
+        }
+
+        // Update yearly breakdown
+        function updateYearlyBreakdown(
+          monthlySavings,
+          interestRate,
+          timeFrame,
+          initialSavings,
+          targetAmount
+        ) {
+          const breakdownRows = document.querySelectorAll("tbody tr");
+
+          // Clear previous data
+          breakdownRows.forEach((row) => {
+            row.cells[0].textContent = "";
+            row.cells[1].textContent = "";
+            row.cells[2].textContent = "";
+            row.cells[3].textContent = "";
+          });
+
+          // Calculate values for each year
+          let balance = initialSavings;
+
+          for (let year = 1; year <= timeFrame; year++) {
+            let yearlyInterest = 0;
+
+            // Calculate for each month in the year
+            for (let month = 1; month <= 12; month++) {
+              // Add monthly contribution
+              balance += monthlySavings;
+
+              // Calculate monthly interest
+              const monthlyInterest = balance * (interestRate / 12);
+              balance += monthlyInterest;
+              yearlyInterest += monthlyInterest;
+            }
+
+            const progress = Math.min(100, (balance / targetAmount) * 100);
+
+            if (year - 1 < breakdownRows.length) {
+              breakdownRows[year - 1].cells[0].textContent = year;
+              breakdownRows[year - 1].cells[1].textContent = `₹${Math.round(
+                balance
+              ).toLocaleString()}`;
+              breakdownRows[year - 1].cells[2].textContent = `₹${Math.round(
+                yearlyInterest
+              ).toLocaleString()}`;
+              breakdownRows[
+                year - 1
+              ].cells[3].textContent = `${progress.toFixed(1)}%`;
+            }
+          }
+        }
+
+        // Initial calculation
+        calculateSavings();
+
+        // Calculate on button click
+        calculateButton.addEventListener("click", calculateSavings);
+      });
+    </script>
+  </body>
+</html>

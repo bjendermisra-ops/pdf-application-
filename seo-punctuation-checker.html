@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SEO Punctuation Checker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .highlight {
+        background-color: #f59e0b;
+        padding: 0 2px;
+        border-radius: 2px;
+        color: #1e293b;
+      }
+      .error-count {
+        animation: pulse 1.5s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-white min-h-screen text-black">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-black mb-2">
+          SEO Punctuation Checker
+        </h1>
+        <p class="text-lg text-gray-700">
+          Improve your content's readability and SEO with proper punctuation
+        </p>
+      </header>
+
+      <main class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Input Section -->
+          <div class="bg-white rounded-xl shadow-md overflow-hidden p-6">
+            <div class="mb-6">
+              <div class="flex justify-between items-center mb-2">
+                <h2 class="text-xl font-semibold text-black">Your Text</h2>
+                <button
+                  onclick="clearText()"
+                  class="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                >
+                  <i class="fas fa-eraser"></i> Clear
+                </button>
+              </div>
+              <textarea
+                id="input-text"
+                rows="12"
+                class="w-full px-4 py-3 bg-white text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Paste or type your content here..."
+              ></textarea>
+            </div>
+
+            <div class="flex flex-wrap gap-3">
+              <button
+                onclick="checkPunctuation()"
+                class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2"
+              >
+                <i class="fas fa-search"></i> Check Punctuation
+              </button>
+              <button
+                onclick="autoCorrect()"
+                class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2"
+              >
+                <i class="fas fa-magic"></i> Auto Correct
+              </button>
+              <button
+                onclick="copyText()"
+                class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2"
+              >
+                <i class="fas fa-copy"></i> Copy Text
+              </button>
+            </div>
+          </div>
+
+          <!-- Results Section -->
+          <div class="bg-white rounded-xl shadow-md overflow-hidden p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-semibold text-black">Results</h2>
+              <div
+                id="error-count"
+                class="error-count px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium hidden"
+              >
+                <span id="error-num">0</span> issues found
+              </div>
+            </div>
+
+            <div
+              id="results-container"
+              class="bg-white p-4 rounded-md min-h-[200px] border border-gray-200"
+            >
+              <p class="text-gray-500 italic">
+                Your analyzed text will appear here...
+              </p>
+            </div>
+
+            <div id="issues-list" class="mt-4 hidden">
+              <h3 class="text-lg font-medium text-black mb-2">
+                Detected Issues
+              </h3>
+              <div
+                class="space-y-2 max-h-60 overflow-y-auto pr-2"
+                id="issues-container"
+              >
+                <!-- Issues will be listed here -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Punctuation Guide -->
+        <div class="mt-8 bg-white rounded-xl shadow-md overflow-hidden p-6">
+          <h2 class="text-2xl font-semibold text-blue-600 mb-4">
+            SEO Punctuation Guide
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+              <h3
+                class="text-lg font-medium text-blue-600 mb-2 flex items-center gap-2"
+              >
+                <i class="fas fa-period"></i> Periods (.)
+              </h3>
+              <ul class="list-disc pl-5 text-gray-700 space-y-1 text-sm">
+                <li>End sentences with a single space after</li>
+                <li>No space before the period</li>
+                <li>Use in abbreviations (e.g., etc.)</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+              <h3
+                class="text-lg font-medium text-blue-600 mb-2 flex items-center gap-2"
+              >
+                <i class="fas fa-comma"></i> Commas (,)
+              </h3>
+              <ul class="list-disc pl-5 text-gray-700 space-y-1 text-sm">
+                <li>Use to separate items in a list</li>
+                <li>Place after introductory phrases</li>
+                <li>No space before, one space after</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+              <h3
+                class="text-lg font-medium text-blue-600 mb-2 flex items-center gap-2"
+              >
+                <i class="fas fa-quote-left"></i> Quotation Marks (" ")
+              </h3>
+              <ul class="list-disc pl-5 text-gray-700 space-y-1 text-sm">
+                <li>Straight quotes are preferred for web content</li>
+                <li>No space between quote and enclosed text</li>
+                <li>Punctuation goes inside quotes in US English</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+              <h3
+                class="text-lg font-medium text-blue-600 mb-2 flex items-center gap-2"
+              >
+                <i class="fas fa-hyphen"></i> Hyphens (-) & Dashes (—)
+              </h3>
+              <ul class="list-disc pl-5 text-gray-700 space-y-1 text-sm">
+                <li>Hyphens for compound words (e.g., well-known)</li>
+                <li>Em dashes for interruptions—like this—with no spaces</li>
+                <li>En dashes for ranges (e.g., 2010–2020)</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+              <h3
+                class="text-lg font-medium text-blue-600 mb-2 flex items-center gap-2"
+              >
+                <i class="fas fa-exclamation"></i> Exclamation Points (!)
+              </h3>
+              <ul class="list-disc pl-5 text-gray-700 space-y-1 text-sm">
+                <li>Use sparingly in professional content</li>
+                <li>Never use multiple (!!)</li>
+                <li>No space before, one space after</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+              <h3
+                class="text-lg font-medium text-blue-600 mb-2 flex items-center gap-2"
+              >
+                <i class="fas fa-ellipsis"></i> Ellipses (...)
+              </h3>
+              <ul class="list-disc pl-5 text-gray-700 space-y-1 text-sm">
+                <li>Use exactly three dots with no spaces between</li>
+                <li>Space before and after when mid-sentence</li>
+                <li>No space before when at sentence end</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm">
+      <p>
+        SEO Punctuation Checker Tool © 2023 | Improve your content's readability
+        and SEO
+      </p>
+    </footer>
+
+    <script>
+      // Store original text for reference
+      let originalText = "";
+      let detectedIssues = [];
+
+      function checkPunctuation() {
+        const inputText = document.getElementById("input-text").value;
+        originalText = inputText;
+
+        if (!inputText.trim()) {
+          document.getElementById("results-container").innerHTML =
+            '<p class="text-red-600">Please enter some text to analyze</p>';
+          return;
+        }
+
+        // Reset previous results
+        detectedIssues = [];
+        document.getElementById("issues-container").innerHTML = "";
+        document.getElementById("issues-list").classList.add("hidden");
+        document.getElementById("error-count").classList.add("hidden");
+
+        // Create a copy to highlight
+        let highlightedText = inputText;
+
+        // Check for common punctuation issues
+        checkDoubleSpaces(inputText);
+        checkMissingSpacesAfterPunctuation(inputText);
+        checkSpaceBeforePunctuation(inputText);
+        checkMultipleExclamation(inputText);
+        checkMultipleQuestion(inputText);
+        checkEllipses(inputText);
+        checkQuotes(inputText);
+        checkHyphens(inputText);
+        checkCommas(inputText);
+
+        // Apply highlights to the text (working from end to beginning to avoid offset issues)
+        detectedIssues
+          .sort((a, b) => b.index - a.index)
+          .forEach((issue) => {
+            const before = highlightedText.substring(0, issue.index);
+            const after = highlightedText.substring(
+              issue.index + issue.match.length
+            );
+            highlightedText =
+              before +
+              `<span class="highlight" title="${issue.message}">${issue.match}</span>` +
+              after;
+          });
+
+        // Display results
+        document.getElementById("results-container").innerHTML =
+          highlightedText;
+
+        // Show issues count if any found
+        if (detectedIssues.length > 0) {
+          document.getElementById("error-num").textContent =
+            detectedIssues.length;
+          document.getElementById("error-count").classList.remove("hidden");
+
+          // List all issues
+          const issuesContainer = document.getElementById("issues-container");
+          detectedIssues.forEach((issue) => {
+            const issueElement = document.createElement("div");
+            issueElement.className =
+              "bg-white p-3 rounded-md border border-gray-200 text-sm";
+            issueElement.innerHTML = `
+              <p class="font-medium text-red-600">${issue.message}</p>
+              <p class="text-gray-700 mt-1">Found: "${escapeHtml(
+                issue.match
+              )}"</p>
+              <p class="text-gray-500 mt-1 text-xs">Suggestion: ${
+                issue.suggestion || "Review punctuation"
+              }</p>
+            `;
+            issuesContainer.appendChild(issueElement);
+          });
+
+          document.getElementById("issues-list").classList.remove("hidden");
+        } else {
+          document.getElementById("results-container").innerHTML = `
+            <div class="bg-green-50 p-4 rounded-md border border-green-200">
+              <p class="text-green-600 font-medium">No punctuation issues found!</p>
+              <p class="text-green-500 mt-1">Your text follows good punctuation practices.</p>
+            </div>
+            <div class="mt-4">${highlightedText}</div>
+          `;
+        }
+      }
+
+      function autoCorrect() {
+        if (!originalText) {
+          checkPunctuation(); // Run check first if not already done
+          if (!originalText) return;
+        }
+
+        let correctedText = originalText;
+
+        // Apply corrections based on detected issues (working from end to beginning)
+        detectedIssues
+          .sort((a, b) => b.index - a.index)
+          .forEach((issue) => {
+            if (issue.correction) {
+              correctedText =
+                correctedText.substring(0, issue.index) +
+                issue.correction +
+                correctedText.substring(issue.index + issue.match.length);
+            }
+          });
+
+        // Update the input field with corrected text
+        document.getElementById("input-text").value = correctedText;
+
+        // Show success message
+        const resultsContainer = document.getElementById("results-container");
+        resultsContainer.innerHTML = `
+          <div class="bg-green-50 p-4 rounded-md border border-green-200 mb-4">
+            <p class="text-green-600 font-medium">Text auto-corrected!</p>
+            <p class="text-green-500 mt-1">${detectedIssues.length} issues were fixed.</p>
+          </div>
+          <div class="mt-4">${correctedText}</div>
+        `;
+
+        // Hide issues list since they're now fixed
+        document.getElementById("issues-list").classList.add("hidden");
+        document.getElementById("error-count").classList.add("hidden");
+
+        // Clear detected issues to prevent duplicate corrections
+        detectedIssues = [];
+      }
+
+      function copyText() {
+        const textToCopy = document.getElementById("input-text").value;
+        if (!textToCopy.trim()) {
+          alert("No text to copy!");
+          return;
+        }
+
+        navigator.clipboard
+          .writeText(textToCopy)
+          .then(() => {
+            // Show temporary feedback
+            const button = event.target.closest("button");
+            const originalHtml = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            button.classList.remove("bg-blue-600");
+            button.classList.add("bg-green-600");
+            setTimeout(() => {
+              button.innerHTML = originalHtml;
+              button.classList.remove("bg-green-600");
+              button.classList.add("bg-blue-600");
+            }, 2000);
+          })
+          .catch((err) => {
+            console.error("Failed to copy: ", err);
+            alert("Failed to copy text");
+          });
+      }
+
+      function clearText() {
+        document.getElementById("input-text").value = "";
+        document.getElementById("results-container").innerHTML =
+          '<p class="text-gray-500 italic">Your analyzed text will appear here...</p>';
+        document.getElementById("issues-list").classList.add("hidden");
+        document.getElementById("error-count").classList.add("hidden");
+        originalText = "";
+        detectedIssues = [];
+      }
+
+      // Helper function to escape regex special characters
+      function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      }
+
+      // Helper function to escape HTML
+      function escapeHtml(unsafe) {
+        return unsafe
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      // Punctuation check functions
+      function checkDoubleSpaces(text) {
+        const regex = / {2,}/g;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+          detectedIssues.push({
+            match: match[0],
+            message: "Multiple consecutive spaces",
+            suggestion: "Replace with single space",
+            correction: " ",
+            index: match.index,
+          });
+        }
+      }
+
+      function checkMissingSpacesAfterPunctuation(text) {
+        const regex = /[.,!?;:](?=[^\s])/g;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+          detectedIssues.push({
+            match: match[0],
+            message: "Missing space after punctuation",
+            suggestion: `Add space after "${match[0]}"`,
+            correction: match[0] + " ",
+            index: match.index,
+          });
+        }
+      }
+
+      function checkSpaceBeforePunctuation(text) {
+        const regex = /\s[.,!?;:]/g;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+          detectedIssues.push({
+            match: match[0],
+            message: "Space before punctuation",
+            suggestion: `Remove space before "${match[0].trim()}"`,
+            correction: match[0].trim(),
+            index: match.index,
+          });
+        }
+      }
+
+      function checkMultipleExclamation(text) {
+        const regex = /!{2,}/g;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+          detectedIssues.push({
+            match: match[0],
+            message: "Multiple exclamation marks",
+            suggestion: "Use just one exclamation mark",
+            correction: "!",
+            index: match.index,
+          });
+        }
+      }
+
+      function checkMultipleQuestion(text) {
+        const regex = /\?{2,}/g;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+          detectedIssues.push({
+            match: match[0],
+            message: "Multiple question marks",
+            suggestion: "Use just one question mark",
+            correction: "?",
+            index: match.index,
+          });
+        }
+      }
+
+      function checkEllipses(text) {
+        const regex = /\.{2,4}/g;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+          if (match[0] !== "...") {
+            detectedIssues.push({
+              match: match[0],
+              message: "Incorrect ellipsis",
+              suggestion: "Use exactly three dots (...) for ellipsis",
+              correction: "...",
+              index: match.index,
+            });
+          }
+        }
+      }
+
+      function checkQuotes(text) {
+        const regex = /[“”‘’]/g;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+          detectedIssues.push({
+            match: match[0],
+            message: "Curly quotation mark",
+            suggestion: 'Consider using straight quotes (") for web content',
+            correction: match[0] === "“" || match[0] === "”" ? '"' : "'",
+            index: match.index,
+          });
+        }
+      }
+
+      function checkHyphens(text) {
+        const regex = /\s-\s/g;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+          detectedIssues.push({
+            match: match[0],
+            message: "Hyphen with spaces used as dash",
+            suggestion: "Consider using em dash (—) without spaces",
+            correction: "—",
+            index: match.index,
+          });
+        }
+      }
+
+      function checkCommas(text) {
+        const regex = /(\w+,\s)+\w+\s(and|or)\s\w+/g;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+          if (!match[0].includes(", and ") && !match[0].includes(", or ")) {
+            const index = match.index + match[0].indexOf(" " + match[2] + " ");
+            detectedIssues.push({
+              match: " " + match[2] + " ",
+              message: "Possible missing Oxford comma",
+              suggestion: "Consider adding comma before conjunction in list",
+              correction: ", " + match[2] + " ",
+              index: index,
+            });
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

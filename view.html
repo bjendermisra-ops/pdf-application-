@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PNG Metadata Viewer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+  <style>
+    .metadata-item {
+      transition: all 0.2s ease;
+    }
+
+    .metadata-item:hover {
+      background-color: #f3f4f6;
+    }
+
+    .dropzone {
+      border: 2px dashed #cbd5e0;
+      transition: all 0.3s ease;
+    }
+
+    .dropzone.active {
+      border-color: #4299e1;
+      background-color: #ebf8ff;
+    }
+  </style>
+</head>
+
+
+<?php include 'includes/navbar.html'; ?>
+<nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+<div class="max-w-4xl mx-auto mt-12 mb-12">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">PNG Metadata Viewer</h1>
+
+  <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+    <!-- File Upload Section -->
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">
+        Upload PNG Image
+      </h2>
+      <div id="dropzone" class="dropzone rounded-lg p-8 text-center cursor-pointer">
+        <input type="file" id="file-input" accept="image/png" class="hidden" />
+        <div class="flex flex-col items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+          <p class="text-gray-600 mb-2">
+            Drag & drop a PNG file here or click to browse
+          </p>
+          <p class="text-sm text-gray-500">Supports: PNG files only</p>
+          <button id="browse-btn"
+            class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            Select File
+          </button>
+        </div>
+      </div>
+      <div id="file-info" class="mt-4 hidden">
+        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-md">
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span id="filename" class="font-medium text-gray-700"></span>
+          </div>
+          <button id="remove-file" class="text-red-500 hover:text-red-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Section (initially hidden) -->
+  <div id="results-section" class="bg-white rounded-lg shadow-md overflow-hidden hidden">
+    <!-- Image Preview Section -->
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">
+        Image Preview
+      </h2>
+      <div class="flex flex-col md:flex-row gap-6 items-center">
+        <div
+          class="w-48 h-48 border border-gray-300 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
+          <img id="image-preview" src="#" alt="Uploaded PNG" class="max-w-full max-h-full object-contain" />
+        </div>
+        <div class="flex-1">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm text-gray-500">Dimensions</p>
+              <p id="dimensions" class="font-medium">-</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">File Size</p>
+              <p id="file-size" class="font-medium">-</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Color Type</p>
+              <p id="color-type" class="font-medium">-</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Bit Depth</p>
+              <p id="bit-depth" class="font-medium">-</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Metadata Table Section -->
+    <div class="p-6">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">
+        Metadata Details
+      </h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Property
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Value
+              </th>
+            </tr>
+          </thead>
+          <tbody id="metadata-table" class="bg-white divide-y divide-gray-200">
+            <!-- Metadata rows will be inserted here by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Actions Section -->
+    <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
+      <button id="download-btn"
+        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        Download Metadata
+      </button>
+      <button id="copy-btn"
+        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
+        Copy to Clipboard
+      </button>
+    </div>
+  </div>
+</div>
+<?php include 'includes/footer.html'; ?>
+
+<script>
+  // DOM Elements
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("file-input");
+  const browseBtn = document.getElementById("browse-btn");
+  const fileInfo = document.getElementById("file-info");
+  const filename = document.getElementById("filename");
+  const removeFileBtn = document.getElementById("remove-file");
+  const resultsSection = document.getElementById("results-section");
+  const imagePreview = document.getElementById("image-preview");
+  const dimensions = document.getElementById("dimensions");
+  const fileSize = document.getElementById("file-size");
+  const colorType = document.getElementById("color-type");
+  const bitDepth = document.getElementById("bit-depth");
+  const metadataTable = document.getElementById("metadata-table");
+  const downloadBtn = document.getElementById("download-btn");
+  const copyBtn = document.getElementById("copy-btn");
+
+  // Sample metadata (in a real app, you would extract this from the actual file)
+  let currentMetadata = {};
+
+  // Event Listeners
+  browseBtn.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", handleFileSelect);
+  removeFileBtn.addEventListener("click", resetFileInput);
+
+  // Drag and drop events
+  ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, preventDefaults, false);
+  });
+
+  ["dragenter", "dragover"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, highlight, false);
+  });
+
+  ["dragleave", "drop"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, unhighlight, false);
+  });
+
+  dropzone.addEventListener("drop", handleDrop, false);
+
+  // Functions
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  function highlight() {
+    dropzone.classList.add("active");
+  }
+
+  function unhighlight() {
+    dropzone.classList.remove("active");
+  }
+
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files.length) {
+      fileInput.files = files;
+      handleFileSelect({ target: fileInput });
+    }
+  }
+
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check if file is PNG
+    if (!file.type.match("image/png")) {
+      alert("Please select a PNG file");
+      return;
+    }
+
+    // Display file info
+    filename.textContent = file.name;
+    fileInfo.classList.remove("hidden");
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      imagePreview.src = e.target.result;
+
+      // In a real app, you would extract metadata here
+      // For this example, we'll use sample data
+      currentMetadata = {
+        FileSize: formatFileSize(file.size),
+        FileType: "PNG",
+        FileTypeExtension: "png",
+        MIMEType: file.type,
+        ImageWidth: "200",
+        ImageHeight: "200",
+        BitDepth: "8",
+        ColorType: "RGB with Alpha",
+        Compression: "Deflate/Inflate",
+        Filter: "Adaptive",
+        Interlace: "Noninterlaced",
+        SRGBRendering: "Perceptual",
+        ImageSize: "200x200",
+        RequestFeature: "#nmlvals n.na",
+      };
+
+      // Update UI with metadata
+      updateMetadataUI();
+
+      // Show results section
+      resultsSection.classList.remove("hidden");
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function resetFileInput() {
+    fileInput.value = "";
+    fileInfo.classList.add("hidden");
+    resultsSection.classList.add("hidden");
+    currentMetadata = {};
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  }
+
+  function updateMetadataUI() {
+    // Update summary
+    dimensions.textContent = `${currentMetadata.ImageWidth} × ${currentMetadata.ImageHeight} px`;
+    fileSize.textContent = currentMetadata.FileSize;
+    colorType.textContent = currentMetadata.ColorType;
+    bitDepth.textContent = currentMetadata.BitDepth;
+
+    // Update metadata table
+    metadataTable.innerHTML = "";
+
+    for (const [key, value] of Object.entries(currentMetadata)) {
+      const row = document.createElement("tr");
+      row.className = "metadata-item";
+
+      const keyCell = document.createElement("td");
+      keyCell.className =
+        "px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900";
+      keyCell.textContent = key;
+
+      const valueCell = document.createElement("td");
+      valueCell.className =
+        "px-6 py-4 whitespace-nowrap text-sm text-gray-500";
+      valueCell.textContent = value;
+
+      row.appendChild(keyCell);
+      row.appendChild(valueCell);
+      metadataTable.appendChild(row);
+    }
+
+    // Set up download and copy buttons
+    downloadBtn.onclick = downloadMetadata;
+    copyBtn.onclick = copyMetadata;
+  }
+
+  function downloadMetadata() {
+    let csvContent = "Property,Value\n";
+
+    for (const [key, value] of Object.entries(currentMetadata)) {
+      csvContent += `"${key}","${value}"\n`;
+    }
+
+    const blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "image_metadata.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function copyMetadata() {
+    let textToCopy = "Image Metadata:\n\n";
+
+    for (const [key, value] of Object.entries(currentMetadata)) {
+      textToCopy += `${key}: ${value}\n`;
+    }
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = "Copied!";
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+      }, 2000);
+    });
+  }
+</script>
+</body>
+
+</html>

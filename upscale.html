@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta
+      name="description"
+      content="<?php echo htmlentities($meta_description); ?>"
+    />
+    <meta name="title" content="<?php echo htmlentities($web_title); ?>" />
+    <link
+      rel="shortcut icon"
+      href="/admin/<?php echo htmlentities($favicon); ?>"
+    />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upscale an Image</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .drop-zone {
+        border: 2px dashed #d1d5db;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        background: #f9fafb;
+        transition: all 0.3s ease;
+      }
+      .drop-zone.dragover {
+        border-color: #3b82f6;
+        background: #dbeafe;
+      }
+      .preview-box {
+        display: none;
+        border: 2px solid #d1d5db;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+      }
+      .loading-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid #fff;
+        border-top: 2px solid #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mx-auto p-4 max-w-3xl mt-12 mb-12 h-[500px]">
+      <h1 class="text-4xl font-bold text-center text-black mb-4">
+        Upscale an Image
+      </h1>
+      <p class="text-center text-gray-500 mb-6">
+        Increase the resolution from your PC, iPhone, or Android device
+      </p>
+      <div class="bg-white p-6 rounded-lg shadow-lg">
+        <div
+          class="drop-zone"
+          id="dropZone"
+          ondragover="handleDragOver(event)"
+          ondragleave="handleDragLeave(event)"
+          ondrop="handleDrop(event)"
+        >
+          <input type="file" id="fileInput" accept="image/*" class="hidden" />
+          <div class="flex flex-col items-center">
+            <i class="fas fa-image text-4xl text-gray-400 mb-2"></i>
+            <p class="text-gray-500 mb-2">Upload from PC or Mobile</p>
+            <button
+              id="uploadBtn"
+              class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
+            >
+              <i class="fas fa-upload mr-2"></i> Upload
+            </button>
+            <p class="text-gray-500 mt-2">or Drag files here</p>
+          </div>
+          <p class="text-gray-500 text-sm mt-2">
+            Uploaded and generated files are deleted 1 hour after upload
+          </p>
+        </div>
+        <div id="previewBox" class="preview-box mt-4">
+          <img id="previewImage" class="max-w-full h-auto" alt="Preview" />
+          <div class="flex items-center justify-between mt-4">
+            <select id="upscaleFactor" class="border p-2 rounded">
+              <option value="2">Increase 2x</option>
+              <option value="4">Increase 4x</option>
+            </select>
+            <button
+              id="upscaleBtn"
+              class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
+              disabled
+            >
+              <span id="upscaleText">Upscale</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const dropZone = document.getElementById("dropZone");
+      const fileInput = document.getElementById("fileInput");
+      const uploadBtn = document.getElementById("uploadBtn");
+      const previewBox = document.getElementById("previewBox");
+      const previewImage = document.getElementById("previewImage");
+      const upscaleBtn = document.getElementById("upscaleBtn");
+      const upscaleText = document.getElementById("upscaleText");
+      let selectedFile = null;
+
+      uploadBtn.addEventListener("click", () => fileInput.click());
+      fileInput.addEventListener("change", handleFileSelect);
+
+      function handleDragOver(event) {
+        event.preventDefault();
+        dropZone.classList.add("dragover");
+      }
+
+      function handleDragLeave(event) {
+        event.preventDefault();
+        dropZone.classList.remove("dragover");
+      }
+
+      function handleDrop(event) {
+        event.preventDefault();
+        dropZone.classList.remove("dragover");
+        const files = event.dataTransfer.files;
+        if (files.length) handleFileSelect({ target: { files } });
+      }
+
+      function handleFileSelect(event) {
+        selectedFile = event.target.files[0];
+        if (selectedFile && selectedFile.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            previewImage.src = e.target.result;
+            previewBox.style.display = "block";
+            upscaleBtn.disabled = false;
+          };
+          reader.readAsDataURL(selectedFile);
+        } else {
+          alert("Please select a valid image file.");
+        }
+      }
+
+      upscaleBtn.addEventListener("click", () => {
+        if (!selectedFile) return;
+
+        upscaleText.innerHTML =
+          '<span class="loading-spinner"></span> Upscaling...';
+        upscaleBtn.disabled = true;
+
+        const upscaleFactor = parseInt(
+          document.getElementById("upscaleFactor").value
+        );
+        const img = new Image();
+        img.src = previewImage.src;
+        img.onload = function () {
+          // Create canvas for upscaling
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+
+          // Calculate new dimensions
+          canvas.width = img.width * upscaleFactor;
+          canvas.height = img.height * upscaleFactor;
+
+          // Draw the upscaled image
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // Get the upscaled image as a data URL
+          const upscaledImage = canvas.toDataURL("image/png");
+
+          // Create download link
+          const link = document.createElement("a");
+          link.href = upscaledImage;
+          link.download = `upscaled_${upscaleFactor}x_${selectedFile.name}`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          upscaleText.textContent = "Upscale";
+          upscaleBtn.disabled = false;
+          alert(`Image upscaled ${upscaleFactor}x and downloaded!`);
+        };
+      });
+    </script>
+  </body>
+</html>

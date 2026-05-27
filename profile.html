@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile Photo Maker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+
+    <style>
+      .drop-zone {
+        transition: all 0.3s ease;
+      }
+
+      .drop-zone.dragover {
+        border-color: #2563eb;
+        background-color: #f0f7ff;
+      }
+
+      .option-btn.active {
+        background-color: #3b82f6;
+        color: white;
+      }
+
+      #canvasPreview {
+        max-width: 100%;
+        max-height: 300px;
+        display: none;
+      }
+
+      .shape-option {
+        transition: all 0.2s ease;
+      }
+
+      .shape-option:hover {
+        transform: scale(1.05);
+      }
+
+      .shape-option.active {
+        border-color: #3b82f6;
+        background-color: #eff6ff;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-50 min-h-screen">
+    <?php include 'includes/navbar.html'; ?>
+    <nav class="bg-white shadow-md py-4">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="/" class="flex items-center">
+            <i
+              class="fas fa-image text-2xl sm:text-3xl text-blue-800 mr-2 sm:mr-3"
+            ></i>
+            <span
+              class="text-xl sm:text-2xl font-bold text-blue-800 hidden sm:inline"
+              >ImgFlow</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center text-sm sm:text-base"
+          >
+            <i class="fas fa-home mr-1 sm:mr-2"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="container mx-auto px-4 py-12 max-w-3xl">
+      <div class="bg-white rounded-xl shadow-md overflow-hidden p-6">
+        <!-- Header -->
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-bold text-gray-800">Profile Photo Maker</h1>
+          <p class="text-gray-600 mt-2">
+            Easily create a round profile photo from any image of yourself
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Upload Section -->
+          <div>
+            <div class="space-y-3 mb-6">
+              <!-- Upload Option 1 -->
+              <div
+                class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer bg-gray-50"
+              >
+                <input
+                  type="checkbox"
+                  id="uploadOption"
+                  class="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
+                  checked
+                />
+                <label for="uploadOption" class="ml-3 text-gray-700"
+                  >Upload from PC or Mobile</label
+                >
+              </div>
+
+              <!-- Upload Option 2 -->
+              <div
+                class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  id="myFilesOption"
+                  class="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="myFilesOption" class="ml-3 text-gray-700"
+                  >My Files</label
+                >
+              </div>
+            </div>
+
+            <!-- Drop Zone -->
+            <div
+              id="dropZone"
+              class="drop-zone border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-6"
+            >
+              <i
+                class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"
+              ></i>
+              <p class="text-gray-500 font-medium">or Drag files here</p>
+              <input
+                type="file"
+                id="imageInput"
+                accept="image/*"
+                class="hidden"
+              />
+            </div>
+          </div>
+
+          <!-- Preview Section -->
+          <div>
+            <div class="flex justify-center mb-6">
+              <canvas
+                id="canvasPreview"
+                class="rounded-full border-4 border-white shadow-lg"
+              ></canvas>
+              <div id="emptyPreview" class="text-center py-12 text-gray-400">
+                <i class="fas fa-user-circle text-6xl mb-3"></i>
+                <p>Preview will appear here</p>
+              </div>
+            </div>
+
+            <!-- Shape Options -->
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-700 mb-2">Display</h3>
+              <div class="flex space-x-3">
+                <div
+                  class="shape-option flex-1 p-3 border rounded-lg text-center cursor-pointer active"
+                  data-shape="circle"
+                >
+                  <i class="fas fa-circle text-2xl mb-1 text-blue-500"></i>
+                  <p class="text-xs">Circle</p>
+                </div>
+                <div
+                  class="shape-option flex-1 p-3 border rounded-lg text-center cursor-pointer"
+                  data-shape="square"
+                >
+                  <i class="fas fa-square text-2xl mb-1 text-gray-500"></i>
+                  <p class="text-xs">Square</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reframe Button -->
+            <button
+              id="reframeBtn"
+              class="w-full mb-6 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition hidden"
+            >
+              <i class="fas fa-crop-alt mr-2"></i> Reframe Photo
+            </button>
+
+            <!-- Download Button -->
+            <button
+              id="downloadBtn"
+              class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition hidden"
+            >
+              <i class="fas fa-download mr-2"></i> Download Profile Photo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <?php include 'includes/footer.html'; ?>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Elements
+        const dropZone = document.getElementById("dropZone");
+        const imageInput = document.getElementById("imageInput");
+        const canvasPreview = document.getElementById("canvasPreview");
+        const emptyPreview = document.getElementById("emptyPreview");
+        const reframeBtn = document.getElementById("reframeBtn");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const shapeOptions = document.querySelectorAll(".shape-option");
+
+        // State
+        let currentImage = null;
+        let currentShape = "circle";
+        let isDragging = false;
+        let startX, startY;
+        let offsetX = 0,
+          offsetY = 0;
+        let scale = 1;
+
+        // Initialize canvas
+        const ctx = canvasPreview.getContext("2d");
+        canvasPreview.width = 300;
+        canvasPreview.height = 300;
+
+        // Handle checkbox behavior
+        document
+          .getElementById("uploadOption")
+          .addEventListener("change", function () {
+            if (this.checked) {
+              document.getElementById("myFilesOption").checked = false;
+            }
+          });
+
+        document
+          .getElementById("myFilesOption")
+          .addEventListener("change", function () {
+            if (this.checked) {
+              document.getElementById("uploadOption").checked = false;
+            }
+          });
+
+        // Drag and drop functionality
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+          dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        ["dragenter", "dragover"].forEach((eventName) => {
+          dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ["dragleave", "drop"].forEach((eventName) => {
+          dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+          dropZone.classList.add("dragover");
+        }
+
+        function unhighlight() {
+          dropZone.classList.remove("dragover");
+        }
+
+        // Handle dropped files
+        dropZone.addEventListener("drop", handleDrop, false);
+
+        function handleDrop(e) {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          handleFiles(files);
+        }
+
+        // Click on drop zone to trigger file input
+        dropZone.addEventListener("click", function () {
+          imageInput.click();
+        });
+
+        // File input change
+        imageInput.addEventListener("change", function () {
+          if (imageInput.files.length) {
+            handleFiles(imageInput.files);
+          }
+        });
+
+        // Shape selection
+        shapeOptions.forEach((option) => {
+          option.addEventListener("click", function () {
+            shapeOptions.forEach((opt) => opt.classList.remove("active"));
+            this.classList.add("active");
+            currentShape = this.dataset.shape;
+            drawPreview();
+          });
+        });
+
+        // Handle image files
+        function handleFiles(files) {
+          if (files.length === 0) return;
+
+          const file = files[0];
+          if (!file.type.startsWith("image/")) {
+            alert("Please select an image file");
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            currentImage = new Image();
+            currentImage.onload = function () {
+              emptyPreview.style.display = "none";
+              canvasPreview.style.display = "block";
+              reframeBtn.classList.remove("hidden");
+              downloadBtn.classList.remove("hidden");
+              drawPreview();
+            };
+            currentImage.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+
+        // Draw preview with current settings
+        function drawPreview() {
+          if (!currentImage) return;
+
+          ctx.clearRect(0, 0, canvasPreview.width, canvasPreview.height);
+
+          // Calculate dimensions to maintain aspect ratio
+          const canvasRatio = canvasPreview.width / canvasPreview.height;
+          const imageRatio = currentImage.width / currentImage.height;
+
+          let drawWidth, drawHeight, dx, dy;
+
+          if (imageRatio > canvasRatio) {
+            drawHeight = canvasPreview.height;
+            drawWidth = drawHeight * imageRatio;
+            dx = (canvasPreview.width - drawWidth) / 2 + offsetX;
+            dy = 0 + offsetY;
+          } else {
+            drawWidth = canvasPreview.width;
+            drawHeight = drawWidth / imageRatio;
+            dx = 0 + offsetX;
+            dy = (canvasPreview.height - drawHeight) / 2 + offsetY;
+          }
+
+          // Apply scale
+          drawWidth *= scale;
+          drawHeight *= scale;
+
+          // Draw the image
+          ctx.save();
+
+          if (currentShape === "circle") {
+            ctx.beginPath();
+            ctx.arc(
+              canvasPreview.width / 2,
+              canvasPreview.height / 2,
+              canvasPreview.width / 2,
+              0,
+              Math.PI * 2
+            );
+            ctx.closePath();
+            ctx.clip();
+          }
+
+          ctx.drawImage(currentImage, dx, dy, drawWidth, drawHeight);
+
+          ctx.restore();
+        }
+
+        // Mouse events for reframing
+        canvasPreview.addEventListener("mousedown", startDrag);
+        canvasPreview.addEventListener("touchstart", startDrag);
+
+        canvasPreview.addEventListener("mousemove", drag);
+        canvasPreview.addEventListener("touchmove", drag);
+
+        canvasPreview.addEventListener("mouseup", endDrag);
+        canvasPreview.addEventListener("touchend", endDrag);
+        canvasPreview.addEventListener("mouseleave", endDrag);
+
+        function startDrag(e) {
+          isDragging = true;
+          const pos = getMousePos(canvasPreview, e);
+          startX = pos.x;
+          startY = pos.y;
+          e.preventDefault();
+        }
+
+        function drag(e) {
+          if (!isDragging) return;
+
+          const pos = getMousePos(canvasPreview, e);
+          const dx = pos.x - startX;
+          const dy = pos.y - startY;
+
+          offsetX += dx;
+          offsetY += dy;
+
+          startX = pos.x;
+          startY = pos.y;
+
+          drawPreview();
+          e.preventDefault();
+        }
+
+        function endDrag() {
+          isDragging = false;
+        }
+
+        function getMousePos(canvas, evt) {
+          const rect = canvas.getBoundingClientRect();
+          return {
+            x: (evt.clientX || evt.touches[0].clientX) - rect.left,
+            y: (evt.clientY || evt.touches[0].clientY) - rect.top,
+          };
+        }
+
+        // Zoom with mouse wheel
+        canvasPreview.addEventListener("wheel", function (e) {
+          e.preventDefault();
+
+          const delta = -e.deltaY;
+          const zoomIntensity = 0.1;
+
+          // Calculate new scale (limit between 0.5 and 3)
+          scale *= Math.exp((delta * zoomIntensity) / 100);
+          scale = Math.max(0.5, Math.min(3, scale));
+
+          drawPreview();
+        });
+
+        // Reframe button
+        reframeBtn.addEventListener("click", function () {
+          offsetX = 0;
+          offsetY = 0;
+          scale = 1;
+          drawPreview();
+        });
+
+        // Download button
+        downloadBtn.addEventListener("click", function () {
+          const link = document.createElement("a");
+          link.download = "profile-photo.png";
+          link.href = canvasPreview.toDataURL("image/png");
+          link.click();
+        });
+      });
+    </script>
+  </body>
+</html>

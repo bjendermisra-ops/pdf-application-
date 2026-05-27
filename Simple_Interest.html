@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Interest Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body class="bg-gray-100 min-h-screen flex flex-col items-center p-4 pt-20">
+    <!-- Added pt-20 for navbar offset -->
+    <nav class="fixed top-0 left-0 w-full z-10 bg-white/95 shadow-md">
+      <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        height: 4rem; /* Consistent height for offset */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 9999px;
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      }
+
+      .back-button i {
+        font-size: 1rem;
+      }
+
+      .back-button:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        transform: translateX(-0.25rem);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+      }
+
+      .bg-white {
+        margin-top: 4rem; /* Offset to prevent overlap with fixed navbar */
+      }
+    </style>
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 mx-auto">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-indigo-700">
+          Simple Interest Calculator
+        </h1>
+        <p class="text-gray-600 mt-2">Calculate interest in Indian Rupees</p>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Principal Amount Input -->
+        <div>
+          <label
+            for="principal"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Principal Amount (₹)
+          </label>
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <span class="text-gray-500">₹</span>
+            </div>
+            <input
+              type="number"
+              id="principal"
+              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter principal amount"
+              min="0"
+              step="100"
+            />
+          </div>
+        </div>
+
+        <!-- Interest Rate Input -->
+        <div>
+          <label
+            for="rate"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Annual Interest Rate (%)
+          </label>
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <span class="text-gray-500">%</span>
+            </div>
+            <input
+              type="number"
+              id="rate"
+              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter interest rate"
+              min="0"
+              step="0.1"
+            />
+          </div>
+        </div>
+
+        <!-- Time Period Input -->
+        <div>
+          <label
+            for="time"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Time Period
+          </label>
+          <div class="flex space-x-4">
+            <div class="flex-1">
+              <input
+                type="number"
+                id="time"
+                class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Enter time"
+                min="0"
+                step="1"
+              />
+            </div>
+            <div class="w-32">
+              <select
+                id="timeUnit"
+                class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="years">Years</option>
+                <option value="months">Months</option>
+                <option value="days">Days</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculate Button -->
+        <button
+          id="calculateBtn"
+          class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Calculate Interest
+        </button>
+
+        <!-- Results Section -->
+        <div
+          id="results"
+          class="hidden bg-gray-50 p-5 rounded-lg border border-gray-200"
+        >
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            Calculation Results
+          </h3>
+
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Principal Amount:</span>
+              <span id="principalResult" class="font-medium">₹0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Interest Earned:</span>
+              <span id="interestResult" class="font-medium text-green-600"
+                >₹0</span
+              >
+            </div>
+            <div class="flex justify-between border-t border-gray-200 pt-3">
+              <span class="text-gray-800 font-semibold">Total Amount:</span>
+              <span id="totalResult" class="font-bold text-indigo-700">₹0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formula Display -->
+        <div class="mt-6 p-4 bg-indigo-50 rounded-lg">
+          <h4 class="font-medium text-indigo-800 mb-2">
+            Simple Interest Formula
+          </h4>
+          <p class="text-sm text-indigo-700">
+            Simple Interest = (Principal × Rate × Time) / 100
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const principalInput = document.getElementById("principal");
+        const rateInput = document.getElementById("rate");
+        const timeInput = document.getElementById("time");
+        const timeUnitSelect = document.getElementById("timeUnit");
+        const calculateBtn = document.getElementById("calculateBtn");
+        const resultsDiv = document.getElementById("results");
+        const principalResult = document.getElementById("principalResult");
+        const interestResult = document.getElementById("interestResult");
+        const totalResult = document.getElementById("totalResult");
+
+        // Format number as Indian Rupees
+        function formatIndianRupees(amount) {
+          // Convert to number if it's a string
+          amount = parseFloat(amount);
+
+          // Format with Indian numbering system
+          return new Intl.NumberFormat("en-IN", {
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2,
+          }).format(amount);
+        }
+
+        // Calculate simple interest
+        function calculateSimpleInterest() {
+          const principal = parseFloat(principalInput.value);
+          const rate = parseFloat(rateInput.value);
+          let time = parseFloat(timeInput.value);
+          const timeUnit = timeUnitSelect.value;
+
+          // Validate inputs
+          if (
+            isNaN(principal) ||
+            isNaN(rate) ||
+            isNaN(time) ||
+            principal <= 0 ||
+            rate <= 0 ||
+            time <= 0
+          ) {
+            alert("Please enter valid positive numbers for all fields.");
+            return;
+          }
+
+          // Convert time to years based on selected unit
+          if (timeUnit === "months") {
+            time = time / 12;
+          } else if (timeUnit === "days") {
+            time = time / 365;
+          }
+
+          // Calculate simple interest
+          const interest = (principal * rate * time) / 100;
+          const totalAmount = principal + interest;
+
+          // Display results with Indian Rupee formatting
+          principalResult.textContent = `₹${formatIndianRupees(principal)}`;
+          interestResult.textContent = `₹${formatIndianRupees(interest)}`;
+          totalResult.textContent = `₹${formatIndianRupees(totalAmount)}`;
+
+          // Show results section
+          resultsDiv.classList.remove("hidden");
+        }
+
+        // Add event listener to calculate button
+        calculateBtn.addEventListener("click", calculateSimpleInterest);
+
+        // Also calculate when Enter key is pressed in any input field
+        [principalInput, rateInput, timeInput].forEach((input) => {
+          input.addEventListener("keyup", function (event) {
+            if (event.key === "Enter") {
+              calculateSimpleInterest();
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

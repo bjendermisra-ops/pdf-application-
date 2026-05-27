@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text to Slug Converter | SEO Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .copy-btn.copied {
+        background-color: #16a34a;
+        border-color: #16a34a;
+      }
+    </style>
+  </head>
+  <body class="bg-white text-black min-h-screen">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+      <header class="mb-10 text-center">
+        <h1 class="text-4xl font-bold text-black mb-2">
+          Text to Slug Converter
+        </h1>
+        <p class="text-gray-700 max-w-2xl mx-auto">
+          Convert your text to SEO-friendly URL slugs
+        </p>
+      </header>
+
+      <main class="max-w-3xl mx-auto">
+        <!-- Input Form -->
+        <div class="bg-white rounded-xl p-6 shadow-lg mb-8">
+          <div class="space-y-5">
+            <!-- Input Text -->
+            <div>
+              <label
+                for="inputText"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Enter your text</label
+              >
+              <textarea
+                id="inputText"
+                rows="3"
+                placeholder="Enter text to convert to slug (e.g., 'How to Build a Website')"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></textarea>
+            </div>
+
+            <!-- Options -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  for="separator"
+                  class="block text-sm font-medium text-blue-800 mb-2"
+                  >Separator</label
+                >
+                <select
+                  id="separator"
+                  class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="-">Hyphen (-)</option>
+                  <option value="_">Underscore (_)</option>
+                  <option value=".">Dot (.)</option>
+                  <option value=" ">Space ( )</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  for="caseType"
+                  class="block text-sm font-medium text-blue-800 mb-2"
+                  >Case</label
+                >
+                <select
+                  id="caseType"
+                  class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="lower">Lowercase</option>
+                  <option value="upper">Uppercase</option>
+                  <option value="title">Title Case</option>
+                  <option value="sentence">Sentence case</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex gap-4 pt-2">
+              <button
+                id="generateBtn"
+                class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium text-white transition-colors flex items-center justify-center gap-2"
+              >
+                <i class="fas fa-magic"></i> Convert to Slug
+              </button>
+              <button
+                id="resetBtn"
+                class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium text-white transition-colors flex items-center justify-center gap-2"
+              >
+                <i class="fas fa-redo"></i> Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output Section -->
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-black">Generated Slug</h2>
+            <div class="flex gap-2">
+              <button
+                id="copyBtn"
+                class="copy-btn px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm flex items-center gap-2"
+              >
+                <i class="fas fa-copy"></i> Copy
+              </button>
+            </div>
+          </div>
+          <div
+            id="slugOutput"
+            class="bg-gray-50 rounded-lg p-4 font-mono text-sm text-gray-800 overflow-x-auto min-h-16"
+          >
+            <p class="text-gray-500">Your generated slug will appear here</p>
+          </div>
+
+          <!-- Preview Section -->
+          <div class="mt-6">
+            <h3 class="font-medium mb-2 text-black">URL Preview</h3>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="text-sm">
+                <span class="text-gray-500">https://example.com/</span>
+                <span id="urlPreview" class="text-blue-600"
+                  >your-slug-here</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="mt-16 text-center text-gray-500 text-sm">
+        <p>Text to Slug Converter © 2023 | SEO Tool</p>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // DOM Elements
+        const inputText = document.getElementById("inputText");
+        const separator = document.getElementById("separator");
+        const caseType = document.getElementById("caseType");
+        const generateBtn = document.getElementById("generateBtn");
+        const resetBtn = document.getElementById("resetBtn");
+        const copyBtn = document.getElementById("copyBtn");
+        const slugOutput = document.getElementById("slugOutput");
+        const urlPreview = document.getElementById("urlPreview");
+
+        // Convert to slug
+        function textToSlug(text, separator, caseType) {
+          // Convert to lowercase first for consistent processing
+          let slug = text.toLowerCase();
+
+          // Replace spaces and special characters with separator
+          slug = slug.replace(/\s+/g, separator);
+          slug = slug.replace(/[^\w\-\. ]+/g, "");
+          slug = slug.replace(/\.+/g, ".");
+          slug = slug.replace(/^\.+|\.+$/g, "");
+
+          // Apply case transformation
+          switch (caseType) {
+            case "upper":
+              slug = slug.toUpperCase();
+              break;
+            case "title":
+              slug = slug.replace(/\b\w/g, (l) => l.toUpperCase());
+              break;
+            case "sentence":
+              slug = slug.charAt(0).toUpperCase() + slug.slice(1);
+              break;
+            // default is lowercase
+          }
+
+          return slug;
+        }
+
+        // Generate slug
+        generateBtn.addEventListener("click", function () {
+          if (!inputText.value.trim()) {
+            alert("Please enter some text to convert");
+            inputText.focus();
+            return;
+          }
+
+          const slug = textToSlug(
+            inputText.value,
+            separator.value,
+            caseType.value
+          );
+
+          // Display the slug
+          slugOutput.textContent = slug;
+          urlPreview.textContent = slug;
+
+          // Highlight the output
+          slugOutput.classList.remove("text-gray-500");
+          slugOutput.classList.add("text-blue-600");
+        });
+
+        // Reset form
+        resetBtn.addEventListener("click", function () {
+          inputText.value = "";
+          separator.value = "-";
+          caseType.value = "lower";
+
+          slugOutput.innerHTML =
+            '<p class="text-gray-500">Your generated slug will appear here</p>';
+          urlPreview.textContent = "your-slug-here";
+
+          slugOutput.classList.remove("text-blue-600");
+          slugOutput.classList.add("text-gray-500");
+        });
+
+        // Copy to clipboard
+        copyBtn.addEventListener("click", function () {
+          if (
+            slugOutput.textContent &&
+            !slugOutput.classList.contains("text-gray-500")
+          ) {
+            navigator.clipboard
+              .writeText(slugOutput.textContent)
+              .then(() => {
+                const original = this.innerHTML;
+                this.classList.add("copied");
+                this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                  this.classList.remove("copied");
+                  this.innerHTML = original;
+                }, 2000);
+              })
+              .catch((err) => {
+                console.error("Failed to copy: ", err);
+                alert("Failed to copy slug. Please try again.");
+              });
+          } else {
+            alert("Generate a slug first");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Social Security Calculator (INR)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: { extend: { fontFamily: { sans: ["Inter", "sans-serif"] } } },
+      };
+    </script>
+  </head>
+  <body
+    class="bg-gradient-to-br from-amber-50 to-orange-50 text-gray-900 min-h-screen"
+  >
+    <nav>
+      <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 9999px;
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      }
+
+      .back-button i {
+        font-size: 1rem;
+      }
+
+      .back-button:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        transform: translateX(-0.25rem);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+      }
+    </style>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+      <header class="text-center mb-10">
+        <h1 class="text-5xl font-bold text-amber-700 mb-2">
+          Social Security Calculator (INR)
+        </h1>
+        <p class="text-lg text-gray-600">
+          Estimate your retirement benefits in Indian Rupees
+        </p>
+      </header>
+
+      <!-- Input Section -->
+      <div id="input-section" class="bg-white rounded-xl shadow p-6 mb-6">
+        <div class="grid md:grid-cols-3 gap-6">
+          <div>
+            <label class="block text-sm font-medium mb-2">Birth Year</label>
+            <input
+              type="number"
+              id="birth-year"
+              value="1960"
+              min="1930"
+              max="2010"
+              class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2">Current Age</label>
+            <input
+              type="number"
+              id="current-age"
+              value="65"
+              min="0"
+              max="120"
+              class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2"
+              >Monthly Earnings (₹)</label
+            >
+            <input
+              type="number"
+              id="monthly-earnings"
+              value="400000"
+              class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500"
+            />
+          </div>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6 mt-6 items-end">
+          <div>
+            <label class="block text-sm font-medium mb-2">Claim Age</label>
+            <select
+              id="claim-age"
+              class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500"
+            >
+              <option value="62">62 (Earliest)</option>
+              <option value="67">67 (FRA)</option>
+              <option value="70">70 (Max)</option>
+            </select>
+          </div>
+          <div>
+            <button
+              id="calc-btn"
+              class="w-full px-4 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
+            >
+              Calculate
+            </button>
+          </div>
+          <div class="flex gap-4">
+            <button
+              id="edit-btn"
+              class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              Edit
+            </button>
+            <button
+              id="clear-btn"
+              class="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="grid md:grid-cols-4 gap-6 mb-6">
+        <div
+          class="bg-gradient-to-r from-amber-500 to-amber-600 text-white p-6 rounded-xl"
+        >
+          <p class="text-sm opacity-90">Monthly Benefit</p>
+          <p id="monthly-benefit" class="text-3xl font-bold">₹0</p>
+        </div>
+        <div
+          class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6 rounded-xl"
+        >
+          <p class="text-sm opacity-90">Annual Benefit</p>
+          <p id="annual-benefit" class="text-3xl font-bold">₹0</p>
+        </div>
+        <div
+          class="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-xl"
+        >
+          <p class="text-sm opacity-90">Lifetime (to 85)</p>
+          <p id="lifetime-benefit" class="text-3xl font-bold">₹0</p>
+        </div>
+        <div
+          class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl"
+        >
+          <p class="text-sm opacity-90">Break-even Age</p>
+          <p id="breakeven-age" class="text-3xl font-bold">—</p>
+        </div>
+      </div>
+
+      <canvas id="benefitChart" height="100"></canvas>
+    </div>
+
+    <script>
+      const FRA_TABLE = {
+        1960: 67,
+        1959: 66.83,
+        1958: 66.67,
+        1957: 66.5,
+        1956: 66.33,
+        1955: 66.17,
+        1954: 66,
+      };
+      const USD_TO_INR = 83;
+      const BEND_POINTS_2024 = [1161 * USD_TO_INR, 7004 * USD_TO_INR];
+      const MAX_TAXABLE = 168600 * USD_TO_INR;
+
+      const getFRA = (year) => FRA_TABLE[year] || 67;
+
+      const calculatePIA = (earnings) => {
+        const capped = Math.min(earnings * 12, MAX_TAXABLE);
+        const aime = capped / 12;
+        let pia;
+        if (aime <= BEND_POINTS_2024[0]) pia = aime * 0.9;
+        else if (aime <= BEND_POINTS_2024[1])
+          pia = BEND_POINTS_2024[0] * 0.9 + (aime - BEND_POINTS_2024[0]) * 0.32;
+        else
+          pia =
+            BEND_POINTS_2024[0] * 0.9 +
+            (BEND_POINTS_2024[1] - BEND_POINTS_2024[0]) * 0.32 +
+            (aime - BEND_POINTS_2024[1]) * 0.15;
+        return Math.round(pia);
+      };
+
+      const calculateAdjustment = (fra, claimAge) => {
+        const diff = (claimAge - fra) * 12;
+        if (diff >= 0) return 1 + (diff * (8 / 12)) / 100;
+        const red =
+          Math.abs(diff) <= 36
+            ? 1 - (Math.abs(diff) * (5 / 9)) / 100
+            : 1 -
+              ((36 * (5 / 9)) / 100 + ((Math.abs(diff) - 36) * (5 / 12)) / 100);
+        return red;
+      };
+
+      const monthlyBenefit = document.getElementById("monthly-benefit");
+      const annualBenefit = document.getElementById("annual-benefit");
+      const lifetimeBenefit = document.getElementById("lifetime-benefit");
+      const breakevenAge = document.getElementById("breakeven-age");
+
+      let chart = null;
+
+      document.getElementById("calc-btn").addEventListener("click", () => {
+        const birthYear = parseInt(document.getElementById("birth-year").value);
+        const earnings =
+          parseFloat(document.getElementById("monthly-earnings").value) || 0;
+        const claimAge = parseInt(document.getElementById("claim-age").value);
+
+        const fra = getFRA(birthYear);
+        const pia = calculatePIA(earnings);
+        const adjFactor = calculateAdjustment(fra, claimAge);
+        const benefit = Math.round(pia * adjFactor);
+        const annual = benefit * 12;
+        const lifetime = annual * (85 - claimAge);
+
+        monthlyBenefit.textContent = `₹${benefit.toLocaleString("en-IN")}`;
+        annualBenefit.textContent = `₹${annual.toLocaleString("en-IN")}`;
+        lifetimeBenefit.textContent = `₹${lifetime.toLocaleString("en-IN")}`;
+        breakevenAge.textContent = "—";
+
+        // Disable inputs after calculating
+        document
+          .querySelectorAll("input, select")
+          .forEach((i) => (i.disabled = true));
+
+        updateChart(pia, fra);
+      });
+
+      document.getElementById("edit-btn").addEventListener("click", () => {
+        document
+          .querySelectorAll("input, select")
+          .forEach((i) => (i.disabled = false));
+      });
+
+      document.getElementById("clear-btn").addEventListener("click", () => {
+        document.querySelectorAll("input").forEach((i) => (i.value = ""));
+        document
+          .querySelectorAll("select")
+          .forEach((s) => (s.selectedIndex = 0));
+        monthlyBenefit.textContent = "₹0";
+        annualBenefit.textContent = "₹0";
+        lifetimeBenefit.textContent = "₹0";
+        breakevenAge.textContent = "—";
+        if (chart) chart.destroy();
+      });
+
+      function updateChart(pia, fra) {
+        const ctx = document.getElementById("benefitChart").getContext("2d");
+        const ages = Array.from({ length: 25 }, (_, i) => 62 + i);
+        const data = ages.map((a) => (a >= fra ? pia * (a - fra + 1) * 12 : 0));
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: ages,
+            datasets: [
+              {
+                label: "Cumulative Benefits (₹)",
+                data,
+                borderColor: "#f59e0b",
+                fill: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+          },
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dentsu - SEO Tools</title>
+    <meta
+      name="description"
+      content="Professional SEO tools and utilities for technical SEO analysis, crawling, rendering, and optimization."
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="canonical" href="https://seo.vibeloopdaily.com/" />
+    <!-- Required -->
+    <meta property="og:title" content="Your Page Title Here" />
+    <meta
+      property="og:description"
+      content="A short description of the page content."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://seo.vibeloopdaily.com/" />
+    <meta
+      property="og:image"
+      content="https://seo.vibeloopdaily.com/path-to-your-image.jpg"
+    />
+
+    <!-- Optional but good to include -->
+    <meta property="og:site_name" content="Vibeloop Daily SEO" />
+    <meta property="og:locale" content="en_US" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Vibeloop Daily SEO",
+        "url": "https://seo.vibeloopdaily.com/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://seo.vibeloopdaily.com/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
+    <style>
+      .sidebar-transition {
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .tool-card {
+        transition: all 0.3s ease;
+      }
+
+      .tool-card:hover {
+        transform: translateY(-4px);
+      }
+
+      .modal-backdrop {
+        backdrop-filter: blur(8px);
+      }
+
+      @media (max-width: 1023px) {
+        .sidebar-closed {
+          transform: translateX(-100%);
+        }
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen bg-white text-black">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div
+      class="bg-white rounded-lg shadow-lg max-w-7xl mt-6 m-6 overflow-hidden"
+    >
+      <!-- Header -->
+      <div class="bg-white text-black p-4">
+        <h1 class="text-xl font-bold">Blogger XML Sitemap Generator</h1>
+      </div>
+
+      <!-- Main Content -->
+      <div class="p-6">
+        <!-- Blog URL Input -->
+        <div class="mb-6">
+          <label class="block text-black font-medium mb-2">Blog URL</label>
+          <div class="flex">
+            <input
+              type="url"
+              id="blog-url"
+              class="flex-grow px-4 py-2 border border-gray-300 rounded-l focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white text-black placeholder-gray-500"
+              placeholder="https://yourblog.blogspot.com"
+              value="https://labnol.blogspot.com"
+            />
+            <button
+              id="generate-btn"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Generate XML Sitemap
+            </button>
+          </div>
+        </div>
+
+        <hr class="my-6 border-gray-200" />
+
+        <!-- Results Section -->
+        <div id="result-container">
+          <h2 class="text-lg font-medium text-black mb-2">XML Sitemap</h2>
+          <p class="mb-4 text-black">
+            The XML sitemap for your blog
+            <span id="result-url" class="font-mono text-blue-600"
+              >https://labnol.blogspot.com</span
+            >
+            is ready
+          </p>
+
+          <div class="border border-gray-200 rounded p-4 relative">
+            <button
+              id="copy-btn"
+              class="copy-btn absolute top-3 right-3 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+                />
+              </svg>
+              Copy
+            </button>
+            <pre
+              id="sitemap-content"
+              class="text-sm text-black overflow-x-auto whitespace-pre-wrap font-mono"
+            ></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-3 text-center text-sm text-black">
+        <p>
+          Sitemap Generator Tool -
+          <a
+            href="https://www.labnol.org/"
+            class="text-blue-600 hover:underline"
+            >labnol.org</a
+          >
+        </p>
+      </div>
+    </div>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const blogUrlInput = document.getElementById("blog-url");
+        const generateBtn = document.getElementById("generate-btn");
+        const resultUrl = document.getElementById("result-url");
+        const sitemapContent = document.getElementById("sitemap-content");
+        const copyBtn = document.getElementById("copy-btn");
+
+        // Generate sitemap when button is clicked
+        generateBtn.addEventListener("click", function () {
+          let blogUrl = blogUrlInput.value.trim();
+
+          // Add https:// if missing
+          if (
+            !blogUrl.startsWith("http://") &&
+            !blogUrl.startsWith("https://")
+          ) {
+            blogUrl = "https://" + blogUrl;
+          }
+
+          if (!blogUrl) {
+            alert("Please enter a valid blog URL");
+            return;
+          }
+
+          // Extract domain from URL
+          let domain;
+          try {
+            const urlObj = new URL(blogUrl);
+            domain = urlObj.hostname;
+          } catch (e) {
+            alert("Please enter a valid URL");
+            return;
+          }
+
+          // Update displayed URL
+          blogUrlInput.value = blogUrl;
+          resultUrl.textContent = blogUrl;
+
+          // Generate and display sitemap
+          generateSitemap(domain);
+        });
+
+        // Generate the sitemap content with complete links
+        function generateSitemap(domain) {
+          const now = new Date();
+          const dateStr = now.toUTCString();
+
+          let sitemap = `# XML Sitemap\n`;
+          sitemap += `# Generated for ${domain} on ${dateStr}\n`;
+          sitemap += `# Created with labnol.org/blogger/sitemap\n\n`;
+
+          // Add paginated sitemap entries
+          const entries = [
+            `${domain}/atom.xml?redirect=false&start-index=1&max-results=500`,
+            `${domain}/atom.xml?redirect=false&start-index=501&max-results=500`,
+            `${domain}/atom.xml?redirect=false&start-index=1001&max-results=500`,
+            `${domain}/atom.xml?redirect=false&start-index=1501&max-results=500`,
+            `${domain}/atom.xml?redirect=false&start-index=2001&max-results=500`,
+            `${domain}/atom.xml?redirect=false&start-index=2501&max-results=500`,
+            `${domain}/atom.xml?redirect=false&start-index=3001&max-results=500`,
+          ];
+
+          entries.forEach((entry) => {
+            sitemap += `https://${entry}\n`;
+          });
+
+          sitemapContent.textContent = sitemap;
+        }
+
+        // Copy to clipboard functionality
+        copyBtn.addEventListener("click", function () {
+          const textToCopy = sitemapContent.textContent;
+          navigator.clipboard
+            .writeText(textToCopy)
+            .then(function () {
+              copyBtn.classList.add("copied");
+              copyBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          Copied!
+        `;
+
+              setTimeout(function () {
+                copyBtn.classList.remove("copied");
+                copyBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+            </svg>
+            Copy
+          `;
+              }, 2000);
+            })
+            .catch(function (err) {
+              console.error("Failed to copy text: ", err);
+            });
+        });
+
+        // Generate initial sitemap
+        generateBtn.click();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms & Conditions - PDF Tools</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+ <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Tailwind Theme -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ["Poppins", "sans-serif"] },
+          colors: {
+            dark: "#4F1271",
+            primary: "#4A4063",
+            accent: "#783F8E",
+            soft: "#BFACC8",
+            light: "#C8C6D7",
+          },
+        },
+      },
+    };
+  </script>
+</head>
+
+<body class="font-sans bg-white text-primary">
+
+    
+ <!-- Navbar with Mobile Toggle -->
+<header class="fixed top-0 w-full bg-white shadow-lg z-50">
+  <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+    <h1 class="text-2xl md:text-3xl font-black text-dark">ToolGi</h1>
+
+    <!-- Desktop Menu -->
+    <nav class="hidden md:flex space-x-10 text-sm font-medium uppercase tracking-wider">
+      <a href="index.html" class="hover:text-accent transition">Home</a>
+      <a href="#about" class="hover:text-accent transition">About Us</a>
+      <a href="#tools" class="hover:text-accent transition">Tools</a>
+      <a href="#features" class="hover:text-accent transition">Features</a>
+      <a href="#contact" class="hover:text-accent transition">Contact Us</a>
+    </nav>
+
+    <!-- Mobile Menu Button -->
+    <i class="fas fa-bars text-2xl cursor-pointer md:hidden text-dark" id="menu-toggle"></i>
+
+    <!-- Mobile Menu (Left Side + BG Color) -->
+    <div id="mobile-menu"
+      class="fixed inset-y-0 left-0 w-72 bg-[#0f0f0f] text-white transform -translate-x-full
+             transition-transform duration-300 z-40 md:hidden shadow-2xl">
+
+      <div class="flex justify-end p-6">
+        <i class="fas fa-times text-3xl cursor-pointer" id="menu-close"></i>
+      </div>
+
+      <nav class="flex flex-col pl-10 gap-8 text-2xl font-medium mt-10">
+        <a href="index.html" class="hover:text-accent transition">Home</a>
+         <a href="#about" class="hover:text-accent transition">About Us</a>
+        <a href="#tools" class="hover:text-accent transition">All Tools</a>
+        <a href="#features" class="hover:text-accent transition">Features</a>
+        <a href="#contact" class="hover:text-accent transition">Contact</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Menu Toggle Script -->
+<script>
+  const menuToggle = document.getElementById('menu-toggle');
+  const menuClose = document.getElementById('menu-close');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  // OPEN
+  menuToggle.addEventListener('click', () => {
+    mobileMenu.classList.remove('-translate-x-full');
+  });
+
+  // CLOSE
+  menuClose.addEventListener('click', () => {
+    mobileMenu.classList.add('-translate-x-full');
+  });
+
+  // Close if clicking outside
+  document.addEventListener('click', (e) => {
+    if (!mobileMenu.contains(e.target) && e.target !== menuToggle) {
+      mobileMenu.classList.add('-translate-x-full');
+    }
+  });
+</script>
+
+
+<!-- ================= HERO SECTION ================= -->
+<section class="relative py-28 bg-gradient-to-b from-accent/25 via-soft/20 to-white overflow-hidden">
+
+  <!-- Floating Shapes -->
+  <div class="absolute top-6 left-0 w-96 h-96 bg-accent/20 blur-[120px] rounded-full"></div>
+  <div class="absolute bottom-0 right-0 w-[450px] h-[450px] bg-dark/10 blur-[130px] rounded-full"></div>
+
+  <div class="max-w-6xl mx-auto px-6 text-center relative z-10">
+    <h1 class="text-6xl md:text-7xl font-black text-dark">Terms & Conditions</h1>
+    <p class="max-w-2xl mx-auto mt-6 text-lg text-primary/80">
+      Please read our terms carefully before using our PDF Tools services.
+    </p>
+  </div>
+
+  <!-- Wave Divider -->
+  <div class="absolute bottom-0 left-0 right-0">
+    <svg viewBox="0 0 1440 130" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#fff" d="M0 60c260 80 960-80 1440 30v40H0V60z" />
+    </svg>
+  </div>
+</section>
+
+<!-- ================= MAIN CONTENT ================= -->
+<section class="max-w-6xl mx-auto px-6 py-20">
+
+  <div class="space-y-20">
+
+    <!-- SECTION 1 -->
+    <div class="grid md:grid-cols-2 gap-12 items-start">
+      <div>
+        <h2 class="text-4xl font-black text-dark mb-4">1. Acceptance of Terms</h2>
+        <p class="text-primary/80 leading-relaxed">
+          By accessing or using <strong class="text-dark">PDF Tools</strong>, you agree to follow these Terms & Conditions. 
+          If you do not agree, please discontinue using our services.
+        </p>
+      </div>
+      <div class="p-8 rounded-3xl bg-gradient-to-br from-white to-soft/30 shadow-xl border border-light/40">
+        <p class="text-primary/80 leading-relaxed">
+          These terms apply to all users, including visitors, customers, and contributors.
+        </p>
+      </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="grid md:grid-cols-2 gap-12 items-start md:flex-row-reverse">
+      <div>
+        <h2 class="text-4xl font-black text-dark mb-4">2. Use of Service</h2>
+        <p class="text-primary/80 leading-relaxed">
+          You agree not to misuse our tools in any way, including distributing harmful content,
+          attempting unauthorized access, or violating applicable laws.
+        </p>
+      </div>
+      <div class="p-8 rounded-3xl bg-gradient-to-br from-soft/20 to-white shadow-xl border border-light/40">
+        <ul class="space-y-3 text-primary/80">
+          <li class="flex gap-3"><span class="text-accent">•</span> No spamming or abuse</li>
+          <li class="flex gap-3"><span class="text-accent">•</span> No reverse engineering</li>
+          <li class="flex gap-3"><span class="text-accent">•</span> No automated misuse</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="p-10 rounded-3xl bg-gradient-to-br from-white to-soft/20 border border-light/40 shadow-xl">
+      <h2 class="text-4xl font-black text-dark mb-4">3. File Handling</h2>
+      <p class="text-primary/80 leading-relaxed">
+        All files uploaded to our servers are processed securely and deleted automatically after processing.
+        We do not store or backup your files.
+      </p>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="p-10 rounded-3xl bg-gradient-to-br from-light/20 to-white border border-light/40 shadow-xl">
+      <h2 class="text-4xl font-black text-dark mb-4">4. Intellectual Property</h2>
+      <p class="text-primary/80 leading-relaxed">
+        All website content, branding, designs, and features belong to PDF Tools.
+        Users may not copy, reproduce, or distribute without permission.
+      </p>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="p-10 rounded-3xl bg-gradient-to-br from-white to-light/20 border border-light/40 shadow-xl">
+      <h2 class="text-4xl font-black text-dark mb-4">5. Limitation of Liability</h2>
+      <p class="text-primary/80 leading-relaxed">
+        We are not responsible for loss of data, system failures, or misuse of tools.
+        Our services are provided “as-is” without warranties.
+      </p>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="p-10 rounded-3xl bg-gradient-to-br from-soft/25 to-white border border-light/40 shadow-xl">
+      <h2 class="text-4xl font-black text-dark mb-4">6. Changes to Terms</h2>
+      <p class="text-primary/80 leading-relaxed">
+        We may update these Terms at any time. Continued use of our services means acceptance of updates.
+      </p>
+    </div>
+
+    <!-- SECTION 7 -->
+    <div class="p-10 rounded-3xl bg-gradient-to-br from-white to-soft/20 border border-light/40 shadow-xl">
+      <h2 class="text-4xl font-black text-dark mb-4">7. Contact Us</h2>
+      <p class="text-primary/80 leading-relaxed">
+        For questions regarding these Terms, email us at:
+      </p>
+      <p class="mt-2 text-dark font-bold text-xl">santosh2grt@gamil.com</p>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- NEWSLETTER SECTION – BRAND GRADIENT -->
+<section class="relative py-24 overflow-hidden">
+  <!-- Gradient Background (only your colors) -->
+  <div class="absolute inset-0 bg-gradient-to-br from-[#4F1271] via-[#783F8E] to-[#4A4063]"></div>
+
+  <!-- Subtle overlay blobs for depth -->
+  <div class="absolute inset-0 opacity-40">
+    <div class="absolute top-0 left-0 w-96 h-96 bg-[#BFACC8]/30 rounded-full blur-3xl animate-blob"></div>
+    <div class="absolute bottom-0 right-0 w-80 h-80 bg-white/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+  </div>
+
+  <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+    <!-- Heading -->
+    <h2 class="text-4xl md:text-5xl font-black text-white mb-4">
+      Stay Ahead of the Curve
+    </h2>
+    <p class="text-xl text-[#BFACC8] mb-10 font-medium">
+      Get exclusive tips, updates, and early access to new AI features.
+    </p>
+
+    <!-- Form -->
+    <form class="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto">
+      <input 
+        type="email" 
+        placeholder="Enter your email" 
+        required
+        class="flex-1 px-8 py-5 rounded-full bg-white/20 backdrop-blur-xl border border-[#BFACC8]/40 text-white placeholder-[#C8C6D7]/70 text-lg focus:outline-none focus:border-[#BFACC8] focus:bg-white/30 transition-all"
+      />
+      <button 
+        type="submit"
+        class="px-12 py-5 bg-gradient-to-r from-[#BFACC8] to-white text-[#4F1271] font-black text-lg rounded-full shadow-2xl hover:scale-105 hover:shadow-[#BFACC8]/50 transition-all duration-300 whitespace-nowrap"
+      >
+        Subscribe Now
+      </button>
+    </form>
+
+    <!-- Trust note -->
+    <p class="mt-6 text-sm text-[#C8C6D7]/80">
+      No spam ever • Unsubscribe anytime • 100% privacy guaranteed
+    </p>
+  </div>
+</section>
+
+<style>
+  @keyframes blob {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(40px, -40px) scale(1.15); }
+  }
+  .animate-blob { animation: blob 20s infinite; }
+  .animation-delay-2000 { animation-delay: 2s; }
+</style>
+  
+<!-- CLEAN WHITE PREMIUM FOOTER – 2025 -->
+<footer class="relative bg-white overflow-hidden">
+  <!-- Subtle brand-colored decorative orbs -->
+  <div class="absolute inset-0 pointer-events-none opacity-60">
+    <div class="absolute top-0 left-0 w-96 h-96 bg-[#783F8E]/20 rounded-full blur-3xl animate-blob"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-[#BFACC8]/15 rounded-full blur-3xl animate-blob animation-delay-3000"></div>
+  </div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-6 pt-24 pb-12">
+    <div class="grid lg:grid-cols-4 md:grid-cols-2 gap-12">
+
+      <!-- Brand Column -->
+      <div class="lg:col-span-1">
+        <h2 class="text-4xl font-black bg-gradient-to-r from-[#4F1271] to-[#783F8E] bg-clip-text text-transparent">
+          ToolGi
+        </h2>
+        <p class="mt-4 text-[#4A4063]/80 text-lg leading-relaxed max-w-xs font-medium">
+          All-in-one tools for PDFs, images, and SEO — fast, beautiful, and private.
+        </p>
+
+        <!-- Social Icons -->
+        <div class="flex gap-6 mt-8 text-2xl text-[#4A4063]">
+          <a href="#" class="hover:text-[#783F8E] transition"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="hover:text-[#783F8E] transition"><i class="fab fa-discord"></i></a>
+          <a href="#" class="hover:text-[#783F8E] transition"><i class="fab fa-github"></i></a>
+          <a href="#" class="hover:text-[#783F8E] transition"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="text-xl font-bold text-[#4F1271] mb-6">Quick Links</h4>
+        <ul class="space-y-4 text-[#4A4063]/90">
+          <li><a href="index.html" class="hover:text-[#783F8E] transition font-medium">Home</a></li>
+          <li><a href="index.html#about" class="hover:text-[#783F8E] transition font-medium">About Us</a></li>
+          <li><a href="index.html#features" class="hover:text-[#783F8E] transition font-medium">Features</a></li>
+          <li><a href="index.html#tools" class="hover:text-[#783F8E] transition font-medium">All Tools</a></li>
+        </ul>
+      </div>
+
+      <!-- Support -->
+      <div>
+        <h4 class="text-xl font-bold text-[#4F1271] mb-6">Support</h4>
+        <ul class="space-y-4 text-[#4A4063]/90">
+          <li><a href="index.html#contact" class="hover:text-[#783F8E] transition font-medium">Contact Us</a></li>
+          <li><a href="privacy.html" class="hover:text-[#783F8E] transition font-medium">Privacy Policy</a></li>
+            <li><a href="term.html" class="hover:text-[#783F8E] transition font-medium">Terms & Conditions</a></li>
+          <li><a href="disclaimer.html" class="hover:text-[#783F8E] transition font-medium">Disclaimer</a></li>
+        </ul>
+      </div>
+
+      <!-- Newsletter -->
+      <div>
+        <h4 class="text-xl font-bold text-[#4F1271] mb-6">Stay Updated</h4>
+        <p class="text-[#4A4063]/80 mb-6">
+          New features, tips, and exclusive updates — delivered weekly.
+        </p>
+
+        <form class="flex flex-col sm:flex-row gap-3">
+          <input 
+            type="email" 
+            placeholder="your@email.com"
+            class="px-6 py-4 rounded-xl bg-[#4A4063]/5 border border-[#BFACC8]/30 text-[#4F1271] placeholder-[#4A4063]/60 focus:outline-none focus:border-[#783F8E] focus:bg-[#783F8E]/5 transition"
+          />
+          <button class="px-8 py-4 bg-gradient-to-r from-[#783F8E] to-[#4F1271] text-white font-bold rounded-xl shadow-lg hover:shadow-[#783F8E]/40 hover:scale-105 transition">
+            Subscribe
+          </button>
+        </form>
+
+        <p class="text-xs text-[#4A4063]/60 mt-4">
+          No spam • Unsubscribe anytime
+        </p>
+      </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="mt-16 pt-8 border-t border-[#BFACC8]/30 text-center">
+      <p class="text-[#4A4063]/70 text-sm font-medium">
+        © 2025 <span class="text-[#4F1271] font-bold">ToolGi</span>. Made with passion in the cloud.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&display=swap');
+  body { font-family: 'Poppins', sans-serif; }
+
+  @keyframes blob {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(40px, -40px) scale(1.15); }
+  }
+  .animate-blob { animation: blob 20s infinite; }
+  .animation-delay-3000 { animation-delay: 3s; }
+</style>
+
+</body>
+</html>

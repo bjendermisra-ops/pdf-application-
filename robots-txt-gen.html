@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Robots.txt Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#1e40af',
+                        accent: '#10b981',
+                        warning: '#f59e0b',
+                        error: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .tab-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .code-output {
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            background-color: #1e293b;
+            color: #e2e8f0;
+        }
+        .rule-item {
+            transition: all 0.3s ease;
+        }
+        .rule-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .validation-check {
+            transition: all 0.3s ease;
+        }
+        .preview-line {
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+        }
+        .highlight {
+            background-color: #fef3c7;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Advanced Robots.txt Generator</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Create and customize robots.txt files to control search engine crawling behavior on your website.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Configuration Section -->
+            <div class="space-y-8">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Robots.txt Configuration</h2>
+                        <div class="flex border-b border-gray-200 mb-4">
+                            <button class="tab-btn px-4 py-2 font-medium text-gray-600 hover:text-primary active" data-tab="basic">Basic Settings</button>
+                            <button class="tab-btn px-4 py-2 font-medium text-gray-600 hover:text-primary" data-tab="advanced">Advanced Rules</button>
+                            <button class="tab-btn px-4 py-2 font-medium text-gray-700 hover:text-primary" data-tab="crawlers">Crawler Settings</button>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <!-- Basic Settings Tab -->
+                        <div id="basic-tab" class="tab-content active">
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Website Domain
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">Your website's domain - used for sitemap reference</span>
+                                    </span>
+                                </label>
+                                <input type="text" id="website-domain" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="easysmartcalculator.com" value="easysmartcalculator.com">
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Default Crawler Access
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">How should search engines generally treat your site?</span>
+                                    </span>
+                                </label>
+                                <div class="flex space-x-4">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="default-access" value="allow" class="text-primary focus:ring-primary" checked>
+                                        <span class="ml-2 text-sm text-gray-700">Allow All (Recommended)</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="default-access" value="disallow" class="text-primary focus:ring-primary">
+                                        <span class="ml-2 text-sm text-gray-700">Disallow All</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Sitemap URL
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">Location of your sitemap file</span>
+                                    </span>
+                                </label>
+                                <input type="text" id="sitemap-url" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="/sitemap.xml" value="/sitemap.xml">
+                                <p class="text-xs text-gray-500 mt-1">Leave empty if you don't have a sitemap</p>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Crawl-Delay Setting
+                                    <span class="tooltip ml-1 text-gray-400">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">Time delay between crawler requests (in seconds)</span>
+                                    </span>
+                                </label>
+                                <select id="crawl-delay" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="">No delay (default)</option>
+                                    <option value="1">1 second</option>
+                                    <option value="2">2 seconds</option>
+                                    <option value="5">5 seconds</option>
+                                    <option value="10">10 seconds</option>
+                                    <option value="custom">Custom delay</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-6" id="custom-delay-container" style="display: none;">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Custom Crawl Delay (seconds)</label>
+                                <input type="number" id="custom-delay" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" min="1" max="60" placeholder="e.g., 3">
+                            </div>
+                        </div>
+
+                        <!-- Advanced Rules Tab -->
+                        <div id="advanced-tab" class="tab-content">
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-800 mb-3">Directory Restrictions</h3>
+                                <p class="text-sm text-gray-600 mb-3">Add directories you want to block from search engine crawling.</p>
+                                
+                                <div id="directory-rules" class="space-y-3 mb-4">
+                                    <!-- Rules will be added here dynamically -->
+                                    <div class="rule-item flex items-center space-x-2 p-3 border border-gray-200 rounded-lg">
+                                        <input type="text" class="flex-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="/admin/" value="/admin/">
+                                        <button class="remove-rule px-3 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="rule-item flex items-center space-x-2 p-3 border border-gray-200 rounded-lg">
+                                        <input type="text" class="flex-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="/login/" value="/login/">
+                                        <button class="remove-rule px-3 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <button id="add-directory-rule" class="w-full px-4 py-2 border-2 border-dashed border-gray-300 text-gray-500 rounded-lg hover:border-primary hover:text-primary transition-colors">
+                                    <i class="fas fa-plus mr-2"></i> Add Directory Rule
+                                </button>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-800 mb-3">File Type Restrictions</h3>
+                                <p class="text-sm text-gray-600 mb-3">Block specific file types from being crawled.</p>
+                                
+                                <div class="grid grid-cols-2 gap-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="file-type-checkbox rounded border-gray-300 text-primary focus:ring-primary" value=".pdf">
+                                        <span class="ml-2 text-sm text-gray-700">PDF Files</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="file-type-checkbox rounded border-gray-300 text-primary focus:ring-primary" value=".doc">
+                                        <span class="ml-2 text-sm text-gray-700">Word Documents</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="file-type-checkbox rounded border-gray-300 text-primary focus:ring-primary" value=".xls">
+                                        <span class="ml-2 text-sm text-gray-700">Excel Files</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="file-type-checkbox rounded border-gray-300 text-primary focus:ring-primary" value=".ppt">
+                                        <span class="ml-2 text-sm text-gray-700">PowerPoint Files</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="file-type-checkbox rounded border-gray-300 text-primary focus:ring-primary" value=".zip">
+                                        <span class="ml-2 text-sm text-gray-700">Zip Archives</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="file-type-checkbox rounded border-gray-300 text-primary focus:ring-primary" value=".jpg">
+                                        <span class="ml-2 text-sm text-gray-700">JPG Images</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-800 mb-3">URL Pattern Restrictions</h3>
+                                <p class="text-sm text-gray-600 mb-3">Block URLs matching specific patterns.</p>
+                                
+                                <div id="pattern-rules" class="space-y-3">
+                                    <!-- Pattern rules will be added here -->
+                                </div>
+                                
+                                <button id="add-pattern-rule" class="w-full px-4 py-2 border-2 border-dashed border-gray-300 text-gray-500 rounded-lg hover:border-primary hover:text-primary transition-colors mt-3">
+                                    <i class="fas fa-plus mr-2"></i> Add Pattern Rule
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Crawler Settings Tab -->
+                        <div id="crawlers-tab" class="tab-content">
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-800 mb-3">Specific Crawler Rules</h3>
+                                <p class="text-sm text-gray-600 mb-3">Set different rules for specific search engine crawlers.</p>
+                                
+                                <div id="crawler-rules" class="space-y-4">
+                                    <!-- Crawler rules will be added here -->
+                                    <div class="rule-item p-4 border border-gray-200 rounded-lg">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="font-medium text-gray-800">BadBot</h4>
+                                            <button class="remove-crawler-rule px-3 py-1 bg-red-100 text-red-700 text-sm rounded hover:bg-red-200 transition-colors">
+                                                Remove
+                                            </button>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="/blocked-path/" value="/">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Add New Crawler Rule</label>
+                                    <div class="flex space-x-2">
+                                        <input type="text" id="new-crawler-name" class="flex-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Crawler name (e.g., BadBot)">
+                                        <button id="add-crawler-rule" class="px-4 py-2 bg-primary text-white rounded hover:bg-secondary transition-colors">
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="text-lg font-medium text-gray-800 mb-3">Popular Crawler Presets</h3>
+                                <div class="grid grid-cols-1 gap-2">
+                                    <button class="crawler-preset text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-crawler="Googlebot">
+                                        <div class="font-medium text-gray-800">Googlebot</div>
+                                        <div class="text-sm text-gray-600">Google's main crawler</div>
+                                    </button>
+                                    <button class="crawler-preset text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-crawler="Bingbot">
+                                        <div class="font-medium text-gray-800">Bingbot</div>
+                                        <div class="text-sm text-gray-600">Microsoft Bing's crawler</div>
+                                    </button>
+                                    <button class="crawler-preset text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-crawler="Slurp">
+                                        <div class="font-medium text-gray-800">Slurp</div>
+                                        <div class="text-sm text-gray-600">Yahoo's crawler</div>
+                                    </button>
+                                    <button class="crawler-preset text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-crawler="DuckDuckBot">
+                                        <div class="font-medium text-gray-800">DuckDuckBot</div>
+                                        <div class="text-sm text-gray-600">DuckDuckGo's crawler</div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Best Practices -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800">Robots.txt Best Practices</h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 rounded-full bg-accent flex items-center justify-center mt-0.5">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Place in root directory</p>
+                                    <p class="text-sm text-gray-600">robots.txt must be accessible at yourdomain.com/robots.txt</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 rounded-full bg-accent flex items-center justify-center mt-0.5">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Use for guidance only</p>
+                                    <p class="text-sm text-gray-600">Respectful crawlers follow robots.txt, but malicious ones may ignore it</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 rounded-full bg-accent flex items-center justify-center mt-0.5">
+                                    <i class="fas fa-check text-white text-xs"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Include sitemap location</p>
+                                    <p class="text-sm text-gray-600">Help search engines discover all your pages</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 h-6 w-6 rounded-full bg-warning flex items-center justify-center mt-0.5">
+                                    <i class="fas fa-exclamation text-white text-xs"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Don't block CSS/JS files</p>
+                                    <p class="text-sm text-gray-600">Blocking these can prevent proper page rendering in search results</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="space-y-8">
+                <!-- Generated Robots.txt -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Generated Robots.txt File</h2>
+                        <p class="text-gray-600">Save this content as "robots.txt" in your website's root directory.</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="code-output p-4 rounded-lg overflow-x-auto max-h-96 overflow-y-auto">
+                            <pre id="robots-output"># Allow all search engines to crawl the site
+User-agent: *
+Disallow:
+
+# Sitemap location (helps search engines find all pages)
+Sitemap: https://easysmartcalculator.com/sitemap.xml
+
+# Block admin and login pages
+User-agent: *
+Disallow: /admin/
+Disallow: /login/
+
+# Block specific crawlers
+User-agent: BadBot
+Disallow: /</pre>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <button id="copy-btn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors flex items-center">
+                                <i class="fas fa-copy mr-2"></i> Copy to Clipboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Validation & Testing -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Validation & Testing</h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="validation-check flex items-center p-3 bg-green-50 border border-green-200 rounded-lg">
+                                <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                <div>
+                                    <div class="font-medium text-green-800">Syntax Valid</div>
+                                    <div class="text-sm text-green-600">Your robots.txt follows correct syntax rules</div>
+                                </div>
+                            </div>
+                            <div class="validation-check flex items-center p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <i class="fas fa-exclamation-triangle text-yellow-500 mr-3"></i>
+                                <div>
+                                    <div class="font-medium text-yellow-800">No Critical Blocks</div>
+                                    <div class="text-sm text-yellow-600">You're not blocking important site resources</div>
+                                </div>
+                            </div>
+                            <div class="validation-check flex items-center p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <i class="fas fa-info-circle text-blue-500 mr-3"></i>
+                                <div>
+                                    <div class="font-medium text-blue-800">Sitemap Included</div>
+                                    <div class="text-sm text-blue-600">Search engines can find your sitemap</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Test Your Robots.txt</h3>
+                            <div class="space-y-3">
+                                <a href="https://search.google.com/search-console/robots-testing-tool" target="_blank" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-external-link-alt text-primary mr-3"></i>
+                                    <div>
+                                        <div class="font-medium text-gray-800">Google Robots Testing Tool</div>
+                                        <div class="text-sm text-gray-600">Test how Google interprets your robots.txt</div>
+                                    </div>
+                                </a>
+                                <a href="https://www.bing.com/webmasters/robotstxt" target="_blank" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-external-link-alt text-primary mr-3"></i>
+                                    <div>
+                                        <div class="font-medium text-gray-800">Bing Robots.txt Tester</div>
+                                        <div class="text-sm text-gray-600">Validate your robots.txt for Bing</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Implementation Guide -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Implementation Guide</h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="prose max-w-none">
+                            <h3 class="text-lg font-medium text-gray-800 mb-2">How to Implement</h3>
+                            <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                                <li>Copy the generated robots.txt content above</li>
+                                <li>Create a new text file named "robots.txt"</li>
+                                <li>Paste the content into this file</li>
+                                <li>Upload the file to your website's root directory (same location as your homepage)</li>
+                                <li>Test the file is accessible at yourdomain.com/robots.txt</li>
+                                <li>Use the testing tools to verify it works correctly</li>
+                            </ol>
+                            
+                            <h3 class="text-lg font-medium text-gray-800 mt-4 mb-2">Common Directories to Block</h3>
+                            <ul class="list-disc pl-5 space-y-1 text-gray-700">
+                                <li><code>/admin/</code> - Administration areas</li>
+                                <li><code>/login/</code> - Login pages</li>
+                                <li><code>/cgi-bin/</code> - Server scripts</li>
+                                <li><code>/tmp/</code> - Temporary files</li>
+                                <li><code>/private/</code> - Private content</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and tabs
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(tab => tab.classList.remove('active'));
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Show corresponding tab
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        // Crawl delay toggle
+        document.getElementById('crawl-delay').addEventListener('change', function() {
+            const customDelayContainer = document.getElementById('custom-delay-container');
+            if (this.value === 'custom') {
+                customDelayContainer.style.display = 'block';
+            } else {
+                customDelayContainer.style.display = 'none';
+            }
+            updateRobotsOutput();
+        });
+
+        // Add directory rule
+        document.getElementById('add-directory-rule').addEventListener('click', function() {
+            const rulesContainer = document.getElementById('directory-rules');
+            const ruleElement = document.createElement('div');
+            ruleElement.className = 'rule-item flex items-center space-x-2 p-3 border border-gray-200 rounded-lg';
+            ruleElement.innerHTML = `
+                <input type="text" class="flex-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="/path/to/block/">
+                <button class="remove-rule px-3 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            rulesContainer.appendChild(ruleElement);
+            
+            // Add event listener to the new input
+            ruleElement.querySelector('input').addEventListener('input', updateRobotsOutput);
+            ruleElement.querySelector('.remove-rule').addEventListener('click', function() {
+                ruleElement.remove();
+                updateRobotsOutput();
+            });
+        });
+
+        // Add pattern rule
+        document.getElementById('add-pattern-rule').addEventListener('click', function() {
+            const rulesContainer = document.getElementById('pattern-rules');
+            const ruleElement = document.createElement('div');
+            ruleElement.className = 'rule-item flex items-center space-x-2 p-3 border border-gray-200 rounded-lg';
+            ruleElement.innerHTML = `
+                <input type="text" class="flex-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="*.php?id=*">
+                <button class="remove-rule px-3 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            rulesContainer.appendChild(ruleElement);
+            
+            // Add event listener to the new input
+            ruleElement.querySelector('input').addEventListener('input', updateRobotsOutput);
+            ruleElement.querySelector('.remove-rule').addEventListener('click', function() {
+                ruleElement.remove();
+                updateRobotsOutput();
+            });
+        });
+
+        // Add crawler rule
+        document.getElementById('add-crawler-rule').addEventListener('click', function() {
+            const crawlerName = document.getElementById('new-crawler-name').value.trim();
+            if (!crawlerName) return;
+            
+            const rulesContainer = document.getElementById('crawler-rules');
+            const ruleElement = document.createElement('div');
+            ruleElement.className = 'rule-item p-4 border border-gray-200 rounded-lg';
+            ruleElement.innerHTML = `
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-medium text-gray-800">${crawlerName}</h4>
+                    <button class="remove-crawler-rule px-3 py-1 bg-red-100 text-red-700 text-sm rounded hover:bg-red-200 transition-colors">
+                        Remove
+                    </button>
+                </div>
+                <div class="space-y-2">
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="/blocked-path/" value="/">
+                </div>
+            `;
+            rulesContainer.appendChild(ruleElement);
+            
+            // Clear input
+            document.getElementById('new-crawler-name').value = '';
+            
+            // Add event listeners
+            ruleElement.querySelector('input').addEventListener('input', updateRobotsOutput);
+            ruleElement.querySelector('.remove-crawler-rule').addEventListener('click', function() {
+                ruleElement.remove();
+                updateRobotsOutput();
+            });
+            
+            updateRobotsOutput();
+        });
+
+        // Crawler presets
+        document.querySelectorAll('.crawler-preset').forEach(button => {
+            button.addEventListener('click', function() {
+                const crawlerName = this.getAttribute('data-crawler');
+                document.getElementById('new-crawler-name').value = crawlerName;
+            });
+        });
+
+        // File type checkboxes
+        document.querySelectorAll('.file-type-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', updateRobotsOutput);
+        });
+
+        // Remove rule event delegation
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-rule') || e.target.closest('.remove-rule')) {
+                const button = e.target.classList.contains('remove-rule') ? e.target : e.target.closest('.remove-rule');
+                button.closest('.rule-item').remove();
+                updateRobotsOutput();
+            }
+        });
+
+        // Form input listeners
+        const formInputs = document.querySelectorAll('input, select, textarea');
+        formInputs.forEach(input => {
+            if (input.type !== 'checkbox' && input.type !== 'radio') {
+                input.addEventListener('input', updateRobotsOutput);
+            }
+            input.addEventListener('change', updateRobotsOutput);
+        });
+
+        // Radio buttons
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', updateRobotsOutput);
+        });
+
+        // Copy to clipboard functionality
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const output = document.getElementById('robots-output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                const copyBtn = document.getElementById('copy-btn');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Copied!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+
+        // Function to update robots.txt output
+        function updateRobotsOutput() {
+            let output = '';
+            
+            // Get basic settings
+            const domain = document.getElementById('website-domain').value;
+            const defaultAccess = document.querySelector('input[name="default-access"]:checked').value;
+            const sitemap = document.getElementById('sitemap-url').value;
+            const crawlDelay = document.getElementById('crawl-delay').value;
+            const customDelay = document.getElementById('custom-delay').value;
+            
+            // Default rule for all crawlers
+            output += `# Allow all search engines to crawl the site\n`;
+            output += `User-agent: *\n`;
+            
+            if (defaultAccess === 'allow') {
+                output += `Disallow:\n`;
+            } else {
+                output += `Disallow: /\n`;
+            }
+            output += `\n`;
+            
+            // Crawl delay
+            if (crawlDelay && crawlDelay !== 'custom') {
+                output += `# Crawl delay setting\n`;
+                output += `Crawl-delay: ${crawlDelay}\n`;
+                output += `\n`;
+            } else if (crawlDelay === 'custom' && customDelay) {
+                output += `# Crawl delay setting\n`;
+                output += `Crawl-delay: ${customDelay}\n`;
+                output += `\n`;
+            }
+            
+            // Sitemap
+            if (sitemap) {
+                const sitemapUrl = sitemap.startsWith('http') ? sitemap : `https://${domain}${sitemap.startsWith('/') ? '' : '/'}${sitemap}`;
+                output += `# Sitemap location (helps search engines find all pages)\n`;
+                output += `Sitemap: ${sitemapUrl}\n`;
+                output += `\n`;
+            }
+            
+            // Directory restrictions
+            const directoryRules = Array.from(document.querySelectorAll('#directory-rules input'))
+                .map(input => input.value.trim())
+                .filter(value => value);
+                
+            if (directoryRules.length > 0) {
+                output += `# Block sensitive directories\n`;
+                output += `User-agent: *\n`;
+                directoryRules.forEach(rule => {
+                    output += `Disallow: ${rule}\n`;
+                });
+                output += `\n`;
+            }
+            
+            // File type restrictions
+            const fileTypes = Array.from(document.querySelectorAll('.file-type-checkbox:checked'))
+                .map(checkbox => checkbox.value);
+                
+            if (fileTypes.length > 0) {
+                output += `# Block specific file types\n`;
+                output += `User-agent: *\n`;
+                fileTypes.forEach(type => {
+                    output += `Disallow: /*${type}\n`;
+                });
+                output += `\n`;
+            }
+            
+            // Pattern restrictions
+            const patternRules = Array.from(document.querySelectorAll('#pattern-rules input'))
+                .map(input => input.value.trim())
+                .filter(value => value);
+                
+            if (patternRules.length > 0) {
+                output += `# Block URL patterns\n`;
+                output += `User-agent: *\n`;
+                patternRules.forEach(rule => {
+                    output += `Disallow: /${rule}\n`;
+                });
+                output += `\n`;
+            }
+            
+            // Specific crawler rules
+            const crawlerRules = Array.from(document.querySelectorAll('#crawler-rules .rule-item'));
+            if (crawlerRules.length > 0) {
+                output += `# Specific crawler rules\n`;
+                crawlerRules.forEach(ruleElement => {
+                    const crawlerName = ruleElement.querySelector('h4').textContent;
+                    const disallowPath = ruleElement.querySelector('input').value.trim();
+                    
+                    output += `User-agent: ${crawlerName}\n`;
+                    output += `Disallow: ${disallowPath}\n`;
+                    output += `\n`;
+                });
+            }
+            
+            // Update the output
+            document.getElementById('robots-output').textContent = output;
+        }
+
+        // Initialize with default values
+        updateRobotsOutput();
+    </script>
+</body>
+</html>

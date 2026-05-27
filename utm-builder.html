@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UTM Builder | SEO Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .copy-btn.copied {
+        background-color: #16a34a;
+        border-color: #16a34a;
+      }
+    </style>
+  </head>
+  <body class="bg-white text-black min-h-screen">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+      <header class="mb-10 text-center">
+        <h1 class="text-4xl font-bold text-black mb-2">UTM Builder</h1>
+        <p class="text-gray-700 max-w-2xl mx-auto">
+          Create UTM parameters for tracking your marketing campaigns
+        </p>
+      </header>
+
+      <main class="max-w-4xl mx-auto">
+        <!-- Input Form -->
+        <div class="bg-white rounded-xl p-6 shadow-lg mb-8">
+          <h2 class="text-xl font-semibold mb-6 text-black">UTM Parameters</h2>
+
+          <div class="space-y-5">
+            <!-- Website URL -->
+            <div>
+              <label
+                for="websiteUrl"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Website URL*</label
+              >
+              <input
+                type="url"
+                id="websiteUrl"
+                placeholder="https://example.com"
+                required
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <!-- Campaign Source -->
+            <div>
+              <label
+                for="campaignSource"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Campaign Source (utm_source)*</label
+              >
+              <input
+                type="text"
+                id="campaignSource"
+                placeholder="google, newsletter, social"
+                required
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p class="text-xs text-gray-500 mt-1">
+                The referrer (e.g. google, newsletter)
+              </p>
+            </div>
+
+            <!-- Campaign Medium -->
+            <div>
+              <label
+                for="campaignMedium"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Campaign Medium (utm_medium)*</label
+              >
+              <input
+                type="text"
+                id="campaignMedium"
+                placeholder="cpc, email, social"
+                required
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p class="text-xs text-gray-500 mt-1">
+                Marketing medium (e.g. cpc, banner, email)
+              </p>
+            </div>
+
+            <!-- Campaign Name -->
+            <div>
+              <label
+                for="campaignName"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Campaign Name (utm_campaign)*</label
+              >
+              <input
+                type="text"
+                id="campaignName"
+                placeholder="summer_sale, product_launch"
+                required
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p class="text-xs text-gray-500 mt-1">
+                Product, promo code, or slogan
+              </p>
+            </div>
+
+            <!-- Campaign Term -->
+            <div>
+              <label
+                for="campaignTerm"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Campaign Term (utm_term)</label
+              >
+              <input
+                type="text"
+                id="campaignTerm"
+                placeholder="running+shoes"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p class="text-xs text-gray-500 mt-1">Identify paid keywords</p>
+            </div>
+
+            <!-- Campaign Content -->
+            <div>
+              <label
+                for="campaignContent"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Campaign Content (utm_content)</label
+              >
+              <input
+                type="text"
+                id="campaignContent"
+                placeholder="logo_link, text_link"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p class="text-xs text-gray-500 mt-1">Use to differentiate ads</p>
+            </div>
+
+            <div class="flex gap-4 pt-2">
+              <button
+                id="generateBtn"
+                class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium text-white transition-colors flex items-center justify-center gap-2"
+              >
+                <i class="fas fa-link"></i> Generate UTM URL
+              </button>
+              <button
+                id="resetBtn"
+                class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium text-white transition-colors flex items-center justify-center gap-2"
+              >
+                <i class="fas fa-redo"></i> Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output Section -->
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-black">Generated UTM URL</h2>
+            <div class="flex gap-2">
+              <button
+                id="copyBtn"
+                class="copy-btn px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm flex items-center gap-2"
+              >
+                <i class="fas fa-copy"></i> Copy
+              </button>
+              <button
+                id="testBtn"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm flex items-center gap-2"
+              >
+                <i class="fas fa-external-link-alt"></i> Test
+              </button>
+            </div>
+          </div>
+          <div
+            id="utmOutput"
+            class="bg-gray-50 rounded-lg p-4 font-mono text-sm text-gray-800 overflow-x-auto"
+          >
+            <p class="text-gray-500">
+              Your UTM URL will appear here after generation
+            </p>
+          </div>
+
+          <div class="mt-6">
+            <h3 class="font-medium mb-2 text-black">UTM Breakdown</h3>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h4 class="text-sm font-medium text-blue-800 mb-1">
+                    Website URL
+                  </h4>
+                  <div
+                    id="breakdownUrl"
+                    class="text-sm p-2 bg-white border border-gray-200 rounded"
+                  >
+                    -
+                  </div>
+                </div>
+                <div>
+                  <h4 class="text-sm font-medium text-blue-800 mb-1">
+                    Campaign Source
+                  </h4>
+                  <div
+                    id="breakdownSource"
+                    class="text-sm p-2 bg-white border border-gray-200 rounded"
+                  >
+                    -
+                  </div>
+                </div>
+                <div>
+                  <h4 class="text-sm font-medium text-blue-800 mb-1">
+                    Campaign Medium
+                  </h4>
+                  <div
+                    id="breakdownMedium"
+                    class="text-sm p-2 bg-white border border-gray-200 rounded"
+                  >
+                    -
+                  </div>
+                </div>
+                <div>
+                  <h4 class="text-sm font-medium text-blue-800 mb-1">
+                    Campaign Name
+                  </h4>
+                  <div
+                    id="breakdownName"
+                    class="text-sm p-2 bg-white border border-gray-200 rounded"
+                  >
+                    -
+                  </div>
+                </div>
+                <div>
+                  <h4 class="text-sm font-medium text-blue-800 mb-1">
+                    Campaign Term
+                  </h4>
+                  <div
+                    id="breakdownTerm"
+                    class="text-sm p-2 bg-white border border-gray-200 rounded"
+                  >
+                    -
+                  </div>
+                </div>
+                <div>
+                  <h4 class="text-sm font-medium text-blue-800 mb-1">
+                    Campaign Content
+                  </h4>
+                  <div
+                    id="breakdownContent"
+                    class="text-sm p-2 bg-white border border-gray-200 rounded"
+                  >
+                    -
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="mt-16 text-center text-gray-500 text-sm">
+        <p>UTM Builder © 2023 | SEO Tool</p>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // DOM Elements
+        const websiteUrl = document.getElementById("websiteUrl");
+        const campaignSource = document.getElementById("campaignSource");
+        const campaignMedium = document.getElementById("campaignMedium");
+        const campaignName = document.getElementById("campaignName");
+        const campaignTerm = document.getElementById("campaignTerm");
+        const campaignContent = document.getElementById("campaignContent");
+        const generateBtn = document.getElementById("generateBtn");
+        const resetBtn = document.getElementById("resetBtn");
+        const copyBtn = document.getElementById("copyBtn");
+        const testBtn = document.getElementById("testBtn");
+        const utmOutput = document.getElementById("utmOutput");
+
+        // Breakdown elements
+        const breakdownUrl = document.getElementById("breakdownUrl");
+        const breakdownSource = document.getElementById("breakdownSource");
+        const breakdownMedium = document.getElementById("breakdownMedium");
+        const breakdownName = document.getElementById("breakdownName");
+        const breakdownTerm = document.getElementById("breakdownTerm");
+        const breakdownContent = document.getElementById("breakdownContent");
+
+        // Generate UTM URL
+        generateBtn.addEventListener("click", function () {
+          // Validate required fields
+          if (!websiteUrl.value) {
+            alert("Please enter a Website URL");
+            websiteUrl.focus();
+            return;
+          }
+
+          if (!campaignSource.value) {
+            alert("Please enter a Campaign Source");
+            campaignSource.focus();
+            return;
+          }
+
+          if (!campaignMedium.value) {
+            alert("Please enter a Campaign Medium");
+            campaignMedium.focus();
+            return;
+          }
+
+          if (!campaignName.value) {
+            alert("Please enter a Campaign Name");
+            campaignName.focus();
+            return;
+          }
+
+          // Build the UTM URL
+          let url = websiteUrl.value;
+
+          // Add ? or & depending on existing parameters
+          const separator = url.includes("?") ? "&" : "?";
+
+          // Add UTM parameters
+          url += `${separator}utm_source=${encodeURIComponent(
+            campaignSource.value
+          )}`;
+          url += `&utm_medium=${encodeURIComponent(campaignMedium.value)}`;
+          url += `&utm_campaign=${encodeURIComponent(campaignName.value)}`;
+
+          if (campaignTerm.value) {
+            url += `&utm_term=${encodeURIComponent(campaignTerm.value)}`;
+          }
+
+          if (campaignContent.value) {
+            url += `&utm_content=${encodeURIComponent(campaignContent.value)}`;
+          }
+
+          // Display the UTM URL
+          utmOutput.innerHTML = `<a href="${url}" target="_blank" class="text-blue-600 hover:underline break-all">${url}</a>`;
+
+          // Update breakdown
+          breakdownUrl.textContent = websiteUrl.value;
+          breakdownSource.textContent = campaignSource.value;
+          breakdownMedium.textContent = campaignMedium.value;
+          breakdownName.textContent = campaignName.value;
+          breakdownTerm.textContent = campaignTerm.value || "-";
+          breakdownContent.textContent = campaignContent.value || "-";
+        });
+
+        // Reset form
+        resetBtn.addEventListener("click", function () {
+          websiteUrl.value = "";
+          campaignSource.value = "";
+          campaignMedium.value = "";
+          campaignName.value = "";
+          campaignTerm.value = "";
+          campaignContent.value = "";
+
+          utmOutput.innerHTML =
+            '<p class="text-gray-500">Your UTM URL will appear here after generation</p>';
+
+          // Reset breakdown
+          breakdownUrl.textContent = "-";
+          breakdownSource.textContent = "-";
+          breakdownMedium.textContent = "-";
+          breakdownName.textContent = "-";
+          breakdownTerm.textContent = "-";
+          breakdownContent.textContent = "-";
+        });
+
+        // Copy to clipboard
+        copyBtn.addEventListener("click", function () {
+          const url = utmOutput.querySelector("a");
+          if (url) {
+            navigator.clipboard
+              .writeText(url.href)
+              .then(() => {
+                const original = this.innerHTML;
+                this.classList.add("copied");
+                this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                  this.classList.remove("copied");
+                  this.innerHTML = original;
+                }, 2000);
+              })
+              .catch((err) => {
+                console.error("Failed to copy: ", err);
+                alert("Failed to copy URL. Please try again.");
+              });
+          } else {
+            alert("Generate a UTM URL first");
+          }
+        });
+
+        // Test URL
+        testBtn.addEventListener("click", function () {
+          const url = utmOutput.querySelector("a");
+          if (url) {
+            window.open(url.href, "_blank");
+          } else {
+            alert("Generate a UTM URL first");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

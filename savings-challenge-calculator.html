@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Savings Challenge Calculator — 52-Week, 100-Day, Custom</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    .back-wrapper {
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .back-wrapper.hidden {
+      transform: translateX(-150%);
+      opacity: 0;
+    }
+    .input-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid #e2e8f0;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+    .input-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.1);
+    }
+    .input-focus:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+    }
+    .challenge-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
+      border: 1px dashed #6ee7b7;
+      border-radius: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    .challenge-card:hover {
+      border-color: #10b981;
+      transform: translateY(-4px);
+    }
+    .week-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 12px;
+      padding: 8px 0;
+      font-size: 0.875rem;
+      border-bottom: 1px dashed #e5e7eb;
+    }
+    .week-header {
+      font-weight: 600;
+      color: #374151;
+      padding: 12px 0;
+      border-bottom: 2px solid #d1d5db;
+    }
+    .chart-container {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    }
+    .piggy-bounce {
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .progress-bar {
+      height: 16px;
+      background: #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #34d399);
+      transition: width 0.6s ease;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 min-h-screen p-6">
+
+  <!-- Back Button -->
+  <div class="fixed top-6 left-6 z-50 back-wrapper">
+    <a href="/" 
+       class="flex items-center gap-2.5 px-5 py-2.5 text-sm font-semibold text-white
+              bg-blue-600
+              rounded-full shadow-lg
+              hover:bg-blue-700
+              hover:shadow-xl hover:-translate-x-1
+              transition-all duration-300 ease-in-out">
+      <i class="fas fa-arrow-left text-base"></i>
+      <span>Back to All Tools</span>
+    </a>
+  </div>
+
+  <!-- Header -->
+  <div class="max-w-7xl mx-auto text-center mb-12">
+    <div class="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+      <i class="fas fa-piggy-bank piggy-bounce text-emerald-600"></i> Savings Challenge
+    </div>
+    <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-3">Save Smarter, Not Harder</h1>
+    <p class="text-lg text-slate-600">52-Week, 100-Day Envelope, or Custom — Track & Achieve!</p>
+  </div>
+
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+    <!-- Left Panel -->
+    <div class="lg:col-span-7 space-y-6">
+
+      <!-- Challenge Type -->
+      <div class="input-card p-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+            <i class="fas fa-trophy text-emerald-600"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-slate-800">Challenge Type</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <label class="flex flex-col p-4 bg-emerald-50 rounded-xl cursor-pointer hover:bg-emerald-100 transition">
+            <input type="radio" name="challenge" value="52week" checked class="sr-only">
+            <div class="flex items-center gap-2 mb-2">
+              <i class="fas fa-calendar-week text-emerald-600"></i>
+              <span class="font-medium">52-Week</span>
+            </div>
+            <p class="text-xs text-slate-600">₹1 to ₹52 weekly</p>
+          </label>
+
+          <label class="flex flex-col p-4 bg-teal-50 rounded-xl cursor-pointer hover:bg-teal-100 transition">
+            <input type="radio" name="challenge" value="100envelope" class="sr-only">
+            <div class="flex items-center gap-2 mb-2">
+              <i class="fas fa-envelope text-teal-600"></i>
+              <span class="font-medium">100-Day Envelope</span>
+            </div>
+            <p class="text-xs text-slate-600">₹1 to ₹100 daily</p>
+          </label>
+
+          <label class="flex flex-col p-4 bg-cyan-50 rounded-xl cursor-pointer hover:bg-cyan-100 transition">
+            <input type="radio" name="challenge" value="custom" class="sr-only">
+            <div class="flex items-center gap-2 mb-2">
+              <i class="fas fa-cog text-cyan-600"></i>
+              <span class="font-medium">Custom</span>
+            </div>
+            <p class="text-xs text-slate-600">Set your own rules</p>
+          </label>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div id="settings52" class="input-card p-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+            <i class="fas fa-sliders-h text-purple-600"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-slate-800">52-Week Settings</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-medium text-slate-700">Start Amount (₹)</label>
+            <input id="start52" type="number" value="1" min="1" class="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg input-focus">
+          </div>
+          <div>
+            <label class="text-sm font-medium text-slate-700">Increment (₹)</label>
+            <input id="increment52" type="number" value="1" min="1" class="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg input-focus">
+          </div>
+        </div>
+      </div>
+
+      <div id="settings100" class="input-card p-6 hidden">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+            <i class="fas fa-sliders-h text-purple-600"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-slate-800">100-Day Settings</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-medium text-slate-700">Min Amount (₹)</label>
+            <input id="min100" type="number" value="1" min="1" class="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg input-focus">
+          </div>
+          <div>
+            <label class="text-sm font-medium text-slate-700">Max Amount (₹)</label>
+            <input id="max100" type="number" value="100" min="1" class="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg input-focus">
+          </div>
+        </div>
+      </div>
+
+      <div id="settingsCustom" class="input-card p-6 hidden">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+            <i class="fas fa-sliders-h text-purple-600"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-slate-800">Custom Challenge</h3>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm font-medium text-slate-700">Duration (days)</label>
+            <input id="durationCustom" type="number" value="365" min="1" class="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg input-focus">
+          </div>
+          <div>
+            <label class="text-sm font-medium text-slate-700">Target Amount (₹)</label>
+            <input id="targetCustom" type="number" value="100000" min="1" class="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg input-focus">
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="input-card p-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-10 h-10 bg-cyan-100 rounded-xl flex items-center justify-center">
+            <i class="fas fa-check-circle text-cyan-600"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-slate-800">Your Progress</h3>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm font-medium text-slate-700">Completed Periods</label>
+            <input id="completed" type="range" min="0" max="52" value="0" class="w-full h-2 rounded-lg appearance-none cursor-pointer mt-2">
+            <div class="flex justify-between text-xs text-slate-600 mt-1">
+              <span>0</span>
+              <span id="completedVal">0</span>
+              <span id="maxPeriods">52</span>
+            </div>
+          </div>
+
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+          </div>
+
+          <div class="flex justify-between text-sm">
+            <span>Saved:</span>
+            <span id="savedAmount" class="font-bold text-emerald-600">₹0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export -->
+      <div class="flex gap-3">
+        <button id="exportCSV" class="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-medium hover:shadow-lg transition flex items-center justify-center gap-2">
+          <i class="fas fa-file-csv"></i> Export CSV
+        </button>
+       
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="lg:col-span-5 space-y-6">
+
+      <!-- Total Target -->
+      <div class="challenge-card p-6 rounded-2xl border-2 bg-gradient-to-br from-emerald-50 to-teal-50">
+        <div class="text-center">
+          <p class="text-sm text-slate-600 font-medium">Total Target</p>
+          <p id="totalTarget" class="text-5xl font-bold text-emerald-600 mt-2 piggy-bounce">₹13,780</p>
+          <p class="text-sm text-slate-500 mt-1">in <span id="durationText">52 weeks</span></p>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-1 gap-4">
+        <div class="challenge-card p-5 rounded-xl">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm text-slate-600">This Period</p>
+              <p id="currentAmount" class="text-xl font-bold text-emerald-600">₹1</p>
+            </div>
+            <i class="fas fa-coins text-2xl text-emerald-500"></i>
+          </div>
+        </div>
+
+        <div class="challenge-card p-5 rounded-xl">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm text-slate-600">Remaining</p>
+              <p id="remainingAmount" class="text-xl font-bold text-teal-600">₹13,780</p>
+            </div>
+            <i class="fas fa-hourglass-half text-2xl text-teal-500"></i>
+          </div>
+        </div>
+
+        <div class="challenge-card p-5 rounded-xl bg-gradient-to-r from-cyan-50 to-teal-50">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm text-slate-700 font-semibold">Daily Avg</p>
+              <p id="dailyAvg" class="text-xl font-bold text-cyan-600">₹53</p>
+            </div>
+            <i class="fas fa-calendar-day text-2xl text-cyan-600"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schedule Preview -->
+      <div class="input-card p-6">
+        <h3 class="text-xl font-semibold text-slate-800 mb-4">Schedule Preview</h3>
+        <div id="schedulePreview" class="max-h-64 overflow-y-auto">
+          <div class="week-header week-row">
+            <div>Period</div>
+            <div>Save</div>
+            <div>Total</div>
+            <div>Status</div>
+          </div>
+          <!-- Filled by JS -->
+        </div>
+      </div>
+
+      <!-- Progress Chart -->
+      <div class="chart-container">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4 text-center">Savings Growth</h3>
+        <canvas id="growthChart"></canvas>
+      </div>
+
+      <!-- Motivation -->
+      <div class="input-card p-6 bg-gradient-to-r from-blue-50 to-cyan-50">
+        <h3 class="text-xl font-semibold text-slate-800 mb-3">Stay Motivated!</h3>
+        <div id="motivation" class="p-3 bg-emerald-50 rounded-lg text-sm text-emerald-800">
+          You're on track! Keep going!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Back button
+    const backWrapper = document.querySelector('.back-wrapper');
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const current = window.scrollY;
+      if (current > lastScroll && current > 80) backWrapper.classList.add('hidden');
+      else backWrapper.classList.remove('hidden');
+      lastScroll = current;
+    });
+
+    // Chart
+    const ctx = document.getElementById('growthChart').getContext('2d');
+    const growthChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Savings',
+          data: [],
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    // Elements
+    const challengeRadios = document.querySelectorAll('input[name="challenge"]');
+    const settings52 = document.getElementById('settings52');
+    const settings100 = document.getElementById('settings100');
+    const settingsCustom = document.getElementById('settingsCustom');
+    const completedSlider = document.getElementById('completed');
+    const completedVal = document.getElementById('completedVal');
+    const maxPeriods = document.getElementById('maxPeriods');
+    const schedulePreview = document.getElementById('schedulePreview');
+
+    let periods = [];
+    let totalTarget = 0;
+    let durationDays = 0;
+
+    function updateChallenge() {
+      const type = document.querySelector('input[name="challenge"]:checked').value;
+
+      settings52.classList.toggle('hidden', type !== '52week');
+      settings100.classList.toggle('hidden', type !== '100envelope');
+      settingsCustom.classList.toggle('hidden', type !== 'custom');
+
+      if (type === '52week') {
+        generate52Week();
+      } else if (type === '100envelope') {
+        generate100Envelope();
+      } else if (type === 'custom') {
+        generateCustom();
+      }
+
+      updateProgress();
+    }
+
+    function generate52Week() {
+      const start = parseInt(document.getElementById('start52').value) || 1;
+      const inc = parseInt(document.getElementById('increment52').value) || 1;
+      periods = [];
+      let total = 0;
+
+      for (let i = 0; i < 52; i++) {
+        const save = start + (i * inc);
+        total += save;
+        periods.push({ week: i + 1, save, total });
+      }
+
+      totalTarget = total;
+      durationDays = 364;
+      document.getElementById('durationText').textContent = '52 weeks';
+      completedSlider.max = 52;
+      maxPeriods.textContent = '52';
+      renderSchedule();
+    }
+
+    function generate100Envelope() {
+      const min = parseInt(document.getElementById('min100').value) || 1;
+      const max = parseInt(document.getElementById('max100').value) || 100;
+      periods = [];
+      let total = 0;
+
+      for (let i = 0; i < 100; i++) {
+        const save = min + (i % (max - min + 1));
+        total += save;
+        periods.push({ day: i + 1, save, total });
+      }
+
+      totalTarget = total;
+      durationDays = 100;
+      document.getElementById('durationText').textContent = '100 days';
+      completedSlider.max = 100;
+      maxPeriods.textContent = '100';
+      renderSchedule();
+    }
+
+    function generateCustom() {
+      const days = parseInt(document.getElementById('durationCustom').value) || 365;
+      const target = parseInt(document.getElementById('targetCustom').value) || 100000;
+      const daily = Math.round(target / days);
+      periods = [];
+      let total = 0;
+
+      for (let i = 0; i < days; i++) {
+        total += daily;
+        periods.push({ day: i + 1, save: daily, total: Math.min(total, target) });
+      }
+
+      totalTarget = target;
+      durationDays = days;
+      document.getElementById('durationText').textContent = `${days} days`;
+      completedSlider.max = days;
+      maxPeriods.textContent = days;
+      renderSchedule();
+    }
+
+    function renderSchedule() {
+      const rows = schedulePreview.querySelectorAll('.week-row:not(.week-header)');
+      rows.forEach(r => r.remove());
+
+      periods.slice(0, 10).forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'week-row';
+        const period = p.week || p.day;
+        const status = period <= parseInt(completedSlider.value) ? 'Done' : 'Pending';
+        row.innerHTML = `
+          <div>Period ${period}</div>
+          <div>₹${p.save}</div>
+          <div>₹${p.total}</div>
+          <div class="text-xs ${status === 'Done' ? 'text-emerald-600' : 'text-slate-500'}">${status}</div>
+        `;
+        schedulePreview.appendChild(row);
+      });
+    }
+
+    function updateProgress() {
+      const completed = parseInt(completedSlider.value);
+      completedVal.textContent = completed;
+
+      const saved = periods.slice(0, completed).reduce((sum, p) => sum + p.save, 0);
+      const remaining = totalTarget - saved;
+      const progress = (saved / totalTarget) * 100;
+
+      document.getElementById('totalTarget').textContent = `₹${totalTarget.toLocaleString('en-IN')}`;
+      document.getElementById('savedAmount').textContent = `₹${saved.toLocaleString('en-IN')}`;
+      document.getElementById('remainingAmount').textContent = `₹${remaining.toLocaleString('en-IN')}`;
+      document.getElementById('currentAmount').textContent = completed < periods.length ? `₹${periods[completed].save}` : '₹0';
+      document.getElementById('dailyAvg').textContent = `₹${Math.round(totalTarget / durationDays)}`;
+      document.getElementById('progressFill').style.width = `${progress}%`;
+
+      // Chart
+      const labels = periods.map((_, i) => i + 1);
+      const data = periods.map(p => p.total);
+      growthChart.data.labels = labels;
+      growthChart.data.datasets[0].data = data;
+      growthChart.update('quiet');
+
+      // Motivation
+      const pct = Math.round(progress);
+      let msg = '';
+      if (pct === 0) msg = "Let's start! First deposit today.";
+      else if (pct < 25) msg = "Great start! Keep the momentum.";
+      else if (pct < 50) msg = "Halfway there? You're crushing it!";
+      else if (pct < 75) msg = "So close! Don't stop now.";
+      else if (pct < 100) msg = "Almost there! Final push!";
+      else msg = "Goal achieved! Celebrate!";
+
+      document.getElementById('motivation').innerHTML = `<strong>${pct}% Complete:</strong> ${msg}`;
+      renderSchedule();
+    }
+
+    // Events
+    challengeRadios.forEach(r => r.addEventListener('change', updateChallenge));
+    ['start52', 'increment52', 'min100', 'max100', 'durationCustom', 'targetCustom'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateChallenge);
+    });
+    completedSlider.addEventListener('input', updateProgress);
+
+    // Export
+    document.getElementById('exportCSV').onclick = () => {
+      let csv = `Period,Save,Total\n`;
+      periods.forEach(p => {
+        const period = p.week || p.day;
+        csv += `${period},₹${p.save},₹${p.total}\n`;
+      });
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'savings-challenge.csv'; a.click();
+    };
+
+    document.getElementById('exportPDF').onclick = () => {
+      alert('PDF export coming soon! Use Print → Save as PDF.');
+    };
+
+    // Init
+    updateChallenge();
+  </script>
+</body>
+</html>

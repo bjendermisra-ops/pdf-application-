@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Resize & Reduce Image — Change Dimensions & Compress in One Step</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s ease;
+        }
+        .upload-area.dragover {
+            border-color: #4f46e5;
+            background-color: #eef2ff;
+        }
+        .preview-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .fade-in {
+            animation: fadeSlideUp 0.3s ease-out;
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .quality-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            outline: none;
+        }
+        .quality-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(79,70,229,0.3);
+        }
+        .platform-badge {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .unit-btn-active {
+            background-color: #4f46e5 !important;
+            color: white !important;
+        }
+        .unit-btn-inactive {
+            background-color: #f3f4f6 !important;
+            color: #374151 !important;
+        }
+        .platform-card {
+            transition: all 0.2s ease;
+        }
+        .platform-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .platform-active {
+            border-color: #4f46e5;
+            background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-slate-100 antialiased">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="bg-white rounded-2xl p-8 text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <p id="loadingText" class="text-gray-700 font-medium">Processing image...</p>
+            <p class="text-xs text-gray-400 mt-2">Please wait</p>
+        </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 md:py-4">
+            <div class="flex items-center gap-2 text-sm">
+                <a href="/" class="text-gray-600 hover:text-indigo-600 transition"><i class="fas fa-home"></i> Home</a>
+                <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                <span class="text-indigo-700 font-semibold">Resize & Reduce Image</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
+        <!-- Header section -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center gap-2 bg-indigo-50 px-4 py-1.5 rounded-full text-indigo-700 text-sm font-medium mb-4">
+                <i class="fas fa-magic"></i> 2-in-1 Tool
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-gray-800 to-indigo-700 bg-clip-text text-transparent mb-4">
+                Resize & Reduce Image
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Change dimensions <span class="text-indigo-500 font-medium">and</span> reduce file size in a single step — 
+                <span class="text-indigo-500 font-medium">free, instant, and 100% private.</span>
+                <i class="fas fa-shield-alt text-green-500 ml-1"></i>
+            </p>
+        </div>
+
+        <!-- Platform Indicator (from URL) -->
+        <div id="platformIndicator" class="hidden max-w-2xl mx-auto mb-8">
+            <div class="platform-badge rounded-2xl p-4 text-center text-white shadow-lg">
+                <i class="fas fa-robot text-xl mr-2"></i>
+                <span id="platformName" class="font-semibold">Instagram</span>
+                <span id="platformDimensions" class="text-sm opacity-90 ml-2"></span>
+                <p class="text-xs opacity-80 mt-1">Platform-optimized dimensions applied automatically</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- LEFT PANEL: Upload & Preview -->
+            <div class="lg:col-span-7 space-y-6">
+                <!-- Dropzone -->
+                <div id="dropzone" class="upload-area rounded-2xl p-8 text-center bg-white transition-all cursor-pointer shadow-sm hover:shadow-md">
+                    <div class="flex flex-col items-center">
+                        <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-magic text-3xl text-indigo-500"></i>
+                        </div>
+                        <p id="uploadStatus" class="text-gray-800 font-semibold text-lg">Upload your image</p>
+                        <p class="text-gray-400 text-sm mt-1">JPEG, PNG, WEBP · Max 20MB</p>
+                        <div class="flex flex-wrap gap-2 justify-center my-4">
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fas fa-camera"></i> JPEG</span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fas fa-file-image"></i> PNG</span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"><i class="fab fa-chrome"></i> WEBP</span>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" class="hidden">
+                        <button id="selectImageBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-xl transition shadow-md flex items-center gap-2">
+                            <i class="fas fa-upload"></i> Select image
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Preview Section -->
+                <div id="previewCard" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hidden fade-in">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-image text-indigo-500"></i> Preview
+                        </h3>
+                        <button id="clearBtn" class="text-red-500 hover:text-red-700 text-sm font-medium transition bg-red-50 px-3 py-1.5 rounded-full">
+                            <i class="fas fa-trash-alt"></i> Clear
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="text-center">
+                            <p class="text-xs font-medium text-gray-500 mb-2">Original</p>
+                            <div class="bg-gray-50 rounded-xl p-3 flex justify-center items-center min-h-[200px]">
+                                <img id="originalImg" src="#" alt="Original" class="max-w-full max-h-[200px] object-contain rounded-lg">
+                            </div>
+                            <div id="originalMeta" class="mt-2 text-xs text-gray-500"></div>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-xs font-medium text-indigo-600 mb-2">Resized & Reduced</p>
+                            <div class="bg-gray-50 rounded-xl p-3 flex justify-center items-center min-h-[200px]">
+                                <img id="optimizedImg" src="#" alt="Optimized" class="max-w-full max-h-[200px] object-contain rounded-lg">
+                            </div>
+                            <div id="optimizedMeta" class="mt-2 text-xs text-indigo-600 font-medium"></div>
+                        </div>
+                    </div>
+                    <div id="statsPanel" class="mt-4 hidden">
+                        <div id="statsCard" class="rounded-xl p-3 text-center bg-gradient-to-r from-indigo-50 to-purple-50">
+                            <p class="text-sm font-semibold flex items-center justify-center gap-2">
+                                <i class="fas fa-chart-line text-indigo-600"></i> 
+                                <span id="statsText"></span>
+                            </p>
+                        </div>
+                    </div>
+                    <button id="downloadBtn" class="w-full mt-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fas fa-download"></i> Download Optimized Image
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Controls -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm sticky top-24">
+                    <div class="flex items-center gap-2 border-b border-gray-100 pb-4 mb-5">
+                        <i class="fas fa-sliders-h text-indigo-500 text-xl"></i>
+                        <h2 class="text-xl font-bold text-gray-800">Resize & Compress</h2>
+                    </div>
+
+                    <!-- Platform Quick Select -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium text-sm mb-2">Quick platform presets</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button data-platform="instagram" class="platform-quick platform-card bg-gray-50 hover:bg-indigo-50 p-2 rounded-xl text-center transition border-2 border-transparent">
+                                <i class="fab fa-instagram text-pink-500 text-lg"></i>
+                                <p class="text-xs font-medium mt-1">Instagram</p>
+                            </button>
+                            <button data-platform="facebook" class="platform-quick platform-card bg-gray-50 hover:bg-indigo-50 p-2 rounded-xl text-center transition border-2 border-transparent">
+                                <i class="fab fa-facebook text-blue-600 text-lg"></i>
+                                <p class="text-xs font-medium mt-1">Facebook</p>
+                            </button>
+                            <button data-platform="youtube" class="platform-quick platform-card bg-gray-50 hover:bg-indigo-50 p-2 rounded-xl text-center transition border-2 border-transparent">
+                                <i class="fab fa-youtube text-red-600 text-lg"></i>
+                                <p class="text-xs font-medium mt-1">YouTube</p>
+                            </button>
+                            <button data-platform="twitter" class="platform-quick platform-card bg-gray-50 hover:bg-indigo-50 p-2 rounded-xl text-center transition border-2 border-transparent">
+                                <i class="fab fa-twitter text-sky-500 text-lg"></i>
+                                <p class="text-xs font-medium mt-1">Twitter/X</p>
+                            </button>
+                            <button data-platform="linkedin" class="platform-quick platform-card bg-gray-50 hover:bg-indigo-50 p-2 rounded-xl text-center transition border-2 border-transparent">
+                                <i class="fab fa-linkedin text-blue-700 text-lg"></i>
+                                <p class="text-xs font-medium mt-1">LinkedIn</p>
+                            </button>
+                            <button data-platform="pinterest" class="platform-quick platform-card bg-gray-50 hover:bg-indigo-50 p-2 rounded-xl text-center transition border-2 border-transparent">
+                                <i class="fab fa-pinterest text-red-600 text-lg"></i>
+                                <p class="text-xs font-medium mt-1">Pinterest</p>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Unit Selection -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium text-sm mb-2">Dimension unit</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button data-unit="px" class="unit-btn unit-btn-inactive px-3 py-2 rounded-xl text-sm font-medium transition">PX</button>
+                            <button data-unit="inch" class="unit-btn unit-btn-inactive px-3 py-2 rounded-xl text-sm font-medium transition">INCH</button>
+                            <button data-unit="cm" class="unit-btn unit-btn-inactive px-3 py-2 rounded-xl text-sm font-medium transition">CM</button>
+                            <button data-unit="mm" class="unit-btn unit-btn-inactive px-3 py-2 rounded-xl text-sm font-medium transition">MM</button>
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-2">* inch/cm/mm conversion based on 96 DPI</p>
+                    </div>
+
+                    <!-- Width & Height Inputs -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-gray-700 font-medium text-sm mb-1">Width</label>
+                            <div class="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 focus-within:ring-2 focus-within:ring-indigo-300">
+                                <input type="number" id="widthInput" placeholder="Width" class="w-full outline-none bg-transparent text-gray-800" step="any">
+                                <span id="widthUnitLabel" class="text-indigo-500 text-sm font-medium">px</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium text-sm mb-1">Height</label>
+                            <div class="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 focus-within:ring-2 focus-within:ring-indigo-300">
+                                <input type="number" id="heightInput" placeholder="Height" class="w-full outline-none bg-transparent text-gray-800" step="any">
+                                <span id="heightUnitLabel" class="text-indigo-500 text-sm font-medium">px</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aspect Ratio Lock -->
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="lockAspect" checked class="w-4 h-4 text-indigo-600 rounded">
+                            <label for="lockAspect" class="text-sm text-gray-700 cursor-pointer">Lock aspect ratio</label>
+                        </div>
+                        <button id="resetDimsBtn" class="text-xs text-indigo-500 hover:text-indigo-700">
+                            <i class="fas fa-undo-alt"></i> Reset to original
+                        </button>
+                    </div>
+
+                    <!-- Quality Compression -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-gray-700 font-medium text-sm">Quality reduction</label>
+                            <span id="qualityPercent" class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-0.5 rounded-full">85%</span>
+                        </div>
+                        <input type="range" id="qualitySlider" class="quality-slider" min="10" max="100" value="85">
+                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                            <span><i class="fas fa-compress"></i> Smaller file</span>
+                            <span><i class="fas fa-eye"></i> Better quality</span>
+                        </div>
+                    </div>
+
+                    <!-- Output Format -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium text-sm mb-2">Output format</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button data-format="jpeg" class="format-btn format-active bg-indigo-600 text-white px-3 py-2 rounded-xl text-sm font-medium transition">JPEG</button>
+                            <button data-format="png" class="format-btn format-inactive bg-gray-100 text-gray-700 px-3 py-2 rounded-xl text-sm font-medium transition">PNG</button>
+                            <button data-format="webp" class="format-btn format-inactive bg-gray-100 text-gray-700 px-3 py-2 rounded-xl text-sm font-medium transition">WEBP</button>
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-2">JPEG: best for photos | PNG: transparency | WEBP: modern & efficient</p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <button id="applyBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-base">
+                        <i class="fas fa-magic"></i> Apply Resize + Reduce
+                    </button>
+
+                    <!-- Sample Images -->
+                    <div class="mt-6 pt-4 border-t border-gray-100">
+                        <p class="text-xs text-gray-500 mb-2"><i class="fas fa-flask"></i> Try with sample:</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="sampleNature" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition">Nature</button>
+                            <button id="sampleCity" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition">City</button>
+                            <button id="sampleFood" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition">Food</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center text-gray-400 text-xs mt-10 pb-4">
+            <i class="fas fa-laptop-code"></i> 100% client-side — your images never leave your device. Resize and compress in one click.
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const selectImageBtn = document.getElementById('selectImageBtn');
+        const previewCard = document.getElementById('previewCard');
+        const originalImg = document.getElementById('originalImg');
+        const optimizedImg = document.getElementById('optimizedImg');
+        const originalMeta = document.getElementById('originalMeta');
+        const optimizedMeta = document.getElementById('optimizedMeta');
+        const statsPanel = document.getElementById('statsPanel');
+        const statsText = document.getElementById('statsText');
+        const widthInput = document.getElementById('widthInput');
+        const heightInput = document.getElementById('heightInput');
+        const widthUnitLabel = document.getElementById('widthUnitLabel');
+        const heightUnitLabel = document.getElementById('heightUnitLabel');
+        const lockAspect = document.getElementById('lockAspect');
+        const resetDimsBtn = document.getElementById('resetDimsBtn');
+        const qualitySlider = document.getElementById('qualitySlider');
+        const qualityPercent = document.getElementById('qualityPercent');
+        const applyBtn = document.getElementById('applyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const platformIndicator = document.getElementById('platformIndicator');
+        const platformName = document.getElementById('platformName');
+        const platformDimensions = document.getElementById('platformDimensions');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingText = document.getElementById('loadingText');
+
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        let urlPlatform = urlParams.get('platform');
+
+        // Platform presets
+        const platformPresets = {
+            instagram: { name: 'Instagram', width: 1080, height: 1080, unit: 'px', desc: 'Square post (1080×1080)' },
+            facebook: { name: 'Facebook', width: 1200, height: 630, unit: 'px', desc: 'Link preview (1200×630)' },
+            youtube: { name: 'YouTube', width: 1280, height: 720, unit: 'px', desc: 'Thumbnail (1280×720)' },
+            twitter: { name: 'Twitter/X', width: 1600, height: 900, unit: 'px', desc: 'Header image (1600×900)' },
+            linkedin: { name: 'LinkedIn', width: 1584, height: 396, unit: 'px', desc: 'Banner (1584×396)' },
+            pinterest: { name: 'Pinterest', width: 1000, height: 1500, unit: 'px', desc: 'Vertical pin (1000×1500)' }
+        };
+
+        // State
+        let originalImage = null;
+        let originalFile = null;
+        let originalFileSize = 0;
+        let currentOptimizedBlob = null;
+        let currentOptimizedUrl = null; // Fix for broken preview URL
+        let currentUnit = 'px';
+        let currentFormat = 'jpeg';
+        let originalWidth = 0, originalHeight = 0;
+        const DPI = 96;
+
+        function showLoading(message) {
+            loadingText.innerText = message;
+            loadingOverlay.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+        }
+
+        // Unit conversions
+        function toPixels(value, unit) {
+            if (unit === 'px') return parseFloat(value);
+            if (unit === 'inch') return parseFloat(value) * DPI;
+            if (unit === 'cm') return parseFloat(value) * (DPI / 2.54);
+            if (unit === 'mm') return parseFloat(value) * (DPI / 25.4);
+            return parseFloat(value);
+        }
+
+        function fromPixels(value, unit) {
+            if (unit === 'px') return value;
+            if (unit === 'inch') return value / DPI;
+            if (unit === 'cm') return value / (DPI / 2.54);
+            if (unit === 'mm') return value / (DPI / 25.4);
+            return value;
+        }
+
+        function updateUnitLabels() {
+            widthUnitLabel.innerText = currentUnit.toUpperCase();
+            heightUnitLabel.innerText = currentUnit.toUpperCase();
+        }
+
+        function updateUnitButtons() {
+            document.querySelectorAll('.unit-btn').forEach(btn => {
+                btn.classList.remove('unit-btn-active');
+                btn.classList.add('unit-btn-inactive');
+            });
+            const activeBtn = document.querySelector(`.unit-btn[data-unit="${currentUnit}"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('unit-btn-inactive');
+                activeBtn.classList.add('unit-btn-active');
+            }
+        }
+
+        function setUnit(unit) {
+            if (!originalImage) {
+                currentUnit = unit;
+                updateUnitLabels();
+                updateUnitButtons();
+                return;
+            }
+            const currentWidthPx = toPixels(widthInput.value, currentUnit);
+            const currentHeightPx = toPixels(heightInput.value, currentUnit);
+            currentUnit = unit;
+            updateUnitLabels();
+            updateUnitButtons();
+            widthInput.value = Math.round(fromPixels(currentWidthPx, currentUnit) * 100) / 100;
+            heightInput.value = Math.round(fromPixels(currentHeightPx, currentUnit) * 100) / 100;
+        }
+
+        // Platform preset from URL
+        function applyPlatformPreset(platform) {
+            const preset = platformPresets[platform];
+            if (preset) {
+                if (preset.unit !== currentUnit) {
+                    setUnit(preset.unit);
+                }
+                widthInput.value = preset.width;
+                heightInput.value = preset.height;
+                platformName.innerText = preset.name;
+                platformDimensions.innerText = preset.desc;
+                platformIndicator.classList.remove('hidden');
+                
+                // Highlight active platform
+                document.querySelectorAll('.platform-quick').forEach(btn => {
+                    btn.classList.remove('border-indigo-500', 'bg-indigo-50');
+                    btn.classList.add('border-transparent');
+                });
+                const activeBtn = document.querySelector(`.platform-quick[data-platform="${platform}"]`);
+                if (activeBtn) {
+                    activeBtn.classList.add('border-indigo-500', 'bg-indigo-50');
+                }
+                
+                if (originalImage) processResizeAndReduce();
+            }
+        }
+
+        // Platform quick select
+        document.querySelectorAll('.platform-quick').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const platform = btn.dataset.platform;
+                applyPlatformPreset(platform);
+            });
+        });
+
+        // Format buttons
+        document.querySelectorAll('.format-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.format-btn').forEach(f => {
+                    f.classList.remove('format-active', 'bg-indigo-600', 'text-white');
+                    f.classList.add('format-inactive', 'bg-gray-100', 'text-gray-700');
+                });
+                btn.classList.remove('format-inactive', 'bg-gray-100', 'text-gray-700');
+                btn.classList.add('format-active', 'bg-indigo-600', 'text-white');
+                currentFormat = btn.dataset.format;
+                if (originalImage) processResizeAndReduce();
+            });
+        });
+
+        // Unit buttons
+        document.querySelectorAll('.unit-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setUnit(btn.dataset.unit);
+                if (originalImage) processResizeAndReduce();
+            });
+        });
+
+        // Quality slider
+        qualitySlider.addEventListener('input', (e) => {
+            qualityPercent.innerText = e.target.value + '%';
+            if (originalImage) processResizeAndReduce();
+        });
+
+        // Aspect ratio sync
+        let isUpdating = false;
+        function syncAspectRatio(changedField) {
+            if (!originalImage || !lockAspect.checked || isUpdating) return;
+            isUpdating = true;
+            const ratio = originalWidth / originalHeight;
+            if (changedField === 'width') {
+                let newWidthPx = toPixels(widthInput.value, currentUnit);
+                if (newWidthPx > 0) {
+                    let newHeightPx = newWidthPx / ratio;
+                    heightInput.value = Math.round(fromPixels(newHeightPx, currentUnit) * 100) / 100;
+                }
+            } else if (changedField === 'height') {
+                let newHeightPx = toPixels(heightInput.value, currentUnit);
+                if (newHeightPx > 0) {
+                    let newWidthPx = newHeightPx * ratio;
+                    widthInput.value = Math.round(fromPixels(newWidthPx, currentUnit) * 100) / 100;
+                }
+            }
+            setTimeout(() => { isUpdating = false; }, 50);
+        }
+
+        widthInput.addEventListener('input', () => syncAspectRatio('width'));
+        heightInput.addEventListener('input', () => syncAspectRatio('height'));
+
+        resetDimsBtn.addEventListener('click', () => {
+            if (originalImage) {
+                widthInput.value = Math.round(fromPixels(originalWidth, currentUnit) * 100) / 100;
+                heightInput.value = Math.round(fromPixels(originalHeight, currentUnit) * 100) / 100;
+                processResizeAndReduce();
+            }
+        });
+
+        // Main processing
+        async function processResizeAndReduce() {
+            if (!originalImage) return;
+            
+            let targetWidthPx = Math.round(toPixels(widthInput.value, currentUnit));
+            let targetHeightPx = Math.round(toPixels(heightInput.value, currentUnit));
+            if (targetWidthPx < 1) targetWidthPx = 1;
+            if (targetHeightPx < 1) targetHeightPx = 1;
+            
+            const quality = parseInt(qualitySlider.value) / 100;
+            const canvas = document.createElement('canvas');
+            canvas.width = targetWidthPx;
+            canvas.height = targetHeightPx;
+            const ctx = canvas.getContext('2d');
+            
+            if (currentFormat === 'jpeg') {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, targetWidthPx, targetHeightPx);
+            }
+            ctx.drawImage(originalImage, 0, 0, targetWidthPx, targetHeightPx);
+            
+            let mimeType = 'image/jpeg';
+            if (currentFormat === 'png') mimeType = 'image/png';
+            if (currentFormat === 'webp') mimeType = 'image/webp';
+            const compressQuality = (currentFormat === 'png') ? undefined : quality;
+            
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType, compressQuality));
+            currentOptimizedBlob = blob;
+            
+            // Fix Broken Image: Revoke old URL before creating new one
+            if (currentOptimizedUrl) {
+                URL.revokeObjectURL(currentOptimizedUrl);
+            }
+            
+            currentOptimizedUrl = URL.createObjectURL(blob);
+            optimizedImg.src = currentOptimizedUrl;
+            
+            const originalSizeKB = (originalFileSize / 1024).toFixed(1);
+            const newSizeKB = (blob.size / 1024).toFixed(1);
+            const savedPercent = ((originalFileSize - blob.size) / originalFileSize * 100).toFixed(1);
+            optimizedMeta.innerHTML = `${newSizeKB} KB • ${targetWidthPx}×${targetHeightPx}`;
+            statsPanel.classList.remove('hidden');
+            statsText.innerHTML = `💾 ${originalSizeKB} KB → ${newSizeKB} KB (${savedPercent}% smaller)`;
+        }
+
+        // Load image
+        function loadImage(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file.');
+                return;
+            }
+            if (file.size > 20 * 1024 * 1024) {
+                alert('File too large. Maximum size is 20MB.');
+                return;
+            }
+            
+            originalFile = file;
+            originalFileSize = file.size;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    originalWidth = img.width;
+                    originalHeight = img.height;
+                    originalImg.src = e.target.result;
+                    originalMeta.innerHTML = `${(file.size / 1024).toFixed(1)} KB • ${img.width}×${img.height}`;
+                    previewCard.classList.remove('hidden');
+                    uploadStatus.innerHTML = '✓ Image loaded <i class="fas fa-check-circle text-green-500"></i>';
+                    
+                    widthInput.value = Math.round(fromPixels(originalWidth, currentUnit) * 100) / 100;
+                    heightInput.value = Math.round(fromPixels(originalHeight, currentUnit) * 100) / 100;
+                    
+                    processResizeAndReduce();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Download
+        function downloadImage() {
+            if (!currentOptimizedBlob) {
+                alert('Please process an image first.');
+                return;
+            }
+            const extension = currentFormat === 'jpeg' ? 'jpg' : currentFormat;
+            const link = document.createElement('a');
+            link.href = currentOptimizedUrl || URL.createObjectURL(currentOptimizedBlob);
+            link.download = `optimized_${Date.now()}.${extension}`;
+            link.click();
+        }
+
+        // Clear
+        function clearAll() {
+            originalImage = null;
+            originalFile = null;
+            currentOptimizedBlob = null;
+            
+            if (currentOptimizedUrl) {
+                URL.revokeObjectURL(currentOptimizedUrl);
+                currentOptimizedUrl = null;
+            }
+            
+            previewCard.classList.add('hidden');
+            statsPanel.classList.add('hidden');
+            fileInput.value = '';
+            uploadStatus.innerHTML = 'Upload your image';
+            originalImg.src = '';
+            optimizedImg.src = '';
+        }
+
+        // Sample images
+        async function loadSampleImage(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
+                loadImage(file);
+            } catch (err) {
+                alert('Could not load sample image.');
+            }
+        }
+
+        // Event listeners
+        applyBtn.addEventListener('click', () => {
+            if (originalImage) processResizeAndReduce();
+            else alert('Please select an image first.');
+        });
+        
+        downloadBtn.addEventListener('click', downloadImage);
+        clearBtn.addEventListener('click', clearAll);
+        
+        document.getElementById('sampleNature').addEventListener('click', () => loadSampleImage('https://picsum.photos/id/104/1200/800', 'nature.jpg'));
+        document.getElementById('sampleCity').addEventListener('click', () => loadSampleImage('https://picsum.photos/id/96/1200/800', 'city.jpg'));
+        document.getElementById('sampleFood').addEventListener('click', () => loadSampleImage('https://picsum.photos/id/30/1200/800', 'food.jpg'));
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) loadImage(e.target.files[0]);
+            fileInput.value = '';
+        });
+        
+        selectImageBtn.addEventListener('click', () => fileInput.click());
+        
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('dragover'); });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) loadImage(e.dataTransfer.files[0]);
+        });
+        dropzone.addEventListener('click', (e) => {
+            if (e.target !== selectImageBtn && !selectImageBtn.contains(e.target)) fileInput.click();
+        });
+        
+        // Initialize
+        setUnit('px');
+        
+        // Apply platform from URL
+        if (urlPlatform && platformPresets[urlPlatform]) {
+            applyPlatformPreset(urlPlatform);
+        }
+    </script>
+</body>
+</html>

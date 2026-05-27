@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Twitter Card Generator | SEO Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .copy-btn.copied {
+        background-color: #16a34a;
+        border-color: #16a34a;
+      }
+    </style>
+  </head>
+  <body class="bg-white text-black min-h-screen">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+      <header class="mb-10 text-center">
+        <h1 class="text-4xl font-bold text-black mb-2">
+          Twitter Card Generator
+        </h1>
+        <p class="text-gray-700 max-w-2xl mx-auto">
+          Create optimized Twitter Cards to improve your content's appearance
+          when shared
+        </p>
+      </header>
+
+      <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Input Form -->
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+          <h2 class="text-xl font-semibold mb-6 text-black">Card Details</h2>
+
+          <div class="space-y-5">
+            <div>
+              <label
+                for="cardType"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Card Type</label
+              >
+              <select
+                id="cardType"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="summary">Summary</option>
+                <option value="summary_large_image">
+                  Summary with Large Image
+                </option>
+                <option value="player">Player Card</option>
+                <option value="app">App Card</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                for="siteUsername"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Twitter @username</label
+              >
+              <input
+                type="text"
+                id="siteUsername"
+                placeholder="@yourusername"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label
+                for="pageUrl"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Page URL</label
+              >
+              <input
+                type="url"
+                id="pageUrl"
+                placeholder="https://example.com/page"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label
+                for="title"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Title (max 70 chars)</label
+              >
+              <input
+                type="text"
+                id="title"
+                placeholder="Your amazing content title"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <div class="text-xs text-gray-500 mt-1 text-right">
+                <span id="titleCount">0</span>/70
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="description"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Description (max 200 chars)</label
+              >
+              <textarea
+                id="description"
+                rows="3"
+                placeholder="A compelling description of your content"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></textarea>
+              <div class="text-xs text-gray-500 mt-1 text-right">
+                <span id="descCount">0</span>/200
+              </div>
+            </div>
+
+            <div id="imageField">
+              <label
+                for="imageUrl"
+                class="block text-sm font-medium text-blue-800 mb-2"
+                >Image URL</label
+              >
+              <input
+                type="url"
+                id="imageUrl"
+                placeholder="https://example.com/image.jpg"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <div class="text-xs text-gray-500 mt-1">
+                Recommended size: 1200×628px (1.91:1 ratio)
+              </div>
+            </div>
+
+            <div id="playerFields" class="hidden space-y-4">
+              <div>
+                <label
+                  for="playerUrl"
+                  class="block text-sm font-medium text-blue-800 mb-2"
+                  >Player URL</label
+                >
+                <input
+                  type="url"
+                  id="playerUrl"
+                  placeholder="https://example.com/player"
+                  class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="playerWidth"
+                  class="block text-sm font-medium text-blue-800 mb-2"
+                  >Player Width (px)</label
+                >
+                <input
+                  type="number"
+                  id="playerWidth"
+                  placeholder="640"
+                  class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="playerHeight"
+                  class="block text-sm font-medium text-blue-800 mb-2"
+                  >Player Height (px)</label
+                >
+                <input
+                  type="number"
+                  id="playerHeight"
+                  placeholder="360"
+                  class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div id="appFields" class="hidden space-y-4">
+              <div>
+                <label
+                  for="appName"
+                  class="block text-sm font-medium text-blue-800 mb-2"
+                  >App Name</label
+                >
+                <input
+                  type="text"
+                  id="appName"
+                  placeholder="My Awesome App"
+                  class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="appId"
+                  class="block text-sm font-medium text-blue-800 mb-2"
+                  >App ID (iOS/Android)</label
+                >
+                <input
+                  type="text"
+                  id="appId"
+                  placeholder="id123456789"
+                  class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="appUrl"
+                  class="block text-sm font-medium text-blue-800 mb-2"
+                  >App URL</label
+                >
+                <input
+                  type="url"
+                  id="appUrl"
+                  placeholder="https://example.com/app"
+                  class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <button
+              id="generateBtn"
+              class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium text-white transition-colors flex items-center justify-center gap-2"
+            >
+              <i class="fas fa-code"></i> Generate Twitter Card Meta Tags
+            </button>
+          </div>
+        </div>
+
+        <!-- Output Preview -->
+        <div class="space-y-6">
+          <!-- Card Preview -->
+          <div class="bg-white rounded-xl p-6 shadow-lg">
+            <h2 class="text-xl font-semibold mb-4 text-black">
+              Twitter Card Preview
+            </h2>
+            <div
+              id="cardPreview"
+              class="bg-white rounded-lg overflow-hidden shadow-md max-w-md mx-auto"
+            >
+              <div
+                id="previewImage"
+                class="bg-gray-200 h-48 flex items-center justify-center text-gray-500"
+              >
+                <i class="fas fa-image text-4xl"></i>
+              </div>
+              <div class="p-4 text-gray-800">
+                <div id="previewSite" class="text-sm text-gray-500 mb-1">
+                  @username
+                </div>
+                <h3 id="previewTitle" class="font-bold mb-2">
+                  Your content title will appear here
+                </h3>
+                <p id="previewDesc" class="text-sm text-gray-600">
+                  Description of your content will show in this section when you
+                  generate the card.
+                </p>
+                <div class="text-xs text-gray-400 mt-3">example.com</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Meta Tags Output -->
+          <div class="bg-white rounded-xl p-6 shadow-lg">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-semibold text-black">Meta Tags</h2>
+              <button
+                id="copyBtn"
+                class="copy-btn px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm flex items-center gap-2"
+              >
+                <i class="fas fa-copy"></i> Copy
+              </button>
+            </div>
+            <div
+              id="metaTagsOutput"
+              class="bg-gray-50 rounded-lg p-4 font-mono text-sm text-gray-800 overflow-x-auto"
+            >
+              <p class="text-gray-500">
+                Fill the form and generate your Twitter Card meta tags
+              </p>
+            </div>
+            <div class="mt-4 text-sm text-gray-500">
+              <p>
+                Add these meta tags to your HTML
+                <code class="bg-gray-100 px-2 py-1 rounded">head</code>
+                section.
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="mt-16 text-center text-gray-500 text-sm">
+        <p>Twitter Card Generator © 2023 | SEO Tool</p>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // DOM Elements
+        const cardType = document.getElementById("cardType");
+        const siteUsername = document.getElementById("siteUsername");
+        const pageUrl = document.getElementById("pageUrl");
+        const title = document.getElementById("title");
+        const description = document.getElementById("description");
+        const imageUrl = document.getElementById("imageUrl");
+        const playerFields = document.getElementById("playerFields");
+        const playerUrl = document.getElementById("playerUrl");
+        const playerWidth = document.getElementById("playerWidth");
+        const playerHeight = document.getElementById("playerHeight");
+        const appFields = document.getElementById("appFields");
+        const appName = document.getElementById("appName");
+        const appId = document.getElementById("appId");
+        const appUrl = document.getElementById("appUrl");
+        const generateBtn = document.getElementById("generateBtn");
+        const copyBtn = document.getElementById("copyBtn");
+        const metaTagsOutput = document.getElementById("metaTagsOutput");
+        const cardPreview = document.getElementById("cardPreview");
+        const previewImage = document.getElementById("previewImage");
+        const previewSite = document.getElementById("previewSite");
+        const previewTitle = document.getElementById("previewTitle");
+        const previewDesc = document.getElementById("previewDesc");
+        const titleCount = document.getElementById("titleCount");
+        const descCount = document.getElementById("descCount");
+
+        // Character counters
+        title.addEventListener("input", function () {
+          const count = this.value.length;
+          titleCount.textContent = count;
+          titleCount.className = count > 70 ? "text-red-600" : "text-gray-500";
+        });
+
+        description.addEventListener("input", function () {
+          const count = this.value.length;
+          descCount.textContent = count;
+          descCount.className = count > 200 ? "text-red-600" : "text-gray-500";
+        });
+
+        // Show/hide fields based on card type
+        cardType.addEventListener("change", function () {
+          const type = this.value;
+
+          // Reset hidden fields
+          playerFields.classList.add("hidden");
+          appFields.classList.add("hidden");
+
+          // Show relevant fields
+          if (type === "player") {
+            playerFields.classList.remove("hidden");
+          } else if (type === "app") {
+            appFields.classList.remove("hidden");
+          }
+
+          // Always show image field except for basic summary
+          if (type === "summary") {
+            imageUrl.required = false;
+          } else {
+            imageUrl.required = true;
+          }
+        });
+
+        // Update preview when inputs change
+        [siteUsername, title, description, imageUrl].forEach((el) => {
+          el.addEventListener("input", updatePreview);
+        });
+
+        function updatePreview() {
+          // Update site username
+          if (siteUsername.value) {
+            previewSite.textContent = siteUsername.value.startsWith("@")
+              ? siteUsername.value
+              : `@${siteUsername.value}`;
+          } else {
+            previewSite.textContent = "@username";
+          }
+
+          // Update title
+          previewTitle.textContent =
+            title.value || "Your content title will appear here";
+
+          // Update description
+          previewDesc.textContent =
+            description.value ||
+            "Description of your content will show in this section when you generate the card.";
+
+          // Update image
+          if (imageUrl.value) {
+            previewImage.innerHTML = `<img src="${imageUrl.value}" alt="Preview" class="w-full h-full object-cover">`;
+          } else {
+            previewImage.innerHTML = '<i class="fas fa-image text-4xl"></i>';
+          }
+        }
+
+        // Generate meta tags
+        generateBtn.addEventListener("click", function () {
+          const type = cardType.value;
+          let metaTags = "";
+
+          // Validate required fields
+          if (!siteUsername.value) {
+            alert("Please enter your Twitter @username");
+            return;
+          }
+
+          if (!pageUrl.value) {
+            alert("Please enter the page URL");
+            return;
+          }
+
+          if (type !== "summary" && !imageUrl.value) {
+            alert("Please enter an image URL (required for this card type)");
+            return;
+          }
+
+          if (
+            type === "player" &&
+            (!playerUrl.value || !playerWidth.value || !playerHeight.value)
+          ) {
+            alert("Please fill all player card fields");
+            return;
+          }
+
+          if (
+            type === "app" &&
+            (!appName.value || !appId.value || !appUrl.value)
+          ) {
+            alert("Please fill all app card fields");
+            return;
+          }
+
+          // Base tags
+          metaTags += `<!-- Twitter Card -->\n`;
+          metaTags += `<meta name="twitter:card" content="${type}">\n`;
+          metaTags += `<meta name="twitter:site" content="${
+            siteUsername.value.startsWith("@")
+              ? siteUsername.value
+              : "@" + siteUsername.value
+          }">\n`;
+          metaTags += `<meta name="twitter:url" content="${pageUrl.value}">\n`;
+
+          if (title.value) {
+            metaTags += `<meta name="twitter:title" content="${title.value.substring(
+              0,
+              70
+            )}">\n`;
+          }
+
+          if (description.value) {
+            metaTags += `<meta name="twitter:description" content="${description.value.substring(
+              0,
+              200
+            )}">\n`;
+          }
+
+          // Type-specific tags
+          if (type !== "summary" && imageUrl.value) {
+            metaTags += `<meta name="twitter:image" content="${imageUrl.value}">\n`;
+
+            if (type === "summary_large_image") {
+              metaTags += `<meta name="twitter:image:alt" content="${
+                title.value || "Content image"
+              }">\n`;
+            }
+          }
+
+          if (type === "player") {
+            metaTags += `<meta name="twitter:player" content="${playerUrl.value}">\n`;
+            metaTags += `<meta name="twitter:player:width" content="${playerWidth.value}">\n`;
+            metaTags += `<meta name="twitter:player:height" content="${playerHeight.value}">\n`;
+
+            if (imageUrl.value) {
+              metaTags += `<meta name="twitter:player:stream" content="${imageUrl.value}">\n`;
+            }
+          }
+
+          if (type === "app") {
+            metaTags += `<meta name="twitter:app:name:iphone" content="${appName.value}">\n`;
+            metaTags += `<meta name="twitter:app:id:iphone" content="${appId.value}">\n`;
+            metaTags += `<meta name="twitter:app:url:iphone" content="${appUrl.value}">\n`;
+            metaTags += `<meta name="twitter:app:name:ipad" content="${appName.value}">\n`;
+            metaTags += `<meta name="twitter:app:id:ipad" content="${appId.value}">\n`;
+            metaTags += `<meta name="twitter:app:url:ipad" content="${appUrl.value}">\n`;
+            metaTags += `<meta name="twitter:app:name:googleplay" content="${appName.value}">\n`;
+            metaTags += `<meta name="twitter:app:id:googleplay" content="${appId.value}">\n`;
+            metaTags += `<meta name="twitter:app:url:googleplay" content="${appUrl.value}">\n`;
+          }
+
+          metaTags += `<!-- End Twitter Card -->`;
+
+          // Display the meta tags
+          metaTagsOutput.innerHTML = metaTags
+            .split("\n")
+            .map((line) => `<div class="whitespace-pre">${line}</div>`)
+            .join("");
+
+          // Update preview
+          updatePreview();
+        });
+
+        // Copy to clipboard
+        copyBtn.addEventListener("click", function () {
+          if (metaTagsOutput.textContent.includes("<!-- Twitter Card -->")) {
+            navigator.clipboard
+              .writeText(metaTagsOutput.textContent)
+              .then(() => {
+                const original = this.innerHTML;
+                this.classList.add("copied");
+                this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                  this.classList.remove("copied");
+                  this.innerHTML = original;
+                }, 2000);
+              })
+              .catch((err) => {
+                console.error("Failed to copy: ", err);
+                alert("Failed to copy meta tags");
+              });
+          } else {
+            alert("Generate meta tags first");
+          }
+        });
+
+        // Initialize preview
+        updatePreview();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speech to PDF Converter</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background: #fff;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1.5rem;
+      }
+      .drop-zone {
+        border: 3px dashed #93c5fd;
+        border-radius: 16px;
+        padding: 2.5rem;
+        text-align: center;
+        background: #eef2ff;
+        transition: all 0.3s ease;
+      }
+      .drop-zone.dragover {
+        border-color: #2563eb;
+        background: #dbeafe;
+        transform: scale(1.02);
+      }
+      .text-output {
+        background: #eef2ff;
+        border-radius: 16px;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        min-height: 250px;
+        width: 100%;
+        border: 3px dashed #93c5fd;
+      }
+      .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        justify-content: center;
+      }
+      .loading-spinner {
+        display: inline-block;
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 0.5rem;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .status-message {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        display: none;
+      }
+      .status-success {
+        background-color: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+      }
+      .status-error {
+        background-color: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+      }
+      .status-info {
+        background-color: #eff6ff;
+        color: #1e40af;
+        border: 1px solid #bfdbfe;
+      }
+      @media (max-width: 640px) {
+        .container {
+          padding: 1rem;
+        }
+        .action-buttons {
+          flex-direction: column;
+        }
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1
+        class="text-5xl font-extrabold text-center text-black mt-5 mb-4 sm:text-3xl"
+      >
+        Speech to PDF Converter
+      </h1>
+      <p class="text-xl text-center text-gray-500 mb-10 sm:text-xl">
+        The Speech to PDF Converter allows users to speak and convert their
+        voice into written text,<br />
+        which is then automatically saved as a PDF document.
+      </p>
+      <!-- Text Output Area -->
+      <div
+        class="text-output"
+        id="textOutput"
+        contenteditable="true"
+        placeholder="Your transcribed text will appear here..."
+        style="
+          width: 100%;
+          max-width: 800px;
+          margin-left: auto;
+          margin-right: auto;
+        "
+      ></div>
+
+      <!-- Status Message -->
+      <div id="statusMessage" class="status-message"></div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button
+          id="startBtn"
+          class="px-6 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition text-base sm:text-sm shadow-md flex items-center justify-center gap-2"
+        >
+          <i class="fas fa-microphone"></i>
+          <span id="startBtnText">Start Speech Recognition</span>
+        </button>
+        <button
+          id="downloadBtn"
+          class="px-6 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition text-base sm:text-sm shadow-md flex items-center justify-center gap-2"
+          disabled
+        >
+          <i class="fas fa-file-pdf"></i>
+          <span>Download PDF</span>
+        </button>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // DOM elements
+        const textOutput = document.getElementById("textOutput");
+        const startBtn = document.getElementById("startBtn");
+        const startBtnText = document.getElementById("startBtnText");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const statusMessage = document.getElementById("statusMessage");
+
+        // State variables
+        let recognition;
+        let isListening = false;
+
+        // Check for speech recognition support
+        if (!("webkitSpeechRecognition" in window)) {
+          startBtn.disabled = true;
+          showStatus(
+            "Speech recognition not supported in this browser. Please use Google Chrome.",
+            "error"
+          );
+        }
+
+        // Start/Stop speech recognition
+        startBtn.addEventListener("click", toggleSpeechRecognition);
+
+        // Download PDF
+        downloadBtn.addEventListener("click", generatePDF);
+
+        function toggleSpeechRecognition() {
+          if (isListening) {
+            stopRecognition();
+          } else {
+            startRecognition();
+          }
+        }
+
+        function startRecognition() {
+          recognition = new webkitSpeechRecognition();
+          recognition.continuous = true;
+          recognition.interimResults = false;
+          recognition.lang = "en-US";
+
+          recognition.onstart = function () {
+            isListening = true;
+            startBtnText.textContent = "Listening...";
+            startBtn.classList.remove("bg-indigo-600");
+            startBtn.classList.add("bg-red-600", "hover:bg-red-700");
+            showStatus("Speech recognition started. Speak now...", "info");
+          };
+
+          recognition.onresult = function (event) {
+            let finalTranscript = "";
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              if (event.results[i].isFinal) {
+                finalTranscript += event.results[i][0].transcript;
+              }
+            }
+
+            // Add space if there's existing text
+            if (textOutput.textContent.trim() !== "") {
+              finalTranscript = " " + finalTranscript;
+            }
+
+            textOutput.textContent += finalTranscript;
+            downloadBtn.disabled = false;
+          };
+
+          recognition.onerror = function (event) {
+            console.error("Speech recognition error", event.error);
+            showStatus(`Error: ${event.error}`, "error");
+            stopRecognition();
+          };
+
+          recognition.onend = function () {
+            if (isListening) {
+              // If still supposed to be listening, restart
+              recognition.start();
+            }
+          };
+
+          recognition.start();
+        }
+
+        function stopRecognition() {
+          if (recognition) {
+            recognition.stop();
+          }
+          isListening = false;
+          startBtnText.textContent = "Start Speech Recognition";
+          startBtn.classList.remove("bg-red-600", "hover:bg-red-700");
+          startBtn.classList.add("bg-indigo-600");
+          showStatus("Speech recognition stopped", "info");
+        }
+
+        function generatePDF() {
+          const text = textOutput.textContent.trim();
+          if (!text) {
+            showStatus("No text to convert to PDF", "error");
+            return;
+          }
+
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+
+          // Split text into lines that fit the PDF page
+          const lines = doc.splitTextToSize(text, 180);
+
+          // Add text to PDF (with margins)
+          doc.text(lines, 15, 15);
+
+          // Save the PDF
+          doc.save("speech-to-text.pdf");
+          showStatus("PDF downloaded successfully!", "success");
+        }
+
+        function showStatus(message, type) {
+          statusMessage.style.display = "block";
+          statusMessage.textContent = message;
+          statusMessage.className = "status-message";
+
+          if (type === "success") {
+            statusMessage.classList.add("status-success");
+          } else if (type === "error") {
+            statusMessage.classList.add("status-error");
+          } else {
+            statusMessage.classList.add("status-info");
+          }
+
+          // Auto-hide after 5 seconds
+          setTimeout(() => {
+            statusMessage.style.display = "none";
+          }, 5000);
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advanced Schema.org Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3b82f6",
+              secondary: "#1e40af",
+              accent: "#10b981",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .schema-type-btn.active {
+        background-color: #3b82f6;
+        color: white;
+      }
+      .schema-tab {
+        display: none;
+      }
+      .schema-tab.active {
+        display: block;
+      }
+      .json-output {
+        font-family: "Courier New", monospace;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+      .code-block {
+        background-color: #1e293b;
+        color: #e2e8f0;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        font-family: "Courier New", monospace;
+      }
+      .form-section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .form-section:last-child {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">
+          Advanced Schema.org Generator
+        </h1>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Generate structured data markup for your website using Schema.org
+          vocabulary. Improve SEO and enhance search engine results.
+        </p>
+      </header>
+
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        <div class="p-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">
+            Select Schema Type
+          </h2>
+          <div class="flex flex-wrap gap-2">
+            <button
+              class="schema-type-btn px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 active"
+              data-type="organization"
+            >
+              Organization
+            </button>
+            <button
+              class="schema-type-btn px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
+              data-type="local-business"
+            >
+              Local Business
+            </button>
+            <button
+              class="schema-type-btn px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
+              data-type="product"
+            >
+              Product
+            </button>
+            <button
+              class="schema-type-btn px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
+              data-type="software-application"
+            >
+              Software Application
+            </button>
+            <button
+              class="schema-type-btn px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
+              data-type="article"
+            >
+              Article
+            </button>
+            <button
+              class="schema-type-btn px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
+              data-type="event"
+            >
+              Event
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <!-- Organization Schema -->
+          <div id="organization-tab" class="schema-tab active">
+            <h3 class="text-lg font-medium text-gray-800 mb-4">
+              Organization Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Organization Name</label
+                >
+                <input
+                  type="text"
+                  id="org-name"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., Example Corp"
+                  value="Example Corp"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Website URL</label
+                >
+                <input
+                  type="url"
+                  id="org-url"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="https://example.com"
+                  value="https://example.com"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Logo URL</label
+                >
+                <input
+                  type="url"
+                  id="org-logo"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="https://example.com/logo.png"
+                  value="https://example.com/logo.png"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Description</label
+                >
+                <textarea
+                  id="org-description"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  rows="3"
+                  placeholder="Brief description of your organization"
+                >
+A leading provider of innovative solutions</textarea
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Local Business Schema -->
+          <div id="local-business-tab" class="schema-tab">
+            <h3 class="text-lg font-medium text-gray-800 mb-4">
+              Local Business Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Business Name</label
+                >
+                <input
+                  type="text"
+                  id="business-name"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., Joe's Pizza"
+                  value="Joe's Pizza"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Business Type</label
+                >
+                <select
+                  id="business-type"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  <option value="LocalBusiness">Local Business</option>
+                  <option value="Restaurant">Restaurant</option>
+                  <option value="Store">Store</option>
+                  <option value="AutomotiveBusiness">
+                    Automotive Business
+                  </option>
+                  <option value="HealthAndBeautyBusiness">
+                    Health & Beauty
+                  </option>
+                  <option value="HomeAndConstructionBusiness">
+                    Home & Construction
+                  </option>
+                </select>
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Description</label
+                >
+                <textarea
+                  id="business-description"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  rows="3"
+                  placeholder="Description of your business"
+                >
+A family-owned pizza restaurant serving authentic Italian cuisine since 1985.</textarea
+                >
+              </div>
+              <div class="md:col-span-2">
+                <h4 class="text-md font-medium text-gray-800 mb-2">Address</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Street Address</label
+                    >
+                    <input
+                      type="text"
+                      id="business-street"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="123 Main St"
+                      value="123 Main St"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >City</label
+                    >
+                    <input
+                      type="text"
+                      id="business-city"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="New York"
+                      value="New York"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >State/Region</label
+                    >
+                    <input
+                      type="text"
+                      id="business-state"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="NY"
+                      value="NY"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >ZIP/Postal Code</label
+                    >
+                    <input
+                      type="text"
+                      id="business-zip"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="10001"
+                      value="10001"
+                    />
+                  </div>
+                  <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Country</label
+                    >
+                    <input
+                      type="text"
+                      id="business-country"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="USA"
+                      value="USA"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Phone Number</label
+                >
+                <input
+                  type="tel"
+                  id="business-phone"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="(555) 123-4567"
+                  value="(555) 123-4567"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Price Range</label
+                >
+                <input
+                  type="text"
+                  id="business-price-range"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., $$"
+                  value="$$"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Website URL</label
+                >
+                <input
+                  type="url"
+                  id="business-url"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="https://example.com"
+                  value="https://joespizza.com"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Opening Hours</label
+                >
+                <input
+                  type="text"
+                  id="business-hours"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="Mo-Fr 09:00-17:00"
+                  value="Mo-Sa 11:00-22:00, Su 12:00-20:00"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Schema -->
+          <div id="product-tab" class="schema-tab">
+            <h3 class="text-lg font-medium text-gray-800 mb-4">
+              Product Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Product Name</label
+                >
+                <input
+                  type="text"
+                  id="product-name"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., Wireless Headphones"
+                  value="Wireless Headphones"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Brand</label
+                >
+                <input
+                  type="text"
+                  id="product-brand"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., AudioTech"
+                  value="AudioTech"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >SKU</label
+                >
+                <input
+                  type="text"
+                  id="product-sku"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., WH-2023"
+                  value="WH-2023"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >GTIN</label
+                >
+                <input
+                  type="text"
+                  id="product-gtin"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., 123456789012"
+                  value="123456789012"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Price</label
+                >
+                <input
+                  type="number"
+                  step="0.01"
+                  id="product-price"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="99.99"
+                  value="129.99"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Currency</label
+                >
+                <select
+                  id="product-currency"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="GBP">GBP</option>
+                  <option value="JPY">JPY</option>
+                  <option value="CAD">CAD</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Availability</label
+                >
+                <select
+                  id="product-availability"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  <option value="InStock">In Stock</option>
+                  <option value="OutOfStock">Out of Stock</option>
+                  <option value="PreOrder">Pre-Order</option>
+                  <option value="Discontinued">Discontinued</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Condition</label
+                >
+                <select
+                  id="product-condition"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  <option value="New">New</option>
+                  <option value="Used">Used</option>
+                  <option value="Refurbished">Refurbished</option>
+                </select>
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Description</label
+                >
+                <textarea
+                  id="product-description"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  rows="3"
+                  placeholder="Product description"
+                >
+High-quality wireless headphones with noise cancellation and 30-hour battery life.</textarea
+                >
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Image URL</label
+                >
+                <input
+                  type="url"
+                  id="product-image"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="https://example.com/image.jpg"
+                  value="https://example.com/headphones.jpg"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Product URL</label
+                >
+                <input
+                  type="url"
+                  id="product-url"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="https://example.com/product"
+                  value="https://example.com/wireless-headphones"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Software Application Schema -->
+          <div id="software-application-tab" class="schema-tab">
+            <h3 class="text-lg font-medium text-gray-800 mb-4">
+              Software Application Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Application Name</label
+                >
+                <input
+                  type="text"
+                  id="app-name"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., Easy Smart Calculator"
+                  value="Easy Smart Calculator"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Application URL</label
+                >
+                <input
+                  type="url"
+                  id="app-url"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="https://example.com/app"
+                  value="https://easysmartcalculator.com/"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Application Category</label
+                >
+                <input
+                  type="text"
+                  id="app-category"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., CalculatorApplication"
+                  value="CalculatorApplication"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Operating System</label
+                >
+                <input
+                  type="text"
+                  id="app-os"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., Web, Android, iOS"
+                  value="Web"
+                />
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Description</label
+                >
+                <textarea
+                  id="app-description"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  rows="3"
+                  placeholder="Description of your application"
+                >
+Easy Smart Calculator offers free online calculators for math, finance, health, and everyday problems.</textarea
+                >
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Author Name</label
+                >
+                <input
+                  type="text"
+                  id="app-author"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., Easy Smart Calculator"
+                  value="Easy Smart Calculator"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Publisher Name</label
+                >
+                <input
+                  type="text"
+                  id="app-publisher"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., Easy Smart Calculator"
+                  value="Easy Smart Calculator"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Article Schema -->
+          <div id="article-tab" class="schema-tab">
+            <h3 class="text-lg font-medium text-gray-800 mb-4">
+              Article Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Article Title</label
+                >
+                <input
+                  type="text"
+                  id="article-title"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., How to Improve Your SEO"
+                  value="How to Improve Your SEO"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Article URL</label
+                >
+                <input
+                  type="url"
+                  id="article-url"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="https://example.com/article"
+                  value="https://example.com/improve-seo"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Article Type</label
+                >
+                <select
+                  id="article-type"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  <option value="Article">Article</option>
+                  <option value="BlogPosting">Blog Post</option>
+                  <option value="NewsArticle">News Article</option>
+                  <option value="ScholarlyArticle">Scholarly Article</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Headline</label
+                >
+                <input
+                  type="text"
+                  id="article-headline"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., 10 SEO Tips for 2023"
+                  value="10 SEO Tips for 2023"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Author Name</label
+                >
+                <input
+                  type="text"
+                  id="article-author"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., John Doe"
+                  value="John Doe"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Publisher Name</label
+                >
+                <input
+                  type="text"
+                  id="article-publisher"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., SEO Blog"
+                  value="SEO Blog"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Date Published</label
+                >
+                <input
+                  type="date"
+                  id="article-date-published"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  value="2023-10-15"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Date Modified</label
+                >
+                <input
+                  type="date"
+                  id="article-date-modified"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  value="2023-10-20"
+                />
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Description</label
+                >
+                <textarea
+                  id="article-description"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  rows="3"
+                  placeholder="Article description"
+                >
+Learn the top 10 SEO strategies to improve your website's search engine ranking in 2023.</textarea
+                >
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Article Body</label
+                >
+                <textarea
+                  id="article-body"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  rows="5"
+                  placeholder="Full article content"
+                >
+In this comprehensive guide, we'll explore the most effective SEO strategies for 2023. From technical SEO to content optimization, these tips will help you improve your website's visibility in search engine results.</textarea
+                >
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Image URL</label
+                >
+                <input
+                  type="url"
+                  id="article-image"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="https://example.com/image.jpg"
+                  value="https://example.com/seo-article.jpg"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Event Schema -->
+          <div id="event-tab" class="schema-tab">
+            <h3 class="text-lg font-medium text-gray-800 mb-4">
+              Event Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Event Name</label
+                >
+                <input
+                  type="text"
+                  id="event-name"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., Annual Tech Conference"
+                  value="Annual Tech Conference"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Event Type</label
+                >
+                <select
+                  id="event-type"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  <option value="Event">Event</option>
+                  <option value="BusinessEvent">Business Event</option>
+                  <option value="ChildrensEvent">Children's Event</option>
+                  <option value="ComedyEvent">Comedy Event</option>
+                  <option value="DanceEvent">Dance Event</option>
+                  <option value="EducationEvent">Education Event</option>
+                  <option value="Festival">Festival</option>
+                  <option value="MusicEvent">Music Event</option>
+                  <option value="SaleEvent">Sale Event</option>
+                  <option value="SocialEvent">Social Event</option>
+                  <option value="SportsEvent">Sports Event</option>
+                  <option value="TheaterEvent">Theater Event</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Start Date & Time</label
+                >
+                <input
+                  type="datetime-local"
+                  id="event-start"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  value="2023-11-15T09:00"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >End Date & Time</label
+                >
+                <input
+                  type="datetime-local"
+                  id="event-end"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  value="2023-11-15T17:00"
+                />
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Description</label
+                >
+                <textarea
+                  id="event-description"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  rows="3"
+                  placeholder="Event description"
+                >
+Join us for our annual tech conference featuring industry leaders, workshops, and networking opportunities.</textarea
+                >
+              </div>
+              <div class="md:col-span-2">
+                <h4 class="text-md font-medium text-gray-800 mb-2">Location</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Venue Name</label
+                    >
+                    <input
+                      type="text"
+                      id="event-venue"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="e.g., Convention Center"
+                      value="Convention Center"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Street Address</label
+                    >
+                    <input
+                      type="text"
+                      id="event-street"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="123 Main St"
+                      value="456 Tech Avenue"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >City</label
+                    >
+                    <input
+                      type="text"
+                      id="event-city"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="New York"
+                      value="San Francisco"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >State/Region</label
+                    >
+                    <input
+                      type="text"
+                      id="event-state"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="NY"
+                      value="CA"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >ZIP/Postal Code</label
+                    >
+                    <input
+                      type="text"
+                      id="event-zip"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="10001"
+                      value="94105"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Country</label
+                    >
+                    <input
+                      type="text"
+                      id="event-country"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="USA"
+                      value="USA"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Event URL</label
+                >
+                <input
+                  type="url"
+                  id="event-url"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="https://example.com/event"
+                  value="https://example.com/tech-conference"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Organizer Name</label
+                >
+                <input
+                  type="text"
+                  id="event-organizer"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., Tech Events Inc."
+                  value="Tech Events Inc."
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Ticket Price</label
+                >
+                <input
+                  type="number"
+                  step="0.01"
+                  id="event-price"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="99.99"
+                  value="149.99"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Currency</label
+                >
+                <select
+                  id="event-currency"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="GBP">GBP</option>
+                  <option value="JPY">JPY</option>
+                  <option value="CAD">CAD</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        <div class="p-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-800 mb-2">
+            Generated Schema Markup
+          </h2>
+          <p class="text-gray-600">
+            Copy and paste this JSON-LD code into the &lt;head&gt; section of
+            your webpage.
+          </p>
+        </div>
+        <div class="p-6">
+          <div class="bg-gray-800 text-gray-200 p-4 rounded-lg overflow-x-auto">
+            <pre id="json-output" class="json-output">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Example Corp",
+  "url": "https://example.com",
+  "logo": "https://example.com/logo.png",
+  "description": "A leading provider of innovative solutions"
+}</pre
+            >
+          </div>
+          <div class="mt-4 flex justify-end">
+            <button
+              id="copy-btn"
+              class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors flex items-center"
+            >
+              <i class="fas fa-copy mr-2"></i> Copy to Clipboard
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        <div class="p-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-800 mb-2">
+            Implementation Example
+          </h2>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-700 mb-4">
+            Here's how to implement the generated JSON-LD markup in your HTML:
+          </p>
+
+          <div class="code-block mb-4">
+            &lt;!DOCTYPE html&gt;<br />
+            &lt;html lang="en"&gt;<br />
+            &lt;head&gt;<br />
+            &nbsp;&nbsp;&lt;meta charset="UTF-8"&gt;<br />
+            &nbsp;&nbsp;&lt;meta name="viewport" content="width=device-width,
+            initial-scale=1.0"&gt;<br />
+            &nbsp;&nbsp;&lt;title&gt;Your Website Title&lt;/title&gt;<br />
+            &nbsp;&nbsp;<span class="text-accent"
+              >&lt;script type="application/ld+json"&gt;</span
+            ><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;<span
+              id="implementation-example"
+              class="text-yellow-200"
+              >{ "@context": "https://schema.org", "@type": "Organization",
+              "name": "Example Corp", "url": "https://example.com", "logo":
+              "https://example.com/logo.png", "description": "A leading provider
+              of innovative solutions" }</span
+            ><br />
+            &nbsp;&nbsp;<span class="text-accent">&lt;/script&gt;</span><br />
+            &lt;/head&gt;<br />
+            &lt;body&gt;<br />
+            &nbsp;&nbsp;&lt;!-- Your website content --&gt;<br />
+            &lt;/body&gt;<br />
+            &lt;/html&gt;
+          </div>
+
+          <p class="text-gray-700">
+            The highlighted section shows where to place your generated JSON-LD
+            code. Make sure it's within the <code>&lt;head&gt;</code> section of
+            your HTML document.
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-800 mb-2">
+            Implementation Guide
+          </h2>
+        </div>
+        <div class="p-6">
+          <div class="prose max-w-none">
+            <h3 class="text-lg font-medium text-gray-800 mb-2">
+              How to Use Schema Markup
+            </h3>
+            <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+              <li>Copy the generated JSON-LD code above</li>
+              <li>Paste it into the &lt;head&gt; section of your HTML page</li>
+              <li>
+                Validate your markup using Google's
+                <a
+                  href="https://search.google.com/structured-data/testing-tool"
+                  class="text-primary hover:underline"
+                  >Structured Data Testing Tool</a
+                >
+              </li>
+              <li>Submit your page to Google Search Console for indexing</li>
+            </ol>
+
+            <h3 class="text-lg font-medium text-gray-800 mt-4 mb-2">
+              Benefits of Schema Markup
+            </h3>
+            <ul class="list-disc pl-5 space-y-2 text-gray-700">
+              <li>Improves search engine understanding of your content</li>
+              <li>Enables rich snippets in search results</li>
+              <li>Increases click-through rates</li>
+              <li>Enhances local SEO for businesses</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Tab switching functionality
+      const schemaTypeButtons = document.querySelectorAll(".schema-type-btn");
+      const schemaTabs = document.querySelectorAll(".schema-tab");
+
+      schemaTypeButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          // Remove active class from all buttons and tabs
+          schemaTypeButtons.forEach((btn) => btn.classList.remove("active"));
+          schemaTabs.forEach((tab) => tab.classList.remove("active"));
+
+          // Add active class to clicked button
+          button.classList.add("active");
+
+          // Show corresponding tab
+          const schemaType = button.getAttribute("data-type");
+          document.getElementById(`${schemaType}-tab`).classList.add("active");
+
+          // Update the JSON output based on the selected schema type
+          updateJsonOutput();
+        });
+      });
+
+      // Form input listeners
+      const formInputs = document.querySelectorAll("input, textarea, select");
+      formInputs.forEach((input) => {
+        input.addEventListener("input", updateJsonOutput);
+        input.addEventListener("change", updateJsonOutput);
+      });
+
+      // Copy to clipboard functionality
+      document.getElementById("copy-btn").addEventListener("click", () => {
+        const jsonOutput = document.getElementById("json-output").textContent;
+        navigator.clipboard.writeText(jsonOutput).then(() => {
+          const copyBtn = document.getElementById("copy-btn");
+          const originalText = copyBtn.innerHTML;
+          copyBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Copied!';
+          setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+          }, 2000);
+        });
+      });
+
+      // Function to update JSON output based on form inputs
+      function updateJsonOutput() {
+        const activeTab = document.querySelector(".schema-tab.active");
+        const schemaType = activeTab.id.replace("-tab", "");
+
+        let schemaData = {
+          "@context": "https://schema.org",
+        };
+
+        switch (schemaType) {
+          case "organization":
+            schemaData["@type"] = "Organization";
+            schemaData.name =
+              document.getElementById("org-name").value || "Example Corp";
+            schemaData.url =
+              document.getElementById("org-url").value || "https://example.com";
+            schemaData.logo =
+              document.getElementById("org-logo").value ||
+              "https://example.com/logo.png";
+            schemaData.description =
+              document.getElementById("org-description").value ||
+              "A leading provider of innovative solutions";
+            break;
+
+          case "local-business":
+            schemaData["@type"] =
+              document.getElementById("business-type").value || "LocalBusiness";
+            schemaData.name =
+              document.getElementById("business-name").value || "Joe's Pizza";
+            schemaData.description =
+              document.getElementById("business-description").value ||
+              "A family-owned pizza restaurant";
+
+            // Address
+            const street = document.getElementById("business-street").value;
+            const city = document.getElementById("business-city").value;
+            const state = document.getElementById("business-state").value;
+            const zip = document.getElementById("business-zip").value;
+            const country = document.getElementById("business-country").value;
+
+            if (street || city || state || zip || country) {
+              schemaData.address = {
+                "@type": "PostalAddress",
+                streetAddress: street || "",
+                addressLocality: city || "",
+                addressRegion: state || "",
+                postalCode: zip || "",
+                addressCountry: country || "",
+              };
+            }
+
+            schemaData.telephone =
+              document.getElementById("business-phone").value || "";
+            schemaData.priceRange =
+              document.getElementById("business-price-range").value || "";
+            schemaData.url =
+              document.getElementById("business-url").value || "";
+
+            const hours = document.getElementById("business-hours").value;
+            if (hours) {
+              schemaData.openingHours = hours;
+            }
+            break;
+
+          case "product":
+            schemaData["@type"] = "Product";
+            schemaData.name =
+              document.getElementById("product-name").value ||
+              "Wireless Headphones";
+            schemaData.brand =
+              document.getElementById("product-brand").value || "AudioTech";
+            schemaData.sku = document.getElementById("product-sku").value || "";
+            schemaData.gtin =
+              document.getElementById("product-gtin").value || "";
+            schemaData.description =
+              document.getElementById("product-description").value ||
+              "High-quality wireless headphones";
+            schemaData.image =
+              document.getElementById("product-image").value || "";
+            schemaData.url = document.getElementById("product-url").value || "";
+
+            const price = document.getElementById("product-price").value;
+            const currency = document.getElementById("product-currency").value;
+            const availability = document.getElementById(
+              "product-availability"
+            ).value;
+            const condition =
+              document.getElementById("product-condition").value;
+
+            if (price || availability || condition) {
+              schemaData.offers = {
+                "@type": "Offer",
+                price: price || "0",
+                priceCurrency: currency || "USD",
+                availability: availability || "InStock",
+                itemCondition: condition || "New",
+              };
+            }
+            break;
+
+          case "software-application":
+            schemaData["@type"] = "SoftwareApplication";
+            schemaData.name =
+              document.getElementById("app-name").value ||
+              "Easy Smart Calculator";
+            schemaData.url =
+              document.getElementById("app-url").value ||
+              "https://easysmartcalculator.com/";
+            schemaData.description =
+              document.getElementById("app-description").value ||
+              "Easy Smart Calculator offers free online calculators";
+            schemaData.applicationCategory =
+              document.getElementById("app-category").value ||
+              "CalculatorApplication";
+            schemaData.operatingSystem =
+              document.getElementById("app-os").value || "Web";
+
+            const authorName = document.getElementById("app-author").value;
+            const publisherName =
+              document.getElementById("app-publisher").value;
+
+            if (authorName) {
+              schemaData.author = {
+                "@type": "Organization",
+                name: authorName,
+              };
+            }
+
+            if (publisherName) {
+              schemaData.publisher = {
+                "@type": "Organization",
+                name: publisherName,
+              };
+            }
+            break;
+
+          case "article":
+            schemaData["@type"] =
+              document.getElementById("article-type").value || "Article";
+            schemaData.headline =
+              document.getElementById("article-headline").value ||
+              "10 SEO Tips for 2023";
+            schemaData.description =
+              document.getElementById("article-description").value ||
+              "Learn the top 10 SEO strategies";
+            schemaData.articleBody =
+              document.getElementById("article-body").value ||
+              "In this comprehensive guide...";
+            schemaData.image =
+              document.getElementById("article-image").value || "";
+            schemaData.url = document.getElementById("article-url").value || "";
+
+            const author = document.getElementById("article-author").value;
+            const publisher =
+              document.getElementById("article-publisher").value;
+            const datePublished = document.getElementById(
+              "article-date-published"
+            ).value;
+            const dateModified = document.getElementById(
+              "article-date-modified"
+            ).value;
+
+            if (author) {
+              schemaData.author = {
+                "@type": "Person",
+                name: author,
+              };
+            }
+
+            if (publisher) {
+              schemaData.publisher = {
+                "@type": "Organization",
+                name: publisher,
+              };
+            }
+
+            if (datePublished) {
+              schemaData.datePublished = datePublished;
+            }
+
+            if (dateModified) {
+              schemaData.dateModified = dateModified;
+            }
+            break;
+
+          case "event":
+            schemaData["@type"] =
+              document.getElementById("event-type").value || "Event";
+            schemaData.name =
+              document.getElementById("event-name").value ||
+              "Annual Tech Conference";
+            schemaData.description =
+              document.getElementById("event-description").value ||
+              "Join us for our annual tech conference";
+            schemaData.url = document.getElementById("event-url").value || "";
+
+            const startDate = document.getElementById("event-start").value;
+            const endDate = document.getElementById("event-end").value;
+
+            if (startDate) {
+              schemaData.startDate = startDate.replace("T", " ");
+            }
+
+            if (endDate) {
+              schemaData.endDate = endDate.replace("T", " ");
+            }
+
+            // Location
+            const venue = document.getElementById("event-venue").value;
+            const eventStreet = document.getElementById("event-street").value;
+            const eventCity = document.getElementById("event-city").value;
+            const eventState = document.getElementById("event-state").value;
+            const eventZip = document.getElementById("event-zip").value;
+            const eventCountry = document.getElementById("event-country").value;
+
+            if (
+              venue ||
+              eventStreet ||
+              eventCity ||
+              eventState ||
+              eventZip ||
+              eventCountry
+            ) {
+              schemaData.location = {
+                "@type": "Place",
+                name: venue || "",
+                address: {
+                  "@type": "PostalAddress",
+                  streetAddress: eventStreet || "",
+                  addressLocality: eventCity || "",
+                  addressRegion: eventState || "",
+                  postalCode: eventZip || "",
+                  addressCountry: eventCountry || "",
+                },
+              };
+            }
+
+            const organizer = document.getElementById("event-organizer").value;
+            const eventPrice = document.getElementById("event-price").value;
+            const eventCurrency =
+              document.getElementById("event-currency").value;
+
+            if (organizer) {
+              schemaData.organizer = {
+                "@type": "Organization",
+                name: organizer,
+              };
+            }
+
+            if (eventPrice) {
+              schemaData.offers = {
+                "@type": "Offer",
+                price: eventPrice,
+                priceCurrency: eventCurrency || "USD",
+              };
+            }
+            break;
+
+          default:
+            schemaData["@type"] = "Organization";
+            schemaData.name = "Example Corp";
+            schemaData.url = "https://example.com";
+            break;
+        }
+
+        // Format and display the JSON
+        const jsonString = JSON.stringify(schemaData, null, 2);
+        document.getElementById("json-output").textContent = jsonString;
+        document.getElementById("implementation-example").textContent =
+          jsonString;
+      }
+
+      // Initialize with default values
+      updateJsonOutput();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SEO Citation Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body class="bg-white min-h-screen">
+    <style>
+      @media (max-width: 768px) {
+        .backnav {
+          zoom: 0.8;
+        }
+      }
+    </style>
+
+    <nav class="backnav">
+      <a href="/" class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <span class="logo-text">
+          VEX SEO
+      </a>
+      <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to All Tools
+      </a>
+    </nav>
+
+    <style>
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logo-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937; /* Dark gray for first part */
+      }
+
+      .logo-text-highlight {
+        color: #6366f1; /* Indigo for second part */
+      }
+
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background-color: #f3f4f6;
+        border-radius: 9999px;
+        color: #374151;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #2563eb;
+        color: white;
+        transform: translateX(-0.25rem);
+      }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-black mb-2">
+          SEO Citation Generator
+        </h1>
+        <p class="text-lg text-gray-700">
+          Generate proper citations for SEO references and resources
+        </p>
+      </header>
+
+      <main
+        class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6"
+      >
+        <div class="mb-8">
+          <h2 class="text-2xl font-semibold text-black mb-4">
+            Citation Details
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label
+                for="author"
+                class="block text-sm font-medium text-black mb-1"
+                >Author Name(s)</label
+              >
+              <input
+                type="text"
+                id="author"
+                placeholder="e.g., John Doe, Jane Smith"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label
+                for="year"
+                class="block text-sm font-medium text-black mb-1"
+                >Publication Year</label
+              >
+              <input
+                type="text"
+                id="year"
+                placeholder="e.g., 2023"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label
+                for="title"
+                class="block text-sm font-medium text-black mb-1"
+                >Title</label
+              >
+              <input
+                type="text"
+                id="title"
+                placeholder="e.g., The Complete Guide to SEO"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label
+                for="source"
+                class="block text-sm font-medium text-black mb-1"
+                >Source/Publisher</label
+              >
+              <input
+                type="text"
+                id="source"
+                placeholder="e.g., Moz, Search Engine Journal"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label for="url" class="block text-sm font-medium text-black mb-1"
+                >URL (if online)</label
+              >
+              <input
+                type="url"
+                id="url"
+                placeholder="https://example.com"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label
+                for="access-date"
+                class="block text-sm font-medium text-black mb-1"
+                >Access Date (for online)</label
+              >
+              <input
+                type="date"
+                id="access-date"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h2 class="text-2xl font-semibold text-black mb-4">Citation Style</h2>
+          <div class="flex flex-wrap gap-4">
+            <button
+              onclick="generateCitation('apa')"
+              class="citation-style-btn px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              data-style="apa"
+            >
+              APA
+            </button>
+            <button
+              onclick="generateCitation('mla')"
+              class="citation-style-btn px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              data-style="mla"
+            >
+              MLA
+            </button>
+            <button
+              onclick="generateCitation('chicago')"
+              class="citation-style-btn px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              data-style="chicago"
+            >
+              Chicago
+            </button>
+            <button
+              onclick="generateCitation('harvard')"
+              class="citation-style-btn px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              data-style="harvard"
+            >
+              Harvard
+            </button>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h2 class="text-2xl font-semibold text-black mb-4">
+            Generated Citation
+          </h2>
+          <div
+            id="citation-result"
+            class="bg-white p-4 rounded-md min-h-20 border border-gray-200"
+          >
+            <p class="text-gray-500 italic">
+              Your citation will appear here...
+            </p>
+          </div>
+          <div class="mt-4 flex gap-2">
+            <button
+              onclick="copyCitation()"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2"
+            >
+              <i class="fas fa-copy"></i> Copy
+            </button>
+            <button
+              onclick="clearForm()"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2"
+            >
+              <i class="fas fa-broom"></i> Clear
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-blue-50 p-4 rounded-md border border-blue-200">
+          <h3 class="text-lg font-medium text-blue-800 mb-2">
+            SEO Citation Tips
+          </h3>
+          <ul class="list-disc pl-5 text-blue-700 space-y-1">
+            <li>Always cite authoritative sources in your content</li>
+            <li>Use consistent citation style throughout your website</li>
+            <li>Include citations for statistics, studies, and claims</li>
+            <li>
+              Proper citations can improve E-A-T (Expertise, Authoritativeness,
+              Trustworthiness)
+            </li>
+          </ul>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      function generateCitation(style) {
+        const author = document.getElementById("author").value.trim();
+        const year = document.getElementById("year").value.trim();
+        const title = document.getElementById("title").value.trim();
+        const source = document.getElementById("source").value.trim();
+        const url = document.getElementById("url").value.trim();
+        const accessDate = document.getElementById("access-date").value;
+
+        // Validate at least some content exists
+        if (!author && !title && !source && !url) {
+          document.getElementById("citation-result").innerHTML =
+            '<p class="text-red-500">Please enter at least some citation information (author, title, source, or URL)</p>';
+          return;
+        }
+
+        let citation = "";
+
+        // Format date for display
+        let formattedDate = "";
+        if (accessDate) {
+          const dateObj = new Date(accessDate);
+          formattedDate = dateObj.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+        }
+
+        switch (style) {
+          case "apa":
+            citation = formatAPACitation(
+              author,
+              year,
+              title,
+              source,
+              url,
+              formattedDate
+            );
+            break;
+          case "mla":
+            citation = formatMLACitation(
+              author,
+              year,
+              title,
+              source,
+              url,
+              formattedDate
+            );
+            break;
+          case "chicago":
+            citation = formatChicagoCitation(
+              author,
+              year,
+              title,
+              source,
+              url,
+              formattedDate
+            );
+            break;
+          case "harvard":
+            citation = formatHarvardCitation(
+              author,
+              year,
+              title,
+              source,
+              url,
+              formattedDate
+            );
+            break;
+          default:
+            citation = "Please select a citation style.";
+        }
+
+        document.getElementById(
+          "citation-result"
+        ).innerHTML = `<p class="text-black">${citation}</p>`;
+      }
+
+      function formatAPACitation(author, year, title, source, url, accessDate) {
+        let citation = "";
+
+        if (author) {
+          citation += author;
+          if (year) citation += ` (${year})`;
+          citation += ". ";
+        } else if (year) {
+          citation += `(${year}). `;
+        }
+
+        if (title) {
+          citation += `<em>${title}</em>. `;
+        }
+
+        if (source) {
+          citation += source;
+          if (url) citation += `. ${url}`;
+        } else if (url) {
+          citation += url;
+        }
+
+        if (accessDate && url) {
+          citation += ` (Accessed ${accessDate})`;
+        }
+
+        return citation || "Insufficient information for APA citation.";
+      }
+
+      function formatMLACitation(author, year, title, source, url, accessDate) {
+        let citation = "";
+
+        if (author) {
+          citation += author + ". ";
+        }
+
+        if (title) {
+          citation += `"${title}." `;
+        }
+
+        if (source) {
+          citation += `<em>${source}</em>, `;
+        }
+
+        if (year) {
+          citation += year + ", ";
+        }
+
+        if (url) {
+          citation += url + ". ";
+        }
+
+        if (accessDate && url) {
+          citation += `Accessed ${accessDate}.`;
+        }
+
+        // Clean up trailing commas
+        citation = citation.replace(/, $/, "");
+
+        return citation || "Insufficient information for MLA citation.";
+      }
+
+      function formatChicagoCitation(
+        author,
+        year,
+        title,
+        source,
+        url,
+        accessDate
+      ) {
+        let citation = "";
+
+        if (author) {
+          citation += author + ". ";
+        }
+
+        if (title) {
+          citation += `"${title}." `;
+        }
+
+        if (source) {
+          citation += source + ". ";
+        }
+
+        if (year) {
+          citation += year + ". ";
+        }
+
+        if (url) {
+          citation += url + ". ";
+        }
+
+        if (accessDate && url) {
+          citation += `(Accessed ${accessDate}).`;
+        }
+
+        return citation || "Insufficient information for Chicago citation.";
+      }
+
+      function formatHarvardCitation(
+        author,
+        year,
+        title,
+        source,
+        url,
+        accessDate
+      ) {
+        let citation = "";
+
+        if (author) {
+          citation += author + " ";
+        }
+
+        if (year) {
+          citation += `(${year}) `;
+        }
+
+        if (title) {
+          citation += `<em>${title}</em>. `;
+        }
+
+        if (source) {
+          citation += source + ". ";
+        }
+
+        if (url) {
+          citation += "Available at: " + url + " ";
+        }
+
+        if (accessDate && url) {
+          citation += `[Accessed ${accessDate}].`;
+        }
+
+        return citation || "Insufficient information for Harvard citation.";
+      }
+
+      function copyCitation() {
+        const citationResult = document.getElementById("citation-result");
+        const citationText = citationResult.innerText;
+
+        if (
+          !citationText.includes("Your citation will appear here") &&
+          !citationText.includes("Please enter at least")
+        ) {
+          navigator.clipboard
+            .writeText(citationText)
+            .then(() => {
+              // Show temporary feedback
+              const originalHTML = citationResult.innerHTML;
+              citationResult.innerHTML =
+                '<p class="text-green-500">Citation copied to clipboard!</p>';
+              setTimeout(() => {
+                citationResult.innerHTML = originalHTML;
+              }, 2000);
+            })
+            .catch((err) => {
+              console.error("Failed to copy: ", err);
+              citationResult.innerHTML =
+                '<p class="text-red-500">Failed to copy citation</p>';
+            });
+        }
+      }
+
+      function clearForm() {
+        document.getElementById("author").value = "";
+        document.getElementById("year").value = "";
+        document.getElementById("title").value = "";
+        document.getElementById("source").value = "";
+        document.getElementById("url").value = "";
+        document.getElementById("access-date").value = "";
+        document.getElementById("citation-result").innerHTML =
+          '<p class="text-gray-500 italic">Your citation will appear here...</p>';
+      }
+    </script>
+  </body>
+</html>
